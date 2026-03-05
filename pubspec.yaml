@@ -1,0 +1,50 @@
+name: linkedin_clone
+description: A LinkedIn clone built with Flutter
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.4.0
+
+  # Navigation
+  go_router: ^12.0.0
+
+  # UI Components
+  cupertino_icons: ^1.0.2
+  cached_network_image: ^3.3.0
+  flutter_svg: ^2.0.9
+
+  # Utils
+  intl: ^0.18.1
+  http: ^1.6.0
+  flutter_secure_storage: ^10.0.0
+  web_socket_channel: ^2.4.0
+  mask_text_input_formatter: ^2.9.0
+  file_picker: ^10.3.10
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    # - assets/icons/
+
+  # fonts:
+  #   - family: Roboto
+  #     fonts:
+  #       - asset: fonts/Roboto-Regular.ttf
+  #       - asset: fonts/Roboto-Bold.ttf
+  #         weight: 700
