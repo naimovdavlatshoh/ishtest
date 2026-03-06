@@ -9,6 +9,7 @@ import 'package:linkedin_clone/shared/models/company_model.dart';
 import 'package:linkedin_clone/features/profile/providers/profile_me_provider.dart';
 import 'package:linkedin_clone/core/utils/extensions.dart';
 
+
 class CompanyFormPage extends ConsumerStatefulWidget {
   final CompanyModel? company;
 
@@ -80,7 +81,7 @@ class _CompanyFormPageState extends ConsumerState<CompanyFormPage> {
       setState(() => _isLoading = false);
       if (success) {
         context.showSnackBar(
-          widget.company != null ? 'Kompaniya tahrirlandi' : 'Kompaniya yaratildi',
+          widget.company != null ? 'Kompaniya ma\'lumotlari yangilandi' : 'Kompaniya muvaffaqiyatli yaratildi',
         );
         context.pop();
       } else {
@@ -89,7 +90,6 @@ class _CompanyFormPageState extends ConsumerState<CompanyFormPage> {
     }
   }
 
-  @override
   Widget build(BuildContext context) {
     final isEditing = widget.company != null;
 
@@ -116,48 +116,48 @@ class _CompanyFormPageState extends ConsumerState<CompanyFormPage> {
               _buildTextField(
                 label: 'Nomi *',
                 controller: _nameController,
-                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldiring' : null,
+                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldirish shart' : null,
               ),
               const SizedBox(height: 16),
               _buildTextField(
                 label: 'Tavsif *',
                 controller: _descriptionController,
                 maxLines: 4,
-                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldiring' : null,
+                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldirish shart' : null,
               ),
               const SizedBox(height: 24),
               _buildSectionTitle('Tafsilotlar'),
               const SizedBox(height: 16),
               _buildTextField(
-                label: 'Vebsayt *',
+                label: 'Veb-sayt *',
                 controller: _websiteController,
                 hint: 'https://example.com',
-                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldiring' : null,
+                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldirish shart' : null,
               ),
               const SizedBox(height: 16),
               _buildTextField(
                 label: 'Manzil *',
                 controller: _locationController,
-                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldiring' : null,
+                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldirish shart' : null,
               ),
               const SizedBox(height: 16),
               _buildTextField(
-                label: 'Sohasi *',
+                label: 'Soha *',
                 controller: _industryController,
-                hint: 'Dasturlash, Dizayn va b.',
-                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldiring' : null,
+                hint: 'masalan: IT, Moliya, Tibbiyot',
+                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldirish shart' : null,
               ),
               const SizedBox(height: 16),
               _buildDropdownField(
-                label: 'Hajmi *',
+                label: 'Kompaniya hajmi *',
                 value: _sizeController.text.isEmpty ? null : _sizeController.text,
                 items: const ['1-10', '11-50', '51-200', '200-500', '500+'],
                 onChanged: (v) => setState(() => _sizeController.text = v ?? ''),
-                validator: (v) => v == null || v.isEmpty ? 'Maydonni tanlang' : null,
+                validator: (v) => v == null || v.isEmpty ? 'Iltimos tanlang' : null,
               ),
               const SizedBox(height: 40),
               PrimaryButton(
-                text: isEditing ? 'Saqlash' : 'Yozib olish',
+                text: isEditing ? 'Saqlash' : 'Yaratish',
                 isLoading: _isLoading,
                 onPressed: _submit,
               ),
@@ -165,7 +165,7 @@ class _CompanyFormPageState extends ConsumerState<CompanyFormPage> {
               Center(
                 child: TextButton(
                   onPressed: () => context.pop(),
-                  child: const Text('Bekor qilish', style: TextStyle(color: AppColors.textSecondary)),
+                  child: Text('Bekor qilish', style: const TextStyle(color: AppColors.textSecondary)),
                 ),
               ),
             ],

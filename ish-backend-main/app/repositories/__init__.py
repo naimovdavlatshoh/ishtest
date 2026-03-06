@@ -1,3 +1,0 @@
-"""
-Repositories for database operations
-"""

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:linkedin_clone/core/theme/app_colors.dart';
 import 'package:linkedin_clone/core/theme/app_text_styles.dart';
 import 'package:linkedin_clone/core/widgets/buttons/primary_button.dart';
@@ -10,7 +9,6 @@ import 'package:linkedin_clone/features/jobs/providers/jobs_provider.dart';
 import 'package:linkedin_clone/core/utils/extensions.dart';
 import 'package:linkedin_clone/features/profile/providers/profile_me_provider.dart';
 import 'package:linkedin_clone/features/jobs/providers/saved_jobs_provider.dart';
-import 'package:linkedin_clone/core/localization/language_provider.dart';
 
 class JobDetailScreen extends ConsumerStatefulWidget {
   final JobModel? job;
@@ -101,20 +99,19 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
 
   String _formatSalary(int? min, int? max, String currency) {
     if (min == null && max == null) return 'Maosh kelishiladi';
-    final formatter = NumberFormat.decimalPattern('uz');
     if (min != null && max != null) {
-      return '${formatter.format(min)} - ${formatter.format(max)} $currency';
+      return '${min.toString()} - ${max.toString()} $currency';
     } else if (min != null) {
-      return 'dan ${formatter.format(min)} $currency';
+      return 'dan ${min.toString()} $currency';
     } else {
-      return '${formatter.format(max)} $currency gacha';
+      return '${max.toString()} $currency gacha';
     }
   }
 
   String _formatDate(String dateStr) {
     try {
       final date = DateTime.parse(dateStr);
-      return DateFormat('dd.MM.yyyy').format(date);
+      return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
     } catch (_) {
       return dateStr;
     }
@@ -220,7 +217,7 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
                             ],
                             const SizedBox(height: 12),
                             Text(
-                              DateFormat('dd.MM.yyyy HH:mm').format(DateTime.parse(app.createdAt)),
+                              DateTime.parse(app.createdAt).toLocal().toString().substring(0, 16),
                               style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
                             ),
                           ],
@@ -330,13 +327,12 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoadingJob) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    if (_job == null) return Scaffold(appBar: AppBar(), body: Center(child: Text(ref.watchTr('no_jobs'))));
+    if (_job == null) return Scaffold(appBar: AppBar(), body: Center(child: Text('no_jobs')));
 
     final profileAsync = ref.watch(profileMeProvider);
     final currentUserId = profileAsync.asData?.value.userId;
     final isAuthor = currentUserId != null && _job!.authorId == currentUserId;
     final isSaved = ref.watch(savedJobsProvider).jobs.any((j) => j.id == _job!.id);
-    final t = ref.watchTr;
     
     return Scaffold(
       backgroundColor: Colors.white,
@@ -390,21 +386,21 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
                   children: [
                     _buildIconLabel(Icons.location_on_outlined, _job!.location),
                     _buildIconLabel(Icons.work_outline, _job!.jobType.toUpperCase()),
-                    if (_job!.isRemote) _buildIconLabel(Icons.home_outlined, t('remote'), color: AppColors.success),
+                    if (_job!.isRemote) _buildIconLabel(Icons.home_outlined, 'Masofaviy', color: AppColors.success),
                     _buildIconLabel(Icons.calendar_today_outlined, _formatDate(_job!.createdAt)),
                   ],
                 ),
                 const Padding(padding: EdgeInsets.symmetric(vertical: 24), child: Divider()),
-                Text(t('salary'), style: AppTextStyles.h3),
+                Text('salary', style: AppTextStyles.h3),
                 const SizedBox(height: 8),
                 Text(_formatSalary(_job!.salaryMin, _job!.salaryMax, _job!.salaryCurrency), style: AppTextStyles.h2.copyWith(color: AppColors.success, fontSize: 20)),
                 const SizedBox(height: 32),
-                Text(t('job_description'), style: AppTextStyles.h3),
+                Text('job_description', style: AppTextStyles.h3),
                 const SizedBox(height: 12),
                 Text(_job!.description, style: AppTextStyles.bodyMedium.copyWith(height: 1.6, color: AppColors.textPrimary.withOpacity(0.8))),
                 const SizedBox(height: 32),
                 if (_job!.requirements.isNotEmpty) ...[
-                  Text(t('requirements'), style: AppTextStyles.h3),
+                  Text('requirements', style: AppTextStyles.h3),
                   const SizedBox(height: 12),
                   ..._job!.requirements.map((req) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -427,7 +423,7 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
               decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -4))]),
               child: PrimaryButton(
-                text: (_hasApplied || isAuthor) ? t('see_applications') : t('apply'),
+                text: (_hasApplied || isAuthor) ? 'see_applications' : 'apply',
                 onPressed: (_hasApplied || isAuthor) ? _showApplicationsModal : _showApplyModal,
               ),
             ),

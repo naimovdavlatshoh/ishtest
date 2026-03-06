@@ -8,7 +8,6 @@ import '../providers/real_chat_provider.dart';
 import '../providers/global_chat_provider.dart';
 import '../../profile/providers/user_me_provider.dart';
 import '../../../shared/models/user_me_model.dart';
-import '../../../core/localization/language_provider.dart';
 
 class ChatListScreen extends ConsumerStatefulWidget {
   const ChatListScreen({super.key});
@@ -33,7 +32,6 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     final UserMe? userMe = ref.watch(userMeProvider).valueOrNull;
     final int myId = userMe?.id ?? 0;
     final GlobalChatState globalState = ref.watch(globalChatProvider);
-    final String Function(String) t = ref.watchTr;
 
     ref.listen(globalChatProvider, (prev, next) {
       if (prev?.unreadByConversation != next.unreadByConversation) {
@@ -50,7 +48,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Text(
-                t('messages'),
+                'Xabarlar',
                 style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
               ),
             ),
@@ -108,10 +106,10 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
             child: const Icon(Icons.chat_bubble_outline_rounded, size: 44, color: AppColors.primary),
           ),
           const SizedBox(height: 20),
-          const Text('Hali xabarlar yo\'q', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text("Hali xabarlar yo'q", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text(
-            'Mutaxassislar sahifasidan suhbat boshlang',
+            'Mutaxassislar sahifasidan chat boshlang',
             style: TextStyle(color: Colors.grey[500], fontSize: 14),
           ),
         ],
@@ -280,7 +278,7 @@ class _ConvCardState extends ConsumerState<_ConvCard>
                       children: [
                         Expanded(
                           child: Text(
-                            lastMsg?.content ?? 'Suhbat boshlandi',
+                            lastMsg?.content ?? 'conversation_started',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(

@@ -8,7 +8,6 @@ import '../../../core/utils/validators.dart';
 import '../../../core/widgets/buttons/primary_button.dart';
 import '../widgets/auth_text_field.dart';
 import '../providers/auth_provider.dart';
-import '../../../core/localization/language_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -68,7 +67,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final AuthState authState = ref.watch(authProvider);
-    final t = ref.watchTr;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -104,16 +102,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                Text(t('welcome'), style: AppTextStyles.h1),
+                Text('Xush kelibsiz', style: AppTextStyles.h1),
                 const SizedBox(height: 8),
                 Text(
-                  t('sign_in'),
+                  'Tizimga kirish',
                   style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 40),
-
                 AuthTextField(
-                  label: t('phone_number'),
+                  label: 'Telefon raqami',
                   hint: '998 90 123 45 67',
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
@@ -122,52 +119,47 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   prefixIcon: const Icon(Icons.phone_outlined),
                 ),
                 const SizedBox(height: 24),
-
                 AuthTextField(
-                  label: t('password'),
-                  hint: t('enter_password'),
+                  label: 'Parol',
+                  hint: 'Parolni kiriting',
                   controller: _passwordController,
                   isPassword: true,
                   validator: Validators.password,
                   prefixIcon: const Icon(Icons.lock_outline),
                 ),
                 const SizedBox(height: 16),
-
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {},
-                    child: Text(t('forgot_password'), style: AppTextStyles.link),
+                    child: Text('Parolni unutdingizmi?', style: AppTextStyles.link),
                   ),
                 ),
                 const SizedBox(height: 24),
-
                 PrimaryButton(
-                  text: t('sign_in'),
+                  text: 'Tizimga kirish',
                   onPressed: _handleLogin,
                   isLoading: authState.isLoading,
                 ),
                 const SizedBox(height: 24),
-
                 Row(
                   children: [
                     const Expanded(child: Divider()),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text('OR', style: AppTextStyles.caption),
+                      child: Text('YOKI', style: AppTextStyles.caption),
                     ),
                     const Expanded(child: Divider()),
                   ],
                 ),
                 const SizedBox(height: 24),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${t('dont_have_account')} ", style: AppTextStyles.bodyMedium),
+                    Text("${'Akkauntingiz yo\'qmi?'} ", style: AppTextStyles.bodyMedium),
                     TextButton(
                       onPressed: () => context.go('/register'),
-                      child: Text(t('sign_up'), style: AppTextStyles.link),
+                      child: Text('Ro\'yxatdan o\'tish', style: AppTextStyles.link),
                     ),
                   ],
                 ),

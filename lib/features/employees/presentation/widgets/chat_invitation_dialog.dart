@@ -49,24 +49,23 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
 
   @override
   Widget build(BuildContext context) {
-    // Loading state
+    
     if (_isChecking) {
-      return const AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+      return AlertDialog(
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 8),
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
+            const SizedBox(height: 8),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
             Text('Tekshirilmoqda...'),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
           ],
         ),
       );
     }
 
-    // CASE 1: Existing conversation → show open chat button
     if (_chatData != null && _chatData['conversation'] != null) {
       final convoId = _chatData['conversation']['id'];
       return Dialog(
@@ -82,7 +81,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Xabar: ${widget.userName}',
+                      '{} ga xabar'.replaceFirst('{}', widget.userName),
                       style: AppTextStyles.h3.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -107,7 +106,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Bu foydalanuvchi bilan allaqachon suhbat mavjud.',
+                        'Siz allaqachon muloqot boshlagan edingiz',
                         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary),
                       ),
                     ),
@@ -123,7 +122,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                     context.push('/chat/$convoId');
                   },
                   icon: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 18),
-                  label: const Text('Suhbatni ochish', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  label: Text('Chatni ochish', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -138,7 +137,6 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
       );
     }
 
-    // CASE 2: Pending invitation from me → show waiting state
     if (_chatData != null && _chatData['pendingInvitationFromMe'] != null) {
       return Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -153,7 +151,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Xabar: ${widget.userName}',
+                      '{} ga xabar'.replaceFirst('{}', widget.userName),
                       style: AppTextStyles.h3.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -190,7 +188,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Siz allaqachon bu foydalanuvchiga taklif yubordingiz. Ular qabul qilishini kuting.',
+                            'Sizning taklifingiz ko\'rib chiqilmoqda',
                             style: AppTextStyles.bodySmall.copyWith(
                               color: const Color(0xFF92400E),
                               height: 1.4,
@@ -212,9 +210,9 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     side: BorderSide(color: Colors.grey[300]!),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Yopish',
-                    style: TextStyle(color: Color(0xFF101828), fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(color: Color(0xFF101828), fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
               ),
@@ -224,7 +222,6 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
       );
     }
 
-    // CASE 3: No conversation, no pending invite → show invitation form
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
@@ -238,7 +235,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
               children: [
                 Expanded(
                   child: Text(
-                    'Xabar: ${widget.userName}',
+                    '{} ga xabar'.replaceFirst('{}', widget.userName),
                     style: AppTextStyles.h3.copyWith(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -252,7 +249,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Chatni boshlash uchun taklif yuboring. Xabar almashishdan oldin ular qabul qilishi kerak.',
+              'Xabar yuboring, agar qabul qilinsa chat ochiladi',
               style: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF475467), height: 1.5),
             ),
             const SizedBox(height: 20),
@@ -260,7 +257,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
               controller: _messageController,
               maxLines: 4,
               decoration: InputDecoration(
-                hintText: 'Ixtiyoriy xabar (masalan, murojaat sababi)',
+                hintText: 'Xabar (ixtiyoriy)...',
                 hintStyle: TextStyle(color: Colors.grey[400]),
                 filled: true,
                 fillColor: Colors.white,
@@ -294,10 +291,10 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                             _messageController.text.trim(),
                           );
                           if (success && mounted) {
-                            context.showSnackBar('Taklif muvaffaqiyatli yuborildi');
+                            context.showSnackBar('Taklif yuborildi');
                             context.pop();
                           } else if (mounted) {
-                            context.showSnackBar('Taklif yuborishda xatolik yuz berdi', isError: true);
+                            context.showSnackBar('Taklif yuborishda xatolik', isError: true);
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -308,11 +305,9 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                         ),
                         child: state.isLoading
                           ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('Taklif yuborish', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                          : Text('Taklif yuborish', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                       ),
                     ),
-                  
-                   
                   ],
                 );
               },

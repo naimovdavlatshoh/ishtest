@@ -54,12 +54,18 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     }
   }
 
-  final List<Map<String, String>> _jobTypes = [
-    {'value': 'full-time', 'label': 'To\'liq stavka'},
-    {'value': 'part-time', 'label': 'Qisman'},
-    {'value': 'internship', 'label': 'Stajirovka'},
-    {'value': 'contract', 'label': 'Shartnoma'},
-  ];
+  late final List<Map<String, String>> _jobTypes;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _jobTypes = [
+      {'value': 'full-time', 'label': 'To\'liq kun'},
+      {'value': 'part-time', 'label': 'Yarim kun'},
+      {'value': 'internship', 'label': 'Amaliyot'},
+      {'value': 'contract', 'label': 'Kontrakt'},
+    ];
+  }
 
   final List<String> _currencies = ['UZS', 'USD', 'EUR', 'RUB'];
 
@@ -103,11 +109,10 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     } else {
       success = await ref.read(myJobsProvider.notifier).createJob(data);
     }
-
     if (mounted) {
       setState(() => _isLoading = false);
       if (success) {
-        context.showSnackBar(widget.job != null ? 'Ish e\'loni tahrirlandi' : 'Ish e\'loni muvaffaqiyatli yaratildi');
+        context.showSnackBar(widget.job != null ? 'Vakansiya tahrirlandi' : 'Vakansiya yaratildi');
         context.pop();
       } else {
         context.showSnackBar('Xatolik yuz berdi', isError: true);
@@ -115,7 +120,6 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     }
   }
 
-  @override
   Widget build(BuildContext context) {
     final companiesAsync = ref.watch(myCompaniesProvider);
 
@@ -128,7 +132,7 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
           children: [
             if (widget.job == null) ...[
               Text(
-                'Yangi ish e\'loni',
+                'Yangi vakansiya',
                 style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
@@ -147,9 +151,9 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
                 label: 'Kompaniya',
                 value: _selectedCompanyId,
                 items: [
-                  const DropdownMenuItem(
+                  DropdownMenuItem(
                     value: -1,
-                    child: Text('Shaxsiy / Kompaniyasi yo\'q'),
+                    child: const Text('Shaxsiy (kompaniyasiz)'),
                   ),
                   ...companies.map((c) => DropdownMenuItem(
                     value: c.id,
@@ -160,14 +164,14 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
                 hint: 'Kompaniyani tanlang',
               ),
               loading: () => const LinearProgressIndicator(),
-              error: (_, __) => const Text('Kompaniyalarni yuklab bo\'lmadi'),
+              error: (_, __) => const Text('Kompaniyalarni yuklashda xatolik'),
             ),
             const SizedBox(height: 20),
 
             _buildTextField(
               label: 'Lavozim nomi',
               controller: _titleController,
-              hint: 'Masalan: Senior Flutter Developer',
+              hint: 'Masalan: Flutter Developer',
               validator: (val) => val == null || val.isEmpty ? 'Majburiy maydon' : null,
             ),
             const SizedBox(height: 20),
@@ -184,9 +188,9 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
             const SizedBox(height: 20),
 
             _buildTextField(
-              label: 'Manzil',
+              label: 'Joylashuv',
               controller: _locationController,
-              hint: 'Masalan: Toshkent, O\'zbekiston',
+              hint: 'Masalan: Toshkent',
               validator: (val) => val == null || val.isEmpty ? 'Majburiy maydon' : null,
             ),
             const SizedBox(height: 12),
@@ -200,22 +204,22 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
               child: SwitchListTile(
                 value: _isRemote,
                 onChanged: (val) => setState(() => _isRemote = val),
-                title: const Text('Masofaviy ish (Remote)', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
-                subtitle: const Text('Nomzod istalgan joydan ishlashi mumkin', style: TextStyle(fontSize: 12)),
+                title: const Text('Masofaviy ish', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                subtitle: const Text('Xodim uydan ishlashi mumkin', style: const TextStyle(fontSize: 12)),
                 activeColor: AppColors.primary,
                 dense: true,
               ),
             ),
 
             const SizedBox(height: 32),
-            _buildSectionTitle('Maosh va Valyuta'),
+            _buildSectionTitle('Maosh va valyuta'),
             const SizedBox(height: 16),
 
             Row(
               children: [
                 Expanded(
                   child: _buildTextField(
-                    label: 'Minimal maosh',
+                    label: 'Minimum maosh',
                     controller: _salaryMinController,
                     keyboardType: TextInputType.number,
                     hint: '0',
@@ -224,7 +228,7 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: _buildTextField(
-                    label: 'Maximal maosh',
+                    label: 'Maksimum maosh',
                     controller: _salaryMaxController,
                     keyboardType: TextInputType.number,
                     hint: '0',
@@ -245,28 +249,28 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
             ),
 
             const SizedBox(height: 32),
-            _buildSectionTitle('Batafsil'),
+            _buildSectionTitle('Tafsilotlar'),
             const SizedBox(height: 16),
 
             _buildTextField(
               label: 'Tavsif',
               controller: _descriptionController,
               maxLines: 5,
-              hint: 'Ish haqida batafsil ma\'lumot bering...',
+              hint: 'Vakansiya haqida batafsil...',
               validator: (val) => val == null || val.isEmpty ? 'Majburiy maydon' : null,
             ),
             const SizedBox(height: 20),
 
             _buildTextField(
-              label: 'Talablar (Har birini yangi qatordan yozing)',
+              label: 'Talablar',
               controller: _requirementsController,
               maxLines: 5,
-              hint: 'Masalan:\n3 yil tajriba\nIngliz tili B2',
+              hint: 'Har qatorga bitta talab...',
             ),
 
             const SizedBox(height: 40),
             PrimaryButton(
-              text: widget.job != null ? 'Saqlash' : 'E\'lonni yaratish',
+              text: widget.job != null ? 'Saqlash' : 'E\'lon yaratish',
               isLoading: _isLoading,
               onPressed: _submit,
             ),
@@ -286,7 +290,7 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Ish e\'lonini tahrirlash'),
+        title: const Text('Vakansiyani tahrirlash'),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,

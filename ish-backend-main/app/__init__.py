@@ -1,3 +1,0 @@
-"""
-ISH Backend Application
-"""

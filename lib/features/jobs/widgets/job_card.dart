@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/models/job_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
-class JobCard extends StatelessWidget {
+class JobCard extends ConsumerWidget {
   final JobModel job;
   final VoidCallback? onTap;
   final Widget? trailing;
@@ -17,21 +17,20 @@ class JobCard extends StatelessWidget {
   });
 
   String _formatSalary(int? min, int? max, String currency) {
-    if (min == null && max == null) return 'Maosh kelishiladi';
-    final formatter = NumberFormat.decimalPattern('uz');
+    if (min == null && max == null) return 'Kelishiladi';
     if (min != null && max != null) {
-      return '${formatter.format(min)} - ${formatter.format(max)} $currency';
+      return '$min - $max $currency';
     } else if (min != null) {
-      return 'dan ${formatter.format(min)} $currency';
+      return '$min dan $currency';
     } else {
-      return '${formatter.format(max)} $currency gacha';
+      return '$max gacha $currency';
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    final companyName = job.company?.name ?? 'Kompaniya nomi ko\'rsatilmagan';
-    final companyIndustry = job.company?.industry ?? 'Soha ko\'rsatilmagan';
+  Widget build(BuildContext context, WidgetRef ref) {
+    final companyName = job.company?.name ?? 'Kompaniya';
+    final companyIndustry = job.company?.industry ?? "Soha ko'rsatilmagan";
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -59,7 +58,6 @@ class JobCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Company Logo Placeholder
                     Container(
                       width: 52,
                       height: 52,
@@ -148,10 +146,10 @@ class JobCard extends StatelessWidget {
 
   String _getJobTypeName(String type) {
     switch (type.toLowerCase()) {
-      case 'full-time': return 'To\'liq stavka';
-      case 'part-time': return 'Yarim stavka';
-      case 'internship': return 'Stajirovka';
-      case 'contract': return 'Shartnoma';
+      case 'full-time': return "To'liq kun";
+      case 'part-time': return 'Yarim kun';
+      case 'internship': return 'Amaliyot';
+      case 'contract': return 'Kontrakt';
       default: return type;
     }
   }
@@ -161,11 +159,11 @@ class JobCard extends StatelessWidget {
       final date = DateTime.parse(dateStr);
       final now = DateTime.now();
       final diff = now.difference(date);
-      
+
       if (diff.inDays == 0) return 'Bugun';
       if (diff.inDays == 1) return 'Kecha';
       if (diff.inDays < 7) return '${diff.inDays} kun oldin';
-      return DateFormat('dd.MM.yyyy').format(date);
+      return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
     } catch (_) {
       return dateStr;
     }

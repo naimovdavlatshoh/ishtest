@@ -12,12 +12,14 @@ class AuthState {
   final bool isAuthenticated;
   final bool isLoading;
   final String? errorMessage;
+  final bool isNewUser;
 
   AuthState({
     this.user,
     this.isAuthenticated = false,
     this.isLoading = false,
     this.errorMessage,
+    this.isNewUser = false,
   });
 
   AuthState copyWith({
@@ -25,12 +27,14 @@ class AuthState {
     bool? isAuthenticated,
     bool? isLoading,
     String? errorMessage,
+    bool? isNewUser,
   }) {
     return AuthState(
       user: user ?? this.user,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
+      isNewUser: isNewUser ?? this.isNewUser,
     );
   }
 }
@@ -41,10 +45,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
     TokenStorage? tokenStorage,
   })  : _client = client ?? http.Client(),
         _tokenStorage = tokenStorage ?? const TokenStorage(),
-        super(AuthState());
+        super(AuthState()) {
+    _init();
+  }
 
   final http.Client _client;
   final TokenStorage _tokenStorage;
+
+  Future<void> _init() async {
+    final token = await _tokenStorage.getAccessToken();
+    if (token != null && token.isNotEmpty) {
+      state = state.copyWith(isAuthenticated: true);
+    }
+  }
 
   Future<void> login(String phone, String password) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
@@ -202,22 +215,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        final Map<String, dynamic> data =
-            jsonDecode(response.body) as Map<String, dynamic>;
-
-        final String? accessToken = data['access_token'] as String?;
-
-        if (accessToken != null && accessToken.isNotEmpty) {
-          await _tokenStorage.saveAccessToken(accessToken);
+        // Automatically login in the background with the registered credentials
+        await login(phone, password);
+        
+        // If the background login was successful, flag the user as a new user
+        // This will redirect them to the profile creation screen
+        if (state.isAuthenticated) {
+          state = state.copyWith(isNewUser: true);
         }
-
-        // After successful registration we consider the user authenticated.
-        // You can extend this to parse user data when backend provides it.
-        state = state.copyWith(
-          isAuthenticated: true,
-          isLoading: false,
-          errorMessage: null,
-        );
       } else {
         String errorMessage = 'Registration failed. Please try again.';
         try {
@@ -248,6 +253,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> logout() async {
     await _tokenStorage.clear();
     state = AuthState();
+  }
+
+  void completeProfileCreation() {
+    state = state.copyWith(isNewUser: false);
   }
 }
 

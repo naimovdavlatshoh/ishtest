@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import '../providers/job_applications_provider.dart';
 import '../../../shared/models/application_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/extensions.dart';
-import '../../../core/localization/language_provider.dart';
 
 class JobApplicationsScreen extends ConsumerStatefulWidget {
   final int jobId;
@@ -32,7 +30,6 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(jobApplicationsProvider);
-    final t = ref.watchTr;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -44,7 +41,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          t('back'),
+          'back',
           style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textPrimary),
         ),
         titleSpacing: 0,
@@ -71,7 +68,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        '«${widget.jobTitle}» ga arizalar',
+                                        'applications_for'.replaceAll('{}', widget.jobTitle),
                                         style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
                                       ),
                                     ),
@@ -79,7 +76,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Ushbu ishga arizalarni ko\'rib chiqish va boshqarish',
+                                  'applications_for_desc',
                                   style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                                 ),
                               ],
@@ -171,7 +168,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                       const SizedBox(height: 4),
                       _buildInfoRow(Icons.phone_outlined, app.applicant?.phone ?? ''),
                       const SizedBox(height: 4),
-                      _buildInfoRow(Icons.calendar_today_outlined, 'Ariza yuborilgan ${DateFormat('MMM d, yyyy').format(DateTime.parse(app.createdAt))}'),
+                      _buildInfoRow(Icons.calendar_today_outlined, app.createdAt.toString().substring(0, 10)),
                     ],
                   ),
                 ),
@@ -201,7 +198,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                   if (app.status.toLowerCase() == 'pending')
                     Expanded(
                       child: _buildActionButton(
-                        label: ref.watchTr('status_pending'),
+                        label: 'status_pending',
                         bgColor: AppColors.primary.withOpacity(0.08),
                         textColor: AppColors.primary,
                         onTap: () => _updateStatus(app.id, 'reviewed'),
@@ -210,7 +207,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                   if (app.status.toLowerCase() == 'pending') const SizedBox(width: 12),
                   Expanded(
                     child: _buildActionButton(
-                      label: ref.watchTr('accept'),
+                      label: 'accept',
                       bgColor: const Color(0xFFECFDF5),
                       textColor: const Color(0xFF10B981),
                       onTap: () => _updateStatus(app.id, 'accepted'),
@@ -219,7 +216,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildActionButton(
-                      label: ref.watchTr('reject'),
+                      label: 'reject',
                       bgColor: const Color(0xFFFEF2F2),
                       textColor: const Color(0xFFEF4444),
                       onTap: () => _updateStatus(app.id, 'rejected'),
@@ -246,7 +243,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  app.coverLetter.isEmpty ? 'Mavjud emas' : app.coverLetter,
+                  app.coverLetter.isEmpty ? 'not_available' : app.coverLetter,
                   style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                 ),
               ],
@@ -267,7 +264,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                   const Icon(Icons.person_outline, size: 20, color: AppColors.primary),
                   const SizedBox(width: 8),
                   Text(
-                    'To\'liq profil',
+                    'full_profile',
                     style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -293,26 +290,26 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
   }
 
   Widget _buildStatusBadge(WidgetRef ref, String status) {
-    String label = 'Yangi';
+    String label = 'new';
     Color color = const Color(0xFFF59E0B);
     Color bgColor = const Color(0xFFFFFBEB);
 
     switch (status.toLowerCase()) {
       case 'pending':
-        label = ref.watchTr('status_pending');
+        label = 'status_pending';
         break;
       case 'reviewed':
-        label = ref.watchTr('status_pending');
+        label = 'status_pending';
         color = AppColors.primary;
         bgColor = AppColors.primary.withOpacity(0.08);
         break;
       case 'accepted':
-        label = ref.watchTr('status_accepted');
+        label = 'status_accepted';
         color = const Color(0xFF10B981);
         bgColor = const Color(0xFFECFDF5);
         break;
       case 'rejected':
-        label = ref.watchTr('status_rejected');
+        label = 'status_rejected';
         color = const Color(0xFFEF4444);
         bgColor = const Color(0xFFFEF2F2);
         break;
@@ -376,17 +373,17 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
       children: [
         Row(
           children: [
-            Expanded(child: _buildStatItem('${state.applications.length}', ref.watchTr('total'))),
+            Expanded(child: _buildStatItem('${state.applications.length}', 'total')),
             const SizedBox(width: 16),
-            Expanded(child: _buildStatItem('$pending', ref.watchTr('pending'), valueColor: const Color(0xFFF59E0B))),
+            Expanded(child: _buildStatItem('$pending', 'pending', valueColor: const Color(0xFFF59E0B))),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: _buildStatItem('0', ref.watchTr('pending'))),
+            Expanded(child: _buildStatItem('0', 'pending')),
             const SizedBox(width: 16),
-            Expanded(child: _buildStatItem('$accepted', ref.watchTr('accepted'), valueColor: const Color(0xFF10B981))),
+            Expanded(child: _buildStatItem('$accepted', 'accepted', valueColor: const Color(0xFF10B981))),
           ],
         ),
       ],
@@ -421,7 +418,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
     final success = await ref.read(jobApplicationsProvider.notifier).updateApplicationStatus(appId, status);
     if (mounted) {
       context.showSnackBar(
-        success ? ref.watchTr('data_saved') : ref.watchTr('error_occurred'),
+        success ? 'data_saved' : 'Xatolik yuz berdi',
         isError: !success,
       );
     }

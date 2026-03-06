@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../providers/my_jobs_provider.dart';
 import '../../../shared/models/job_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/extensions.dart';
 import 'job_form_screen.dart';
-import '../../../core/localization/language_provider.dart';
 
 class MyJobsScreen extends ConsumerStatefulWidget {
   const MyJobsScreen({super.key});
@@ -18,6 +16,7 @@ class MyJobsScreen extends ConsumerStatefulWidget {
 }
 
 class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
+
   @override
   void initState() {
     super.initState();
@@ -27,7 +26,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
   String _formatDate(String dateStr) {
     try {
       final date = DateTime.parse(dateStr);
-      return DateFormat('MMM d, yyyy').format(date);
+      return '${date.day}.${date.month.toString().padLeft(2, '0')}.${date.year}';
     } catch (_) {
       return dateStr;
     }
@@ -36,7 +35,6 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(myJobsProvider);
-    final t = ref.watchTr;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -54,15 +52,18 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                           children: [
                             const Icon(Icons.business_center, color: AppColors.primary, size: 36),
                             const SizedBox(width: 12),
-                            Text(
-                              t('my_jobs'),
-                              style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
+                            Expanded(
+                              child: Text(
+                                'Mening vakansiyalarim',
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          t('add_job'),
+                          "Vakansiya qo'shish",
                           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                         ),
                         const SizedBox(height: 24),
@@ -82,7 +83,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                                 const Icon(Icons.add, color: Colors.white, size: 24),
                                 const SizedBox(width: 8),
                                 Text(
-                                  t('add_job'),
+                                  'Vakansiya qo\'shish',
                                   style: AppTextStyles.button.copyWith(color: Colors.white, fontSize: 16),
                                 ),
                               ],
@@ -104,9 +105,9 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
   }
 
   Widget _buildJobCard(JobModel job) {
-    final bool isDraft = job.status == 'draft' || job.status == 'pending';
+    final bool isDraft = job.status == 'Qoralama' || job.status == 'pending';
     final bool isClosed = job.status == 'closed';
-    final bool isActive = job.status == 'active';
+    final bool isActive = job.status == 'Faol';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -168,7 +169,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                 children: [
                   if (isDraft)
                     _buildBadge(
-                      icon: Icons.access_time,
+                      icon: Icons.edit_note,
                       label: 'Qoralama',
                       color: const Color(0xFF6B7280),
                       bgColor: const Color(0xFFF3F4F6),
@@ -176,7 +177,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                   else if (isClosed)
                     _buildBadge(
                       icon: Icons.cancel_outlined,
-                      label: 'Yopiq',
+                      label: 'closed',
                       color: const Color(0xFFEF4444),
                       bgColor: const Color(0xFFFEE2E2),
                     )
@@ -191,7 +192,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                   const SizedBox(width: 8),
                   _buildBadge(
                     icon: Icons.people_outline,
-                    label: 'Arizalar',
+                    label: 'applications',
                     color: AppColors.primary,
                     bgColor: AppColors.primary.withOpacity(0.1),
                     onTap: () => context.push('/jobs/${job.id}/applications', extra: job.title),
@@ -201,16 +202,16 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                     const SizedBox(width: 8),
                     _buildBadge(
                       icon: Icons.send,
-                      label: 'E\'lon qilish',
+                      label: 'publish',
                       color: Colors.white,
                       bgColor: const Color(0xFF10B981),
-                      onTap: () => _updateStatus(job.id, 'active'),
+                      onTap: () => _updateStatus(job.id, 'Faol'),
                     ),
                   ] else if (isActive) ...[
                     const SizedBox(width: 8),
                     _buildBadge(
                       icon: Icons.block,
-                      label: 'Yopish',
+                      label: 'close_job',
                       color: Colors.white,
                       bgColor: const Color(0xFFF59E0B),
                       onTap: () => _updateStatus(job.id, 'closed'),
@@ -256,7 +257,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
           children: [
             _buildActionItem(
               icon: Icons.visibility_outlined,
-              label: 'Ishni ko\'rish',
+              label: "Ko'rish",
               onTap: () {
                 Navigator.pop(context);
                 context.push('/jobs/${job.id}', extra: job);
@@ -280,20 +281,20 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                 );
               },
             ),
-            if (job.status == 'draft' || job.status == 'pending')
+            if (job.status == 'Qoralama' || job.status == 'pending')
               _buildActionItem(
                 icon: Icons.send_outlined,
-                label: 'E\'lon qilish',
+                label: 'publish',
                 color: const Color(0xFF10B981),
                 onTap: () {
                   Navigator.pop(context);
-                  _updateStatus(job.id, 'active');
+                  _updateStatus(job.id, 'Faol');
                 },
               )
-            else if (job.status == 'active')
+            else if (job.status == 'Faol')
               _buildActionItem(
                 icon: Icons.block_outlined,
-                label: 'Yopish',
+                label: 'close_job',
                 color: const Color(0xFFF59E0B),
                 onTap: () {
                   Navigator.pop(context);
@@ -339,7 +340,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
     final success = await ref.read(myJobsProvider.notifier).updateJobStatus(jobId, status);
     if (context.mounted) {
       context.showSnackBar(
-        success ? 'Status muvaffaqiyatli yangilandi' : 'Xatolik yuz berdi',
+        success ? 'Holat yangilandi' : 'Xatolik yuz berdi',
         isError: !success,
       );
     }
@@ -349,10 +350,10 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('O\'chirish'),
-        content: const Text('Haqiqatan ham ushbu e\'lonni o\'chirmoqchimisiz?'),
+        title: Text('O\'chirish'),
+        content: Text('Ushbu vakansiyani o\'chirmoqchimisiz?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Bekor qilish')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Bekor qilish')),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
@@ -364,7 +365,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                 );
               }
             },
-            child: const Text('O\'chirish', style: TextStyle(color: Colors.red)),
+            child: Text('O\'chirish', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -419,15 +420,14 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
   }
 
   Widget _buildStatsSection(dynamic state) {
-    final activeCount = state.jobs.where((j) => j.status == 'active').length;
-    final draftCount = state.jobs.where((j) => j.status == 'draft' || j.status == 'pending').length;
+    final activeCount = state.jobs.where((j) => j.status == 'Faol').length;
+    final draftCount = state.jobs.where((j) => j.status == 'Qoralama' || j.status == 'pending').length;
     final totalViews = state.jobs.fold(0, (sum, j) => sum + (j.viewsCount ?? 0));
-
     return Column(
       children: [
         Row(
           children: [
-            Expanded(child: _buildStatItem('${state.jobs.length}', 'Jami ishlar')),
+            Expanded(child: _buildStatItem('${state.jobs.length}', 'Jami')),
             const SizedBox(width: 16),
             Expanded(child: _buildStatItem('$activeCount', 'Faol')),
           ],
@@ -437,7 +437,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
           children: [
             Expanded(child: _buildStatItem('$draftCount', 'Qoralama')),
             const SizedBox(width: 16),
-            Expanded(child: _buildStatItem('$totalViews', 'Ko\'rilish', isViews: true)),
+            Expanded(child: _buildStatItem('$totalViews', 'Ko\'rishlar', isViews: true)),
           ],
         ),
       ],
@@ -473,10 +473,10 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
 
   String _translateJobType(String type) {
     switch (type.toLowerCase()) {
-      case 'full-time': return 'To\'liq stavka';
-      case 'part-time': return 'Qisman';
-      case 'internship': return 'Stajirovka';
-      case 'contract': return 'Shartnoma';
+      case 'full-time': return 'To\'liq kun';
+      case 'part-time': return 'Yarim kun';
+      case 'internship': return 'Amaliyot';
+      case 'contract': return 'Kontrakt';
       default: return type;
     }
   }

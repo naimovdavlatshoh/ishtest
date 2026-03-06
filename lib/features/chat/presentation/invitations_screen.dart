@@ -5,7 +5,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/extensions.dart';
 import '../providers/invitations_provider.dart';
-import '../../../core/localization/language_provider.dart';
 
 class InvitationsScreen extends ConsumerStatefulWidget {
   const InvitationsScreen({super.key});
@@ -36,7 +35,6 @@ class _InvitationsScreenState extends ConsumerState<InvitationsScreen>
     final state = ref.watch(invitationsProvider);
     final receivedCount = state.received.length;
     final sentCount = state.sent.length;
-    final t = ref.watchTr;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -66,14 +64,14 @@ class _InvitationsScreenState extends ConsumerState<InvitationsScreen>
                       ),
                       const SizedBox(width: 14),
                       Text(
-                        t('invitations'),
+                        'Taklifnomalar',
                         style: AppTextStyles.h2.copyWith(fontSize: 26, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Kimdir Xodimlar sahifasidan sizga taklif yuborganida, qabul qilib chat ochishingiz mumkin.',
+                    'Chat orqali mutaxassislar bilan bog\'laning',
                     style: TextStyle(
                       fontSize: 13.5,
                       color: Colors.grey[500],
@@ -191,7 +189,7 @@ class _ReceivedTab extends ConsumerWidget {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.received.isEmpty) {
-      return _buildEmpty('Hali taklif kelmagan', Icons.mark_email_unread_outlined);
+      return _buildEmpty("Qabul qilingan taklifnomalar yo'q", Icons.mark_email_unread_outlined);
     }
     return RefreshIndicator(
       onRefresh: () => ref.read(invitationsProvider.notifier).loadReceived(),
@@ -240,7 +238,7 @@ class _SentTab extends ConsumerWidget {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.sent.isEmpty) {
-      return _buildEmpty('Hali taklif yubormadingiz', Icons.send_outlined);
+      return _buildEmpty("Yuborilgan taklifnomalar yo'q", Icons.send_outlined);
     }
     return RefreshIndicator(
       onRefresh: () => ref.read(invitationsProvider.notifier).loadSent(),
@@ -343,7 +341,7 @@ class _ReceivedCardState extends ConsumerState<_ReceivedCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${from?.fullName ?? 'Noma\'lum'} suhbatlashmoqchi',
+                        '${from?.fullName ?? 'Noma\'lum'} siz bilan chat ochmoqchi',
                         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF101828)),
                       ),
                       const SizedBox(height: 5),
@@ -428,12 +426,12 @@ class _ReceivedCardState extends ConsumerState<_ReceivedCard> {
 
 // ─── Sent Card ────────────────────────────────────────────────────────────────
 
-class _SentCard extends StatelessWidget {
+class _SentCard extends ConsumerWidget {
   final InvitationModel invitation;
   const _SentCard({required this.invitation});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final inv = invitation;
     final to = inv.toUser;
     final avatarUrl = to?.avatar?.fullImageUrl;
@@ -480,7 +478,7 @@ class _SentCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Taklif → ${to?.fullName ?? 'Noma\'lum'}',
+                    'Taklifnoma: ${to?.fullName ?? 'Noma\'lum'}',
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF101828)),
                   ),
                   const SizedBox(height: 6),
@@ -503,7 +501,7 @@ class _SentCard extends StatelessWidget {
                       Icon(Icons.send_rounded, size: 12, color: Colors.grey[400]),
                       const SizedBox(width: 4),
                       Text(
-                        'Yuborilgan ${_formatDate(inv.createdAt)}',
+                        'Yuborildi: ${_formatDate(inv.createdAt)}',
                         style: TextStyle(fontSize: 12, color: Colors.grey[400]),
                       ),
                     ],
@@ -524,12 +522,12 @@ class _SentCard extends StatelessWidget {
                             ),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 15),
-                              SizedBox(width: 6),
-                              Text('Chatni ochish', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
+                              const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 15),
+                              const SizedBox(width: 6),
+                              Text('Chatni ochish', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
                             ],
                           ),
                         ),
@@ -627,53 +625,58 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color color;
-    Color bg;
-    String label;
-    IconData icon;
+    // Add Consumer support or pass t. But wait, _StatusBadge is a StatelessWidget, let's just make it ConsumerWidget or use context directly.
+    return Consumer(
+      builder: (context, ref, child) {
+        Color color;
+        Color bg;
+        String label;
+        IconData icon;
 
-    switch (status) {
-      case 'accepted':
-        color = const Color(0xFF059669);
-        bg = const Color(0xFFECFDF5);
-        label = 'Qabul qilindi';
-        icon = Icons.check_circle_outline_rounded;
-        break;
-      case 'rejected':
-        color = const Color(0xFFDC2626);
-        bg = const Color(0xFFFEF2F2);
-        label = 'Rad etildi';
-        icon = Icons.cancel_outlined;
-        break;
-      default:
-        color = const Color(0xFFF59E0B);
-        bg = const Color(0xFFFFFBEB);
-        label = 'Kutilmoqda';
-        icon = Icons.schedule_rounded;
-    }
+        switch (status) {
+          case 'accepted':
+            color = const Color(0xFF059669);
+            bg = const Color(0xFFECFDF5);
+            label = 'Qabul qilindi';
+            icon = Icons.check_circle_outline_rounded;
+            break;
+          case 'rejected':
+            color = const Color(0xFFDC2626);
+            bg = const Color(0xFFFEF2F2);
+            label = 'Rad etildi';
+            icon = Icons.cancel_outlined;
+            break;
+          default:
+            color = const Color(0xFFF59E0B);
+            bg = const Color(0xFFFFFBEB);
+            label = 'Kutilmoqda';
+            icon = Icons.schedule_rounded;
+        }
 
-    if (small) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 11, color: color),
-          const SizedBox(width: 3),
-          Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
-        ],
-      );
-    }
+        if (small) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 11, color: color),
+              const SizedBox(width: 3),
+              Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+            ],
+          );
+        }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 15, color: color),
-          const SizedBox(width: 6),
-          Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 13)),
-        ],
-      ),
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 15, color: color),
+              const SizedBox(width: 6),
+              Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 13)),
+            ],
+          ),
+        );
+      },
     );
   }
 }

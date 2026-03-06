@@ -5,7 +5,6 @@ import '../../../core/theme/app_text_styles.dart';
 import '../providers/employees_provider.dart';
 import 'widgets/chat_invitation_dialog.dart';
 import 'employee_profile_screen.dart';
-import '../../../core/localization/language_provider.dart';
 import '../../../core/utils/extensions.dart';
 
 class EmployeesScreen extends ConsumerStatefulWidget {
@@ -27,7 +26,6 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(employeesProvider);
-    final t = ref.watchTr;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -42,14 +40,14 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                   const Icon(Icons.business_center, color: AppColors.primary, size: 36),
                   const SizedBox(width: 12),
                   Text(
-                    t('employees'),
+                    'Xodimlar',
                     style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
               Text(
-                t('search_employees'),
+                'Mutaxassislarni qidiring',
                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 24),
@@ -76,7 +74,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                         const Icon(Icons.filter_list, size: 20, color: AppColors.textSecondary),
                         const SizedBox(width: 8),
                         Text(
-                          '${state.total} mutaxassis',
+                          '${state.total} ${'mutaxassis'}',
                           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
                         ),
                       ],
@@ -87,7 +85,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                         const Icon(Icons.code, size: 18, color: AppColors.textSecondary),
                         const SizedBox(width: 8),
                         Text(
-                          t('skills'),
+                          'Ko\'nikmalar',
                           style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
                         ),
                       ],
@@ -99,7 +97,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                           child: TextField(
                             controller: _skillController,
                             decoration: InputDecoration(
-                              hintText: t('add_skill'),
+                              hintText: 'Ko\'nikma qo\'shing...',
                               filled: true,
                               fillColor: Colors.grey[50],
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -127,7 +125,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          child: const Text('Qo\'shish', style: TextStyle(color: Colors.white)),
+                          child: Text('Qo\'shish', style: const TextStyle(color: Colors.white)),
                         ),
                       ],
                     ),
@@ -157,8 +155,8 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                   child: CircularProgressIndicator(),
                 ))
               else if (state.employees.isEmpty)
-                const Center(child: Padding(
-                  padding: EdgeInsets.all(40),
+                Center(child: Padding(
+                  padding: const EdgeInsets.all(40),
                   child: Text('Mutaxassislar topilmadi'),
                 ))
               else
@@ -208,13 +206,13 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
   }
 }
 
-class _EmployeeCard extends StatelessWidget {
+class _EmployeeCard extends ConsumerWidget {
   final EmployeeModel employee;
 
   const _EmployeeCard({required this.employee});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(20),
@@ -260,9 +258,9 @@ class _EmployeeCard extends StatelessWidget {
                         color: const Color(0xFFE9FFF2),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Text(
-                        'Ishga ochiq',
-                        style: TextStyle(color: Color(0xFF10B981), fontSize: 13, fontWeight: FontWeight.bold),
+                      child: Text(
+                        'Ishga tayyor',
+                        style: const TextStyle(color: Color(0xFF10B981), fontSize: 13, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -301,7 +299,7 @@ class _EmployeeCard extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                  label: const Text('Xabar'),
+                  label: Text('Xabar'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF039855),
                     foregroundColor: Colors.white,
@@ -326,7 +324,7 @@ class _EmployeeCard extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     side: BorderSide(color: Colors.grey[300]!),
                   ),
-                  child: const Text('Profil', style: TextStyle(color: AppColors.textPrimary)),
+                  child: Text('Profil', style: const TextStyle(color: AppColors.textPrimary)),
                 ),
               ),
             ],

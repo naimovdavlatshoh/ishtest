@@ -8,8 +8,6 @@ import '../../auth/providers/auth_provider.dart';
 import '../../profile/providers/profile_me_provider.dart';
 import '../../../core/utils/extensions.dart';
 import '../../chat/providers/global_chat_provider.dart';
-import '../../../core/localization/language_provider.dart';
-import '../../../core/localization/language_picker_modal.dart';
 
 class MainScreen extends ConsumerWidget {
   final Widget child;
@@ -29,10 +27,9 @@ class MainScreen extends ConsumerWidget {
     final profile = profileAsync.asData?.value;
     // Initialize and watch global chat for unread badge
     final totalUnread = ref.watch(totalUnreadProvider);
-
     final displayName =
         profile?.fullName ?? currentUser?.name ?? 'Foydalanuvchi';
-    final displayTitle = profile?.title ?? currentUser?.headline ?? 'Middle';
+    final displayTitle = profile?.title ?? currentUser?.headline ?? 'Mutaxassis';
 
     final userInitial = displayName.isNotEmpty
         ? displayName[0].toUpperCase()
@@ -107,32 +104,31 @@ class MainScreen extends ConsumerWidget {
 
               // ASOSIY section
               Text(
-                ref.watchTr('feed').toUpperCase(),
+                'Yangiliklar'.toUpperCase(),
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.8,
                 ),
               ),
               const SizedBox(height: 8),
-              // Dashboard
               _buildDrawerItem(
                 context,
                 Icons.space_dashboard_rounded,
-                'Dashboard',
+                'Boshqaruv paneli',
                 '/feed',
                 0,
               ),
               _buildDrawerItem(
                 context,
                 Icons.account_circle_outlined,
-                ref.watchTr('my_profile'),
+                'Mening profilim',
                 '/profile/me',
                 1,
               ),
               _buildDrawerItemWithBadge(
                 context,
                 Icons.chat_bubble_outline_rounded,
-                ref.watchTr('chat'),
+                'Xabarlar',
                 '/chat',
                 3,
                 totalUnread,
@@ -140,14 +136,14 @@ class MainScreen extends ConsumerWidget {
               _buildDrawerItem(
                 context,
                 Icons.mark_email_read_outlined,
-                ref.watchTr('invitations'),
+                'Taklifnomalar',
                 '/invitations',
                 9,
               ),
               _buildDrawerItem(
                 context,
                 Icons.badge_outlined,
-                ref.watchTr('employees'),
+                'Xodimlar',
                 '/employees',
                 2,
               ),
@@ -156,7 +152,7 @@ class MainScreen extends ConsumerWidget {
 
               // ISHLAR section
               Text(
-                ref.watchTr('jobs').toUpperCase(),
+                'Vakansiyalar'.toUpperCase(),
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.8,
@@ -166,28 +162,28 @@ class MainScreen extends ConsumerWidget {
               _buildDrawerItem(
                 context,
                 Icons.work_outline_rounded,
-                ref.watchTr('jobs'),
+                'Vakansiyalar',
                 '/jobs',
                 4,
               ),
               _buildDrawerItem(
                 context,
                 Icons.bookmark_border,
-                ref.watchTr('saved_jobs'),
+                'Saqlanganlar',
                 '/jobs/saved',
                 6,
               ),
               _buildDrawerItem(
                 context,
                 Icons.add_box_outlined,
-                ref.watchTr('add_job'),
+                'Vakansiya qo\'shish',
                 '/jobs/add',
                 8,
               ),
               _buildDrawerItem(
                 context,
                 Icons.article_outlined,
-                ref.watchTr('my_jobs'),
+                'Mening vakansiyalarim',
                 '/jobs/my-jobs',
                 7,
               ),
@@ -196,7 +192,7 @@ class MainScreen extends ConsumerWidget {
 
               // ARIZALAR section
               Text(
-                ref.watchTr('my_applications').toUpperCase(),
+                'Mening arizalarim'.toUpperCase(),
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.8,
@@ -206,7 +202,7 @@ class MainScreen extends ConsumerWidget {
               _buildDrawerItem(
                 context,
                 Icons.send_outlined,
-                ref.watchTr('my_applications'),
+                'Mening arizalarim',
                 '/my-applications',
                 10,
               ),
@@ -215,7 +211,7 @@ class MainScreen extends ConsumerWidget {
 
               // KOMPANIYALAR section
               Text(
-                ref.watchTr('companies').toUpperCase(),
+                'Kompaniyalar'.toUpperCase(),
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.8,
@@ -225,7 +221,7 @@ class MainScreen extends ConsumerWidget {
               _buildDrawerItem(
                 context,
                 Icons.apartment_outlined,
-                ref.watchTr('my_companies'),
+                'Mening kompaniyalarim',
                 '/companies',
                 5,
               ),
@@ -234,7 +230,7 @@ class MainScreen extends ConsumerWidget {
 
               // SOZLAMALAR section
               Text(
-                ref.watchTr('settings').toUpperCase(),
+                'Sozlamalar'.toUpperCase(),
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.8,
@@ -252,7 +248,7 @@ class MainScreen extends ConsumerWidget {
                   size: 20,
                 ),
                 title: Text(
-                  ref.watchTr('profile_settings'),
+                  'Profil sozlamalari',
                   style: AppTextStyles.bodyMedium.copyWith(fontSize: 13),
                 ),
                 onTap: () {
@@ -271,7 +267,7 @@ class MainScreen extends ConsumerWidget {
                   size: 20,
                 ),
                 title: Text(
-                  ref.watchTr('visibility'),
+                  'Ko\'rinish',
                   style: AppTextStyles.bodyMedium.copyWith(fontSize: 13),
                 ),
                 onTap: () {
@@ -290,7 +286,7 @@ class MainScreen extends ConsumerWidget {
                   size: 20,
                 ),
                 title: Text(
-                  ref.watchTr('my_resume'),
+                  'Mening rezyumem',
                   style: AppTextStyles.bodyMedium.copyWith(fontSize: 13),
                 ),
                 onTap: () {
@@ -313,7 +309,7 @@ class MainScreen extends ConsumerWidget {
                   color: Colors.red,
                 ),
                 title: Text(
-                  ref.watchTr('logout'),
+                  'Chiqish',
                   style: const TextStyle(
                     color: Colors.red,
                     fontWeight: FontWeight.w500,
@@ -370,11 +366,6 @@ class MainScreen extends ConsumerWidget {
         ),
         actions: [
           // Globe — language picker
-          IconButton(
-            icon: const Icon(Icons.language_rounded, size: 22, color: AppColors.iconPrimary),
-            tooltip: ref.watchTr('select_language'),
-            onPressed: () => LanguagePickerModal.show(context),
-          ),
           // Chat badge button
           Stack(
             clipBehavior: Clip.none,

@@ -9,6 +9,7 @@ import '../widgets/profile_header.dart';
 import '../widgets/skill_chip.dart';
 import '../../auth/providers/auth_provider.dart';
 
+
 class ProfileScreen extends ConsumerWidget {
   final String userId;
 
@@ -31,7 +32,7 @@ class ProfileScreen extends ConsumerWidget {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        title: const Text('Profile'),
+        title: Text('Mening profilim'),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) async {
@@ -44,9 +45,9 @@ class ProfileScreen extends ConsumerWidget {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'logout',
-                child: Text('Logout'),
+                child: Text('Chiqish'),
               ),
             ],
           ),
@@ -55,7 +56,7 @@ class ProfileScreen extends ConsumerWidget {
       body: profileState.isLoading
           ? const AppLoader()
           : profileState.user == null
-              ? const Center(child: Text('User not found'))
+              ? Center(child: Text('Foydalanuvchi topilmadi'))
               : SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,7 +86,7 @@ class ProfileScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'About',
+                                'Haqida',
                                 style: AppTextStyles.h3,
                               ),
                               const SizedBox(height: 12),
@@ -107,7 +108,7 @@ class ProfileScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Skills',
+                                'Ko\'nikmalar',
                                 style: AppTextStyles.h3,
                               ),
                               const SizedBox(height: 12),
@@ -132,7 +133,7 @@ class ProfileScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Experience',
+                                'Tajriba',
                                 style: AppTextStyles.h3,
                               ),
                               const SizedBox(height: 16),

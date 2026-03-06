@@ -7,7 +7,6 @@ import '../../auth/providers/auth_provider.dart';
 import '../providers/dashboard_stats_provider.dart';
 import '../../../shared/models/dashboard_stats_model.dart';
 import '../../../shared/models/user_model.dart';
-import '../../../core/localization/language_provider.dart';
 
 class FeedScreen extends ConsumerWidget {
   const FeedScreen({super.key});
@@ -15,13 +14,12 @@ class FeedScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final UserModel? currentUser = ref.watch(authProvider).user;
-    final String name = currentUser?.name ?? 'foydalanuvchi';
+    final String name = currentUser?.name ?? 'Foydalanuvchi';
     final AsyncValue<DashboardStats> statsAsync = ref.watch(dashboardStatsProvider);
     final DashboardStats stats = statsAsync.maybeWhen(
       data: (DashboardStats value) => value,
       orElse: () => DashboardStats.empty,
     );
-    final String Function(String) t = ref.watchTr;
 
     return Container(
       color: AppColors.background,
@@ -31,12 +29,12 @@ class FeedScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${t('welcome_user')}, $name! 👋',
+              '${'Xush kelibsiz'}, $name! 👋',
               style: AppTextStyles.h2.copyWith(fontSize: 22),
             ),
             const SizedBox(height: 8),
             Text(
-              t('dashboard_subtitle'),
+              'Profilingiz statistikasi va yangiliklarni kuzatib boring',
               style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 24),
@@ -48,7 +46,7 @@ class FeedScreen extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _StatCard(
-                    title: t('profile_views'),
+                    title: 'Profilni ko\'rishlar',
                     value: stats.profileViews.toString(),
                     icon: Icons.remove_red_eye_outlined,
                     color: const Color(0xFFEAF3FF),
@@ -57,7 +55,7 @@ class FeedScreen extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _StatCard(
-                    title: t('applications_count'),
+                    title: 'Arizalar',
                     value: stats.jobsApplied.toString(),
                     icon: Icons.assignment_outlined,
                     color: const Color(0xFFE9FFF2),
@@ -70,7 +68,7 @@ class FeedScreen extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _StatCard(
-                    title: t('connections'),
+                    title: 'Aloqalar',
                     value: stats.connections.toString(),
                     icon: Icons.people_outline,
                     color: const Color(0xFFF5EEFF),
@@ -79,7 +77,7 @@ class FeedScreen extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _StatCard(
-                    title: t('notifications_count'),
+                    title: 'Bildirishnomalar',
                     value: stats.notifications.toString(),
                     icon: Icons.notifications_outlined,
                     color: const Color(0xFFFFF3E5),
@@ -89,34 +87,34 @@ class FeedScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
 
-            Text(t('recent_activity'), style: AppTextStyles.h3),
+            Text('Oxirgi faoliyat', style: AppTextStyles.h3),
             const SizedBox(height: 12),
             _ActivityCard(
-              title: t('profile_views'),
-              timeLabel: '2 ${t('hours_ago') == 'hours_ago' ? 'soat oldin' : t('hours_ago')}',
+              title: 'Profilni ko\'rishlar',
+              timeLabel: '2 ${'soat oldin'}',
               icon: Icons.remove_red_eye_outlined,
             ),
             const SizedBox(height: 8),
             _ActivityCard(
-              title: 'Senior Developer ${t('application_reviewed') == 'application_reviewed' ? 'uchun arizangiz ko\'rib chiqildi' : t('application_reviewed')}',
-              timeLabel: '1 kun oldin',
+              title: 'Senior Developer ${'arizangiz ko\'rib chiqildi'}',
+              timeLabel: '1 ${'kun oldin'}',
               icon: Icons.work_outline,
             ),
             const SizedBox(height: 8),
             _ActivityCard(
-              title: 'Profil kuchi 85% ga oshdi',
-              timeLabel: '3 kun oldin',
+              title: 'Profil darajasi oshdi',
+              timeLabel: '3 ${'kun oldin'}',
               icon: Icons.trending_up,
             ),
             const SizedBox(height: 24),
 
-            Text(t('quick_actions'), style: AppTextStyles.h3),
+            Text('Tezkor amallar', style: AppTextStyles.h3),
             const SizedBox(height: 12),
-            _QuickActionTile(icon: Icons.work_outline, title: t('browse_jobs')),
+            _QuickActionTile(icon: Icons.work_outline, title: 'Vakansiyalarni ko\'rish'),
             const SizedBox(height: 8),
-            _QuickActionTile(icon: Icons.people_outline, title: t('find_specialist')),
+            _QuickActionTile(icon: Icons.people_outline, title: 'Mutaxassis qidirish'),
             const SizedBox(height: 8),
-            _QuickActionTile(icon: Icons.check_circle_outline, title: t('update_profile')),
+            _QuickActionTile(icon: Icons.check_circle_outline, title: 'Profilni yangilash'),
             const SizedBox(height: 24),
 
             _OpenToWorkCard(),
@@ -130,7 +128,6 @@ class FeedScreen extends ConsumerWidget {
 class _ProfileProgressCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watchTr;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -145,17 +142,17 @@ class _ProfileProgressCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(t('complete_profile'), style: AppTextStyles.h3.copyWith(color: Colors.white)),
+          Text('Profilingizni yakunlang', style: AppTextStyles.h3.copyWith(color: Colors.white)),
           const SizedBox(height: 8),
           Text(
-            t('complete_profile_subtitle'),
+            'To\'liq profil ish beruvchilar e\'tiborini 2 barobar ko\'proq tortadi.',
             style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withOpacity(0.9)),
           ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(t('progress'), style: AppTextStyles.bodySmall.copyWith(color: Colors.white)),
+              Text('Jarayon', style: AppTextStyles.bodySmall.copyWith(color: Colors.white)),
               Text('55%', style: AppTextStyles.bodySmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600)),
             ],
           ),
@@ -181,7 +178,7 @@ class _ProfileProgressCard extends ConsumerWidget {
                 textStyle: AppTextStyles.buttonSmall.copyWith(color: AppColors.primary),
               ),
               onPressed: () {},
-              child: Text(t('complete_now')),
+              child: Text('Hozir yakunlash'),
             ),
           ),
         ],
@@ -299,7 +296,6 @@ class _QuickActionTile extends StatelessWidget {
 class _OpenToWorkCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watchTr;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -309,31 +305,40 @@ class _OpenToWorkCard extends ConsumerWidget {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(t('open_to_work_label'),
-                      style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(t('open_to_work_subtitle'), style: AppTextStyles.caption),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Ishga tayyorlik',
+                        style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    Text(
+                      "Mutaxassislar sahifasida ko'rsatish",
+                      style: AppTextStyles.caption,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: AppColors.background,
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Text(
-                  t('inactive'),
-                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                child: const Text(
+                  'Faol emas',
+                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          Text(t('manage_visibility'), style: AppTextStyles.link),
+          Text("Ko'rinishni boshqarish", style: AppTextStyles.link),
         ],
       ),
     );

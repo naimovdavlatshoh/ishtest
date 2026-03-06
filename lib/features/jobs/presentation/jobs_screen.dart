@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -9,7 +8,6 @@ import '../../../core/widgets/empty_states/empty_state.dart';
 import '../providers/jobs_provider.dart';
 import '../providers/saved_jobs_provider.dart';
 import '../widgets/job_card.dart';
-import '../../../core/localization/language_provider.dart';
 
 class JobsScreen extends ConsumerStatefulWidget {
   const JobsScreen({super.key});
@@ -47,7 +45,6 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
   @override
   Widget build(BuildContext context) {
     final jobsState = ref.watch(jobsProvider);
-    final t = ref.watchTr;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -56,7 +53,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         title: Text(
-          t('jobs'),
+          'Vakansiyalar',
           style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
         ),
         actions: [
@@ -118,7 +115,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                 ),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                  label: state.filters.location ?? 'Hudud',
+                  label: state.filters.location ?? 'Viloyat',
                   isSelected: state.filters.location != null,
                   onTap: () => _showLocationDialog(state.filters),
                   onClear: state.filters.location != null 
@@ -127,7 +124,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                 ),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                  label: state.filters.isRemote == true ? 'Masofaviy' : 'Ish joyi',
+                  label: state.filters.isRemote == true ? 'Masofaviy' : 'Ofisda',
                   isSelected: state.filters.isRemote != null,
                   onTap: () => _showRemoteDialog(state.filters),
                   onClear: state.filters.isRemote != null 
@@ -243,7 +240,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
       return EmptyState(
         icon: Icons.work_outline,
         title: 'Vakansiyalar topilmadi',
-        message: 'Filtrlarni o\'zgartirib ko\'ring yoki keyinroq tekshiring',
+        message: 'Filtrlarni o\'zgartirin',
         actionText: 'Yangilash',
         onAction: () => ref.read(jobsProvider.notifier).refreshJobs(),
       );
@@ -324,12 +321,12 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
   void _showLocationDialog(JobsFilters current) {
     final controller = TextEditingController(text: current.location);
     _showCustomDialog(
-      title: 'Hududni qidirish',
+      title: 'Manzil qidirish',
       content: (dialogContext) => TextField(
         controller: controller,
         autofocus: true,
         decoration: InputDecoration(
-          hintText: 'Masalan: Buxoro',
+          hintText: 'Masalan: Toshkent',
           prefixIcon: const Icon(Icons.search),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           filled: true,
@@ -337,7 +334,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
         ),
       ),
       actions: (dialogContext) => [
-        TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('Bekor qilish')),
+        TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: Text('Bekor qilish')),
         ElevatedButton(
           onPressed: () {
             ref.read(jobsProvider.notifier).updateFilters(current.copyWith(location: controller.text));
@@ -352,13 +349,13 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
 
   void _showRemoteDialog(JobsFilters current) {
     _showCustomDialog(
-      title: 'Masofaviy ish',
+      title: 'Ish joyi',
       content: (dialogContext) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
             leading: const Icon(Icons.home_outlined),
-            title: const Text('Masofaviy (Remote)'),
+            title: Text('Masofaviy'),
             onTap: () {
               ref.read(jobsProvider.notifier).updateFilters(current.copyWith(isRemote: true));
               Navigator.of(dialogContext).pop();
@@ -366,7 +363,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.location_city_outlined),
-            title: const Text('Ofisdan (On-site)'),
+            title: const Text('Ofisda'),
             onTap: () {
               ref.read(jobsProvider.notifier).updateFilters(current.copyWith(isRemote: false));
               Navigator.of(dialogContext).pop();
@@ -389,7 +386,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
             controller: minController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              labelText: 'Minimal (UZS)',
+              labelText: 'Minimum (so\'m)',
               labelStyle: const TextStyle(fontSize: 14),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               prefixIcon: const Icon(Icons.remove_circle_outline, size: 20),
@@ -400,7 +397,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
             controller: maxController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              labelText: 'Maksimal (UZS)',
+              labelText: 'Maksimum (so\'m)',
               labelStyle: const TextStyle(fontSize: 14),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               prefixIcon: const Icon(Icons.add_circle_outline, size: 20),
@@ -427,7 +424,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
             elevation: 0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
           ),
-          child: const Text('Saqlash'),
+          child: Text('Saqlash'),
         ),
       ],
     );
@@ -453,7 +450,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
       },
     );
     if (picked != null) {
-      final formattedDate = DateFormat('yyyy-MM-dd').format(picked);
+      final formattedDate = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
       ref.read(jobsProvider.notifier).updateFilters(current.copyWith(dateFrom: formattedDate));
     }
   }

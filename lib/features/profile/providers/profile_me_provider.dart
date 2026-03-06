@@ -156,6 +156,40 @@ class ProfileMeNotifier extends StateNotifier<AsyncValue<ProfileMe>> {
       return false;
     }
   }
+
+  Future<bool> uploadAvatar(String filePath) async {
+    try {
+      const tokenStorage = TokenStorage();
+      final String? token = await tokenStorage.getAccessToken();
+
+      if (token == null || token.isEmpty) return false;
+
+      final Uri uri = Uri.parse(
+        '${Environment.apiBaseUrl}/api/${Environment.apiVersion}/users/me/avatar',
+      );
+
+      final http.MultipartRequest request = http.MultipartRequest('POST', uri);
+      request.headers['Authorization'] = 'Bearer $token';
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'file', // Use 'file' as key, modify if the API strictly requires something else.
+          filePath,
+        ),
+      );
+
+      final streamedResponse = await request.send();
+      final http.Response response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        await fetchProfile(); // refresh profile details after upload
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
 final profileMeProvider =

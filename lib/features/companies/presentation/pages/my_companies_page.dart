@@ -9,6 +9,7 @@ import 'package:linkedin_clone/features/companies/providers/company_provider.dar
 import 'package:linkedin_clone/shared/models/company_model.dart';
 import 'package:linkedin_clone/core/utils/extensions.dart';
 
+
 class MyCompaniesPage extends ConsumerWidget {
   const MyCompaniesPage({super.key});
 
@@ -19,7 +20,7 @@ class MyCompaniesPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Mening kompaniyalarim'),
+        title: Text('Mening kompaniyalarim'),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
@@ -32,11 +33,11 @@ class MyCompaniesPage extends ConsumerWidget {
             children: [
               const Icon(Icons.error_outline, size: 64, color: AppColors.error),
               const SizedBox(height: 16),
-              Text('Xatolik yuz berdi: $err', textAlign: TextAlign.center),
+              Text('${'Xatolik yuz berdi'}: $err', textAlign: TextAlign.center),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.refresh(myCompaniesProvider),
-                child: const Text('Qayta urinish'),
+                child: Text('Qayta urinish'),
               ),
             ],
           ),
@@ -52,16 +53,16 @@ class MyCompaniesPage extends ConsumerWidget {
               ),
             ),
             if (companies.isEmpty)
-              const Expanded(
+              Expanded(
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.business_outlined, size: 80, color: AppColors.textTertiary),
-                      SizedBox(height: 16),
+                      const Icon(Icons.business_outlined, size: 80, color: AppColors.textTertiary),
+                      const SizedBox(height: 16),
                       Text(
-                        'Hali kompaniya qo\'shilmagan',
-                        style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
+                        'Hozircha kompaniyalar yo\'q',
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 16),
                       ),
                     ],
                   ),
@@ -112,7 +113,7 @@ class _CompanyCard extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.settings_outlined, color: AppColors.primary),
-              title: const Text('O\'zgartirish', style: TextStyle(fontWeight: FontWeight.w600)),
+              title: Text('Tahrirlash', style: const TextStyle(fontWeight: FontWeight.w600)),
               onTap: () {
                 context.pop();
                 context.push('/companies/edit/${company.id}', extra: company);
@@ -120,14 +121,14 @@ class _CompanyCard extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
-              title: const Text('O\'chirish', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w600)),
+              title: Text('O\'chirish', style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w600)),
               onTap: () async {
                 context.pop();
                 final confirmed = await showDialog<bool>(
                   context: context,
                   builder: (context) => ConfirmDialog(
                     title: 'Kompaniyani o\'chirish',
-                    message: '${company.name} kompaniyasini o\'chirib tashlamoqchimisiz?',
+                    message: '${company.name} ${'Ushbu kompaniyani o\'chirishga ishonchingiz komilmi?'}',
                     confirmText: 'O\'chirish',
                     cancelText: 'Bekor qilish',
                   ),
@@ -151,7 +152,6 @@ class _CompanyCard extends ConsumerWidget {
     );
   }
 
-  @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -228,7 +228,7 @@ class _CompanyCard extends ConsumerWidget {
                   const Icon(Icons.people_outline, size: 14, color: AppColors.textTertiary),
                   const SizedBox(width: 4),
                   Text(
-                    '${company.size} xodim',
+                    '${company.size} ${'xodim'}',
                     style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
                   ),
                 ],
@@ -236,9 +236,9 @@ class _CompanyCard extends ConsumerWidget {
               TextButton.icon(
                 onPressed: () => context.go('/jobs/add', extra: {'companyId': company.id}),
                 icon: const Icon(Icons.add_circle_outline, size: 18, color: AppColors.primary),
-                label: const Text(
-                  'Ish qo\'shish',
-                  style: TextStyle(
+                label: Text(
+                  'Vakansiya qo\'shish',
+                  style: const TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,

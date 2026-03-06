@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import '../../../core/config/env.dart';
 import '../../../core/services/token_storage.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../providers/my_applications_provider.dart';
 import '../../../shared/models/application_model.dart';
-import '../../../core/localization/language_provider.dart';
 
 class MyApplicationsScreen extends ConsumerStatefulWidget {
   const MyApplicationsScreen({super.key});
@@ -28,7 +26,6 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(myApplicationsProvider);
-    final t = ref.watchTr;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -61,11 +58,11 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            t('my_applications'),
+                            'Mening arizalarim',
                             style: AppTextStyles.h2.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            t('track_applications'),
+                            'Arizalaringizni kuzating',
                             style: TextStyle(fontSize: 13, color: Colors.grey[500]),
                           ),
                         ],
@@ -111,16 +108,15 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
     final pending = apps.where((a) => a.status == 'pending').length;
     final accepted = apps.where((a) => a.status == 'accepted').length;
     final rejected = apps.where((a) => a.status == 'rejected').length;
-
     return Row(
       children: [
-        Expanded(child: _StatChip(label: 'Jami', value: apps.length, color: const Color(0xFF1D4ED8))),
+        Expanded(child: _StatChip(label: 'total', value: apps.length, color: const Color(0xFF1D4ED8))),
         const SizedBox(width: 10),
-        Expanded(child: _StatChip(label: 'Kutilmoqda', value: pending, color: const Color(0xFFF59E0B))),
+        Expanded(child: _StatChip(label: 'pending', value: pending, color: const Color(0xFFF59E0B))),
         const SizedBox(width: 10),
-        Expanded(child: _StatChip(label: 'Qabul', value: accepted, color: const Color(0xFF059669))),
+        Expanded(child: _StatChip(label: 'accepted', value: accepted, color: const Color(0xFF059669))),
         const SizedBox(width: 10),
-        Expanded(child: _StatChip(label: 'Rad', value: rejected, color: const Color(0xFFDC2626))),
+        Expanded(child: _StatChip(label: 'rejected', value: rejected, color: const Color(0xFFDC2626))),
       ],
     );
   }
@@ -140,10 +136,10 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
             child: const Icon(Icons.description_outlined, size: 44, color: AppColors.primary),
           ),
           const SizedBox(height: 20),
-          const Text("Hali ariza yo'q", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text('Hali arizalar yo\'q', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text(
-            'Vakansiyalar sahifasidan ariza bering',
+            'Vakansiyalar bo\'limidan ariza topshiring',
             style: TextStyle(color: Colors.grey[500], fontSize: 14),
           ),
           const SizedBox(height: 24),
@@ -155,7 +151,7 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
                 gradient: const LinearGradient(colors: [Color(0xFF1D4ED8), Color(0xFF3B82F6)]),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text("Vakansiyalarga o't", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+              child: Text('Vakansiyalarga o\'tish', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -282,7 +278,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          job?.title ?? "Vakansiya nomi yo'q",
+                          job?.title ?? 'Vakansiya',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -303,7 +299,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                               _InfoChip(icon: Icons.location_on_outlined, text: job.location),
                             _InfoChip(
                               icon: Icons.calendar_today_outlined,
-                              text: 'Ariza yuborilgan ${_formatDate(app.createdAt)}',
+                              text: 'Ariza yuborildi: ${_formatDate(app.createdAt)}',
                             ),
                           ],
                         ),
@@ -347,14 +343,14 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                                 height: 14,
                                 child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFDC2626)),
                               )
-                            : const Row(
+                            : Row( // Removed const
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.delete_outline_rounded, size: 15, color: Color(0xFFDC2626)),
-                                  SizedBox(width: 5),
+                                  const Icon(Icons.delete_outline_rounded, size: 15, color: Color(0xFFDC2626)),
+                                  const SizedBox(width: 5),
                                   Text(
-                                    'Qaytarib olish',
-                                    style: TextStyle(
+                                    'withdraw',
+                                    style: const TextStyle( // Added const
                                       color: Color(0xFFDC2626),
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
@@ -373,7 +369,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                 const Divider(height: 1, color: Color(0xFFF2F4F7)),
                 const SizedBox(height: 12),
                 Text(
-                  "Qo'shma xat:",
+                  'Arizadagi maktub:',
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey[400]),
                 ),
                 const SizedBox(height: 4),
@@ -411,14 +407,14 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                 child: const Icon(Icons.delete_outline_rounded, color: Color(0xFFDC2626), size: 30),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Arizani qaytarib olish',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // Added const
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                "Haqiqatan ham bu arizani qaytarib olmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.",
+                'Arizani qaytarib olmoqchimisiz?',
                 style: TextStyle(fontSize: 13.5, color: Colors.grey[500], height: 1.5),
                 textAlign: TextAlign.center,
               ),
@@ -435,10 +431,10 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.grey[200]!),
                         ),
-                        child: const Center(
+                        child: Center( // Removed const
                           child: Text(
                             'Bekor qilish',
-                            style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF344054)),
+                            style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF344054)), // Added const
                           ),
                         ),
                       ),
@@ -454,10 +450,10 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                           color: const Color(0xFFDC2626),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Center(
+                        child: Center( // Removed const
                           child: Text(
                             'Ha, qaytarib olish',
-                            style: TextStyle(
+                            style: const TextStyle( // Added const
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
                               fontSize: 13,
@@ -479,7 +475,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
   String _formatDate(String dateStr) {
     try {
       final date = DateTime.parse(dateStr);
-      return DateFormat('MMM d, yyyy', 'en').format(date);
+      return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
     } catch (_) {
       return dateStr;
     }
@@ -488,12 +484,12 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
-class _StatusBadge extends StatelessWidget {
+class _StatusBadge extends ConsumerWidget {
   final String status;
   const _StatusBadge({required this.status});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Color color;
     Color bg;
     Color border;
@@ -519,7 +515,7 @@ class _StatusBadge extends StatelessWidget {
         color = const Color(0xFFD97706);
         bg = const Color(0xFFFFFBEB);
         border = const Color(0xFFFDE68A);
-        label = "Ko'rib chiqilmoqda";
+        label = 'Ko\'rib chiqilmoqda';
         icon = Icons.schedule_rounded;
     }
 

@@ -7,7 +7,6 @@ import '../../../core/widgets/loaders/app_loader.dart';
 import '../providers/profile_me_provider.dart';
 import '../../../shared/models/profile_me_model.dart';
 import '../../../core/utils/extensions.dart';
-import '../../../core/localization/language_provider.dart';
 
 class ProfileMeScreen extends ConsumerWidget {
   const ProfileMeScreen({super.key});
@@ -15,7 +14,6 @@ class ProfileMeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<ProfileMe> profileAsync = ref.watch(profileMeProvider);
-    final String Function(String) t = ref.watchTr;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -25,7 +23,7 @@ class ProfileMeScreen extends ConsumerWidget {
         automaticallyImplyLeading: false,
         leading: null,
         title: Text(
-          t('my_profile'),
+          'Mening profilim',
           style: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
         ),
         actions: const [],
@@ -99,7 +97,7 @@ class ProfileMeScreen extends ConsumerWidget {
                 OutlinedButton.icon(
                   onPressed: () => context.push('/profile/edit'),
                   icon: const Icon(Icons.edit_outlined, size: 18),
-                  label: Text(ref.watchTr('profile_edit')),
+                  label: Text('profile_edit'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primary,
                     side: const BorderSide(color: AppColors.primary),
@@ -192,7 +190,7 @@ class ProfileMeScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.code, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              Text(ref.watchTr('skills'), style: AppTextStyles.h3),
+              Text('Ko\'nikmalar', style: AppTextStyles.h3),
             ],
           ),
           const SizedBox(height: 16),
@@ -238,7 +236,7 @@ class ProfileMeScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.work_outline, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              Text(ref.watchTr('experience'), style: AppTextStyles.h3),
+              Text('Tajriba', style: AppTextStyles.h3),
             ],
           ),
           const SizedBox(height: 24),
@@ -294,7 +292,7 @@ class ProfileMeScreen extends ConsumerWidget {
                             const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textTertiary),
                             const SizedBox(width: 4),
                             Text(
-                              '${exp.startDate} - ${exp.endDate ?? 'Hozirgacha'}',
+                              '${exp.startDate} - ${exp.endDate ?? 'present'}',
                               style: AppTextStyles.caption,
                             ),
                           ],
@@ -338,7 +336,7 @@ class ProfileMeScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.school_outlined, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              Text(ref.watchTr('education'), style: AppTextStyles.h3),
+              Text('education', style: AppTextStyles.h3),
             ],
           ),
           const SizedBox(height: 24),
@@ -368,7 +366,7 @@ class ProfileMeScreen extends ConsumerWidget {
                           const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textTertiary),
                           const SizedBox(width: 4),
                           Text(
-                            '${edu.startDate} - ${edu.endDate ?? 'Hozirgacha'}',
+                            '${edu.startDate} - ${edu.endDate ?? 'present'}',
                             style: AppTextStyles.caption,
                           ),
                         ],
@@ -404,7 +402,7 @@ class ProfileMeScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.description_outlined, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              Text(ref.watchTr('resume'), style: AppTextStyles.h3),
+              Text('resume', style: AppTextStyles.h3),
             ],
           ),
           const SizedBox(height: 16),
@@ -430,11 +428,11 @@ class ProfileMeScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        profile.cvFile?.split('/').last ?? 'Rezyume.pdf',
+                        profile.cvFile?.split('/').last ?? 'resume_pdf',
                         style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        'Yuklangan CV',
+                        'uploaded_cv',
                         style: AppTextStyles.caption,
                       ),
                     ],
@@ -443,7 +441,7 @@ class ProfileMeScreen extends ConsumerWidget {
                 ElevatedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.open_in_new, size: 16),
-                  label: Text(ref.watchTr('view_profile')),
+                  label: Text('Profilni ko\'rish'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,

@@ -9,7 +9,6 @@ import '../providers/user_me_provider.dart';
 import '../../../shared/models/profile_me_model.dart';
 import '../../../core/utils/extensions.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -103,14 +102,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: initialValue != null && initialValue.isNotEmpty 
-          ? DateFormat('yyyy-MM').parse(initialValue) 
+          ? DateTime(int.parse(initialValue.split('-')[0]), int.parse(initialValue.split('-')[1])) 
           : DateTime.now(),
       firstDate: DateTime(1950),
       lastDate: DateTime.now(),
       initialDatePickerMode: DatePickerMode.year,
     );
     if (picked != null) {
-      return DateFormat('yyyy-MM').format(picked);
+      return '${picked.year}-${picked.month.toString().padLeft(2, "0")}';
+
     }
     return initialValue;
   }
@@ -157,7 +157,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Profil ma'lumotlari va ko'rinishini boshqarish",
+                'profile_edit_subtitle',
                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 20),
@@ -203,23 +203,61 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(40),
-            ),
-            child: profile.avatar != null
-                ? ClipRRect(
+          GestureDetector(
+            onTap: () async {
+              final result = await FilePicker.platform.pickFiles(
+                type: FileType.image,
+                allowMultiple: false,
+              );
+              if (result != null && result.files.isNotEmpty && result.files.first.path != null) {
+                final filePath = result.files.first.path!;
+                if (mounted) {
+                  context.showSnackBar('uploading_image', isError: false);
+                  final success = await ref.read(profileMeProvider.notifier).uploadAvatar(filePath);
+                  if (mounted) {
+                    context.showSnackBar(
+                      success ? 'image_uploaded' : 'image_upload_error',
+                      isError: !success,
+                    );
+                  }
+                }
+              }
+            },
+            child: Stack(
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(40),
-                    child: Image.network(profile.avatar!.fullImageUrl, fit: BoxFit.cover),
-                  )
-                : const Icon(Icons.person, size: 40, color: Colors.white),
+                  ),
+                  child: profile.avatar != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(40),
+                          child: Image.network(profile.avatar!.fullImageUrl, fit: BoxFit.cover),
+                        )
+                      : const Icon(Icons.person, size: 40, color: Colors.white),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           Text(profile.fullName, style: AppTextStyles.h3),
-          Text(profile.city ?? 'Joylashuv kiritilmagan', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+          Text(profile.city ?? 'location_not_set', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
           Text(profile.title, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
           const SizedBox(height: 12),
           Container(
@@ -235,7 +273,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 const Icon(Icons.check_circle_outline, size: 14, color: Colors.green),
                 const SizedBox(width: 4),
                 Text(
-                  'To\'liq',
+                  'complete',
                   style: AppTextStyles.caption.copyWith(color: Colors.green, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -248,17 +286,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   Widget _buildAsosiySection() {
     return _buildExpansionCard(
-      title: 'Asosiy',
+      title: 'main_section',
       icon: Icons.person_outline,
       children: [
-        _buildTextField(label: 'To\'liq ism *', controller: _nameController),
+        _buildTextField(label: 'full_name_required', controller: _nameController),
         const SizedBox(height: 16),
-        _buildTextField(label: 'Shahar *', controller: _cityController),
+        _buildTextField(label: 'city_required', controller: _cityController),
         const SizedBox(height: 16),
-        _buildTextField(label: 'Lavozim', controller: _titleController),
+        _buildTextField(label: 'position', controller: _titleController),
         const SizedBox(height: 16),
         _buildTextField(
-          label: 'O\'zingiz haqida',
+          label: 'about_me',
           controller: _bioController,
           maxLines: 4,
           hint: 'Python/Js Software Engineer',
@@ -267,7 +305,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            '${_bioController.text.length} belgi',
+            '${_bioController.text.length} ${'characters'}',
             style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
           ),
         ),
@@ -283,7 +321,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             });
             if (context.mounted) {
               context.showSnackBar(
-                success ? 'Ma\'lumotlar saqlandi' : 'Xatolik yuz berdi',
+                success ? 'data_saved' : 'error',
                 isError: !success,
               );
             }
@@ -304,7 +342,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           children: [
             Expanded(
               child: _buildTextField(
-                label: 'Ko\'nikma qo\'shish',
+                label: 'Ko\'nikma qo\'shing...',
                 controller: _skillController,
                 hint: 'React',
               ),
@@ -335,7 +373,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            'Ko\'nikmalaringiz (${_skills.length})',
+            '${'your_skills'} (${_skills.length})',
             style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
@@ -347,14 +385,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ),
         const SizedBox(height: 24),
         PrimaryButton(
-          text: 'Ko\'nikmalarni saqlash',
+          text: 'save_skills',
           onPressed: () async {
             final success = await ref.read(profileMeProvider.notifier).updateProfile({
               'skills': _skills,
             });
             if (context.mounted) {
               context.showSnackBar(
-                success ? 'Ko\'nikmalar saqlandi' : 'Xatolik yuz berdi',
+                success ? 'skills_saved' : 'error',
                 isError: !success,
               );
             }
@@ -395,13 +433,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       title: 'Tajriba',
       icon: Icons.business_center_outlined,
       children: [
-        const Align(
+        Align(
           alignment: Alignment.centerLeft,
-          child: Text('Ish tajribasi', style: AppTextStyles.h4),
+          child: Text('work_experience', style: AppTextStyles.h4),
         ),
         const SizedBox(height: 16),
         PrimaryButton(
-          text: 'Tajriba qo\'shish',
+          text: 'add_experience',
           onPressed: () {
             setState(() {
               _experiences.add(Experience(
@@ -422,14 +460,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         }),
         const SizedBox(height: 12),
         PrimaryButton(
-          text: 'Tajribani saqlash',
+          text: 'save_experience',
           onPressed: () async {
             final success = await ref.read(profileMeProvider.notifier).updateProfile({
               'experience': _experiences.map((e) => e.toJson()).toList(),
             });
             if (context.mounted) {
               context.showSnackBar(
-                success ? 'Tajriba saqlandi' : 'Xatolik yuz berdi',
+                success ? 'experience_saved' : 'error',
                 isError: !success,
               );
             }
@@ -453,7 +491,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTextField(
-            label: 'Lavozim *',
+            label: 'position_required',
             initialValue: exp.title,
             onChanged: (v) {
               setState(() {
@@ -471,7 +509,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(height: 16),
           _buildTextField(
-            label: 'Kompaniya *',
+            label: 'company_required',
             initialValue: exp.company,
             onChanged: (v) {
               setState(() {
@@ -489,7 +527,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(height: 16),
           _buildTextField(
-            label: 'Manzil',
+            label: 'address',
             initialValue: exp.location ?? '',
             onChanged: (v) {
               setState(() {
@@ -527,7 +565,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             },
             child: AbsorbPointer(
               child: _buildTextField(
-                label: 'Boshlanish *',
+                label: 'start_date_required',
                 initialValue: exp.startDate,
                 suffixIcon: const Icon(Icons.calendar_today, size: 18),
               ),
@@ -555,7 +593,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               },
               child: AbsorbPointer(
                 child: _buildTextField(
-                  label: 'Tugash',
+                  label: 'end_date',
                   initialValue: exp.endDate ?? '',
                   suffixIcon: const Icon(Icons.calendar_today, size: 18),
                 ),
@@ -582,12 +620,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   });
                 },
               ),
-              const Text('Hozir shu yerda ishlayman'),
+              Text('currently_working_here'),
             ],
           ),
           const SizedBox(height: 16),
           _buildTextField(
-            label: 'Tavsif',
+            label: 'description',
             initialValue: exp.description ?? '',
             maxLines: 3,
             onChanged: (v) {
@@ -615,7 +653,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 });
               },
               icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
-              label: const Text('O\'chirish', style: TextStyle(color: Colors.red)),
+              label: Text('O\'chirish', style: const TextStyle(color: Colors.red)),
             ),
           ),
         ],
@@ -625,16 +663,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   Widget _buildTalimSection(ProfileMe profile) {
     return _buildExpansionCard(
-      title: 'Ta\'lim',
+      title: 'education',
       icon: Icons.school_outlined,
       children: [
-        const Align(
+        Align(
           alignment: Alignment.centerLeft,
-          child: Text('Ta\'lim', style: AppTextStyles.h4),
+          child: Text('education', style: AppTextStyles.h4),
         ),
         const SizedBox(height: 16),
         PrimaryButton(
-          text: 'Ta\'lim qo\'shish',
+          text: 'add_education',
           onPressed: () {
             setState(() {
               _educations.add(Education(
@@ -657,14 +695,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         }),
         const SizedBox(height: 12),
         PrimaryButton(
-          text: 'Ta\'limni saqlash',
+          text: 'save_education',
           onPressed: () async {
             final success = await ref.read(profileMeProvider.notifier).updateProfile({
               'education': _educations.map((e) => e.toJson()).toList(),
             });
             if (context.mounted) {
               context.showSnackBar(
-                success ? 'Ta\'lim saqlandi' : 'Xatolik yuz berdi',
+                success ? 'education_saved' : 'error',
                 isError: !success,
               );
             }
@@ -688,7 +726,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTextField(
-            label: 'Maktab/O\'liy o\'quv yurti *',
+            label: 'school_required',
             initialValue: edu.school,
             onChanged: (v) {
               setState(() {
@@ -706,7 +744,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(height: 16),
           _buildTextField(
-            label: 'Daraja *',
+            label: 'degree_required',
             initialValue: edu.degree,
             onChanged: (v) {
               setState(() {
@@ -724,7 +762,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(height: 16),
           _buildTextField(
-            label: 'Mutaxassislik',
+            label: 'specialization',
             initialValue: edu.field,
             onChanged: (v) {
               setState(() {
@@ -760,7 +798,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             },
             child: AbsorbPointer(
               child: _buildTextField(
-                label: 'Boshlanish *',
+                label: '${'start_date'} *',
                 initialValue: edu.startDate,
                 suffixIcon: const Icon(Icons.calendar_today, size: 18),
               ),
@@ -787,7 +825,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               },
               child: AbsorbPointer(
                 child: _buildTextField(
-                  label: 'Tugash',
+                  label: 'end_date',
                   initialValue: edu.endDate ?? '',
                   suffixIcon: const Icon(Icons.calendar_today, size: 18),
                 ),
@@ -826,7 +864,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 });
               },
               icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
-              label: const Text('O\'chirish', style: TextStyle(color: Colors.red)),
+              label: Text('O\'chirish', style: const TextStyle(color: Colors.red)),
             ),
           ),
         ],
@@ -839,14 +877,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       title: 'Ko\'rinish',
       icon: Icons.visibility_outlined,
       children: [
-        const Align(
+        Align(
           alignment: Alignment.centerLeft,
-          child: Text('Profil ko\'rinishi', style: AppTextStyles.h4),
+          child: Text('profile_visibility', style: AppTextStyles.h4),
         ),
         const SizedBox(height: 16),
         _buildVisibilityToggle(
-          title: 'Ishga ochiq (Xodim)',
-          description: 'Profilingizni Xodimlar sahifasida ko\'rsating — ish beruvchilar sizni topishi uchun.',
+          title: 'Ko\'rinish',
+          description: 'open_to_work_desc',
           value: _isPublic,
           onChanged: (v) async {
             setState(() => _isPublic = v);
@@ -856,7 +894,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             });
             if (context.mounted) {
               context.showSnackBar(
-                success ? 'Ko\'rinish yangilandi' : 'Xatolik yuz berdi',
+                success ? 'visibility_updated' : 'Xatolik yuz berdi',
                 isError: !success,
               );
             }
@@ -912,10 +950,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       : null,
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Ushbu sahifada ko\'rsatish',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    'show_on_this_page',
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
@@ -930,7 +968,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final userMeAsync = ref.watch(userMeProvider);
 
     return _buildExpansionCard(
-      title: 'Akkaunt',
+      title: 'account',
       icon: Icons.link,
       children: [
         const Align(

@@ -8,7 +8,6 @@ import '../../../core/utils/validators.dart';
 import '../../../core/widgets/buttons/primary_button.dart';
 import '../widgets/auth_text_field.dart';
 import '../providers/auth_provider.dart';
-import '../../../core/localization/language_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -81,7 +80,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final AuthState authState = ref.watch(authProvider);
-    final t = ref.watchTr;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -113,34 +111,31 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                Text(t('register'), style: AppTextStyles.h1),
+                Text('Ro\'yxatdan o\'tish', style: AppTextStyles.h1),
                 const SizedBox(height: 8),
                 Text(
-                  t('sign_up'),
+                  'Ro\'yxatdan o\'tish',
                   style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 40),
-
                 AuthTextField(
-                  label: t('first_name'),
-                  hint: t('enter_first_name'),
+                  label: 'Ism',
+                  hint: 'Ismingizni kiriting',
                   controller: _firstNameController,
                   validator: Validators.name,
                   prefixIcon: const Icon(Icons.person_outline),
                 ),
                 const SizedBox(height: 24),
-
                 AuthTextField(
-                  label: t('last_name'),
-                  hint: t('enter_last_name'),
+                  label: 'Familiya',
+                  hint: 'Familiyangizni kiriting',
                   controller: _lastNameController,
                   validator: Validators.name,
                   prefixIcon: const Icon(Icons.person_outline),
                 ),
                 const SizedBox(height: 24),
-
                 AuthTextField(
-                  label: t('phone_number'),
+                  label: 'Telefon raqami',
                   hint: '998 90 123 45 67',
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
@@ -149,51 +144,46 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   prefixIcon: const Icon(Icons.phone_outlined),
                 ),
                 const SizedBox(height: 24),
-
                 AuthTextField(
-                  label: t('email'),
-                  hint: t('enter_email'),
+                  label: 'Elektron pochta',
+                  hint: 'Emailingizni kiriting',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: Validators.email,
                   prefixIcon: const Icon(Icons.email_outlined),
                 ),
                 const SizedBox(height: 24),
-
                 AuthTextField(
-                  label: t('password'),
-                  hint: t('enter_password'),
+                  label: 'Parol',
+                  hint: 'Parolni kiriting',
                   controller: _passwordController,
                   isPassword: true,
                   validator: Validators.password,
                   prefixIcon: const Icon(Icons.lock_outline),
                 ),
                 const SizedBox(height: 24),
-
                 AuthTextField(
-                  label: t('confirm_password'),
-                  hint: t('re_enter_password'),
+                  label: 'Parolni tasdiqlang',
+                  hint: 'Parolni qayta kiriting',
                   controller: _confirmPasswordController,
                   isPassword: true,
                   validator: (value) => Validators.confirmPassword(value, _passwordController.text),
                   prefixIcon: const Icon(Icons.lock_outline),
                 ),
                 const SizedBox(height: 32),
-
                 PrimaryButton(
-                  text: t('register'),
+                  text: 'Ro\'yxatdan o\'tish',
                   onPressed: _handleRegister,
                   isLoading: authState.isLoading,
                 ),
                 const SizedBox(height: 24),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${t('already_have_account')} ", style: AppTextStyles.bodyMedium),
+                    Text("${'Akkauntingiz bormi?'} ", style: AppTextStyles.bodyMedium),
                     TextButton(
                       onPressed: () => context.go('/login'),
-                      child: Text(t('sign_in'), style: AppTextStyles.link),
+                      child: Text('Tizimga kirish', style: AppTextStyles.link),
                     ),
                   ],
                 ),

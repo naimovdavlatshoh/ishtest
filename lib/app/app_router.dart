@@ -8,6 +8,7 @@ import '../features/feed/presentation/feed_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/profile/presentation/profile_me_screen.dart';
 import '../features/profile/presentation/edit_profile_screen.dart';
+import '../features/profile/presentation/create_profile_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_room_screen.dart';
 import '../features/chat/presentation/invitations_screen.dart';
@@ -69,18 +70,31 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final AuthState authState = ref.read(authProvider);
       final bool isAuthenticated = authState.isAuthenticated;
+      final bool isNewUser = authState.isNewUser;
       final bool isLoginRoute = state.matchedLocation == '/login' ||
                           state.matchedLocation == '/register';
 
       if (!isAuthenticated && !isLoginRoute) {
         return '/login';
       }
-      if (isAuthenticated && isLoginRoute) {
-        return '/feed';
+      
+      if (isAuthenticated) {
+        if (isNewUser && state.matchedLocation != '/create-profile') {
+          return '/create-profile';
+        }
+        
+        if (!isNewUser && (isLoginRoute || state.matchedLocation == '/create-profile')) {
+          return '/feed';
+        }
       }
+      
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/create-profile',
+        builder: (context, state) => const CreateProfileScreen(),
+      ),
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
@@ -300,7 +314,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/jobs/:id/applications',
             pageBuilder: (context, state) {
               final int id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
-              final String jobTitle = state.extra as String? ?? 'Vakansiya';
+              final String jobTitle = state.extra as String? ?? 'Vakansiyalar';
               
               return buildPageWithCustomTransition(
                 context: context,

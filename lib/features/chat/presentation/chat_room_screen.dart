@@ -8,7 +8,6 @@ import '../../profile/providers/user_me_provider.dart';
 import '../../../shared/models/user_me_model.dart';
 import '../widgets/message_bubble.dart';
 import '../widgets/chat_input.dart';
-import '../../../core/localization/language_provider.dart';
 
 class ChatRoomScreen extends ConsumerStatefulWidget {
   final String chatId;
@@ -20,6 +19,7 @@ class ChatRoomScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
+  final TextEditingController _messageController = TextEditingController();
   final _scrollController = ScrollController();
   late final int _conversationId;
 
@@ -36,6 +36,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
 
   @override
   void dispose() {
+    _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -63,7 +64,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
     if (state.messages.isNotEmpty) _scrollToBottom();
 
     final avatarUrl = other?.avatar?.fullImageUrl;
-    final name = other?.fullName ?? 'Suhbat';
+    final name = other?.fullName ?? 'conversation';
     final initials = name.isNotEmpty
         ? name.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
         : '?';
@@ -116,7 +117,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
                         ),
                       ),
                       Text(
-                        state.isConnected ? 'Online' : ref.watchTr('loading'),
+                        state.isConnected ? 'online' : 'loading',
                         style: TextStyle(
                           fontSize: 12,
                           color: state.isConnected ? const Color(0xFF10B981) : Colors.grey[400],
@@ -209,9 +210,9 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
             child: const Icon(Icons.chat_bubble_outline_rounded, size: 38, color: AppColors.primary),
           ),
           const SizedBox(height: 16),
-          const Text('Hali xabarlar yo\'q', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+          Text('no_messages_yet', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          Text('Birinchi xabarni yuboring!', style: TextStyle(color: Colors.grey[400], fontSize: 14)),
+          Text('send_first_message', style: TextStyle(color: Colors.grey[400], fontSize: 14)),
         ],
       ),
     );

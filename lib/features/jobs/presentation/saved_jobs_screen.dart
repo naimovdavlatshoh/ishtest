@@ -5,7 +5,6 @@ import '../providers/saved_jobs_provider.dart';
 import '../widgets/job_card.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/localization/language_provider.dart';
 
 class SavedJobsScreen extends ConsumerStatefulWidget {
   const SavedJobsScreen({super.key});
@@ -24,12 +23,11 @@ class _SavedJobsScreenState extends ConsumerState<SavedJobsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(savedJobsProvider);
-    final t = ref.watchTr;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(t('saved_jobs')),
+        title: Text('Saqlanganlar'),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -46,7 +44,7 @@ class _SavedJobsScreenState extends ConsumerState<SavedJobsScreen> {
                           Icon(Icons.bookmark_border, size: 64, color: AppColors.textTertiary.withOpacity(0.5)),
                           const SizedBox(height: 16),
                           Text(
-                            t('no_saved_jobs'),
+                            "Saqlangan vakansiyalar yo'q",
                             style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
                           ),
                         ],
@@ -65,7 +63,7 @@ class _SavedJobsScreenState extends ConsumerState<SavedJobsScreen> {
                             trailing: IconButton(
                               icon: const Icon(Icons.bookmark, color: AppColors.primary),
                               onPressed: () => ref.read(savedJobsProvider.notifier).unsaveJob(job.id),
-                              tooltip: 'Olib tashlash',
+                              tooltip: 'remove',
                             ),
                           );
                         },
