@@ -412,6 +412,103 @@ class MainScreen extends ConsumerWidget {
         ],
       ),
       body: child,
+      bottomNavigationBar: _buildBottomNavBar(context, totalUnread),
+    );
+  }
+
+  Widget _buildBottomNavBar(BuildContext context, int totalUnread) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            offset: const Offset(0, -2),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      padding: EdgeInsets.only(
+        top: 8,
+        bottom: MediaQuery.of(context).padding.bottom + 8,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+           _buildNavItem(context, Icons.space_dashboard_rounded, 'Asosiy', 0, '/feed', 0),
+           _buildNavItem(context, Icons.chat_bubble_outline_rounded, 'Xabarlar', 3, '/chat', totalUnread),
+           _buildNavItem(context, Icons.work_outline_rounded, 'Vakansiyalar', 4, '/jobs', 0),
+           _buildNavItem(context, Icons.account_circle_outlined, 'Profil', 1, '/profile/me', 0),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(BuildContext context, IconData icon, String label, int itemIndex, String route, int badgeCount) {
+    final isActive = selectedIndex == itemIndex;
+    return Expanded(
+      child: InkWell(
+        onTap: () => context.go(route),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  icon,
+                  color: isActive ? AppColors.primary : AppColors.iconPrimary,
+                  size: 24,
+                ),
+                if (badgeCount > 0)
+                  Positioned(
+                    top: -4,
+                    right: -6,
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFEF4444),
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Center(
+                        child: Text(
+                          badgeCount > 99 ? '99+' : '$badgeCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            height: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                color: isActive ? AppColors.primary : AppColors.iconPrimary,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

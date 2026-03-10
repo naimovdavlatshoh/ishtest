@@ -215,37 +215,45 @@ class _CompanyCard extends ConsumerWidget {
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textTertiary),
-                  const SizedBox(width: 4),
-                  Text(
-                    company.location,
-                    style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
-                  ),
-                  const SizedBox(width: 12),
-                  const Icon(Icons.people_outline, size: 14, color: AppColors.textTertiary),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${company.size} ${'xodim'}',
-                    style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
-                  ),
-                ],
+              Flexible(
+                child: Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textTertiary),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        company.location,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Icon(Icons.people_outline, size: 14, color: AppColors.textTertiary),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${company.size} xodim',
+                      style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               TextButton.icon(
                 onPressed: () => context.go('/jobs/add', extra: {'companyId': company.id}),
                 icon: const Icon(Icons.add_circle_outline, size: 18, color: AppColors.primary),
-                label: Text(
-                  'Vakansiya qo\'shish',
-                  style: const TextStyle(
+                label: const Text(
+                  "Vakansiya qo'sh",
+                  style: TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
                   ),
                 ),
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   backgroundColor: AppColors.primary.withOpacity(0.08),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),

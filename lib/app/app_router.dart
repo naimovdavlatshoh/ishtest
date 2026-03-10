@@ -40,20 +40,18 @@ Page<dynamic> buildPageWithCustomTransition({
     transitionDuration: const Duration(milliseconds: 350),
     reverseTransitionDuration: const Duration(milliseconds: 300),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(1.0, 0.0);
-      const end = Offset.zero;
       const curve = Curves.easeOutCubic;
 
-      final Animatable<Offset> tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      final Animation<Offset> offsetAnimation = animation.drive(tween);
-
       final Tween<double> fadeTween = Tween<double>(begin: 0.0, end: 1.0);
-      final Animation<double> fadeAnimation = animation.drive(fadeTween);
+      final Animation<double> fadeAnimation = animation.drive(fadeTween.chain(CurveTween(curve: curve)));
 
-      return SlideTransition(
-        position: offsetAnimation,
-        child: FadeTransition(
-          opacity: fadeAnimation,
+      final Tween<double> scaleTween = Tween<double>(begin: 0.95, end: 1.0);
+      final Animation<double> scaleAnimation = animation.drive(scaleTween.chain(CurveTween(curve: curve)));
+
+      return FadeTransition(
+        opacity: fadeAnimation,
+        child: ScaleTransition(
+          scale: scaleAnimation,
           child: child,
         ),
       );
