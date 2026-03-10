@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -32,6 +34,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     final UserMe? userMe = ref.watch(userMeProvider).valueOrNull;
     final int myId = userMe?.id ?? 0;
     final GlobalChatState globalState = ref.watch(globalChatProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     ref.listen(globalChatProvider, (prev, next) {
       if (prev?.unreadByConversation != next.unreadByConversation) {
@@ -48,7 +51,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Text(
-                'Xabarlar',
+                l10n.messagesTitle,
                 style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
               ),
             ),
@@ -59,7 +62,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
               child: state.isLoading && state.conversations.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : state.conversations.isEmpty
-                      ? _buildEmpty()
+                      ? _buildEmpty(l10n)
                       : RefreshIndicator(
                           onRefresh: () => ref.read(conversationListProvider.notifier).load(),
                           child: ListView.builder(
@@ -75,6 +78,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                                 other: other,
                                 myId: myId,
                                 liveUnread: liveUnread,
+                                l10n: l10n,
                                 onTap: () {
                                   // Clear badge immediately on tap
                                   ref.read(globalChatProvider.notifier).markConversationRead(conv.id);
@@ -91,7 +95,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
     );
   }
 
-  Widget _buildEmpty() {
+  Widget _buildEmpty(l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -106,10 +110,10 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
             child: const Icon(Icons.chat_bubble_outline_rounded, size: 44, color: AppColors.primary),
           ),
           const SizedBox(height: 20),
-          const Text("Hali xabarlar yo'q", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(l10n.messagesNoMessagesYet, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text(
-            'Mutaxassislar sahifasidan chat boshlang',
+            l10n.messagesStartChat,
             style: TextStyle(color: Colors.grey[500], fontSize: 14),
           ),
         ],
@@ -119,6 +123,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
 }
 
 class _ConvCard extends ConsumerStatefulWidget {
+  final AppLocalizations l10n;
   final ConversationModel conversation;
   final ParticipantModel? other;
   final int myId;
@@ -131,6 +136,7 @@ class _ConvCard extends ConsumerStatefulWidget {
     required this.myId,
     required this.liveUnread,
     required this.onTap,
+    required this.l10n,
   });
 
   @override
@@ -264,7 +270,7 @@ class _ConvCardState extends ConsumerState<_ConvCard>
                         ),
                         if (lastMsg != null)
                           Text(
-                            _formatTime(lastMsg.createdAt),
+                            _formatTime(lastMsg.createdAt, widget.l10n),
                             style: TextStyle(
                               fontSize: 12,
                               color: isUnread ? AppColors.primary : Colors.grey[400],
@@ -278,7 +284,7 @@ class _ConvCardState extends ConsumerState<_ConvCard>
                       children: [
                         Expanded(
                           child: Text(
-                            lastMsg?.content ?? 'conversation_started',
+                            lastMsg?.content ?? widget.l10n.messagesConversationStarted,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -324,13 +330,13 @@ class _ConvCardState extends ConsumerState<_ConvCard>
     );
   }
 
-  String _formatTime(DateTime time) {
+  String _formatTime(DateTime time, AppLocalizations l10n) {
     final now = DateTime.now();
     final diff = now.difference(time);
     if (diff.inDays == 0) {
       return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
     } else if (diff.inDays == 1) {
-      return 'Kecha';
+      return l10n.messagesYesterday;
     }
     return '${time.day}/${time.month}';
   }

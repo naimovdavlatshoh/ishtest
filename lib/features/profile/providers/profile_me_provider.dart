@@ -100,22 +100,27 @@ class ProfileMeNotifier extends StateNotifier<AsyncValue<ProfileMe>> {
       if (token == null || token.isEmpty) return false;
 
       final Uri uri = Uri.parse(
-        '${Environment.apiBaseUrl}/api/${Environment.apiVersion}/profiles/me',
+        '${Environment.apiBaseUrl}/api/${Environment.apiVersion}/profiles/me/cv',
       );
 
-      final http.MultipartRequest request = http.MultipartRequest('PUT', uri);
-      request.headers['Authorization'] = 'Bearer $token';
+      final http.MultipartRequest request = http.MultipartRequest('POST', uri);
+      request.headers.addAll({
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      });
 
       request.files.add(
         await http.MultipartFile.fromPath(
-          'cvFile',
+          'file',
           filePath,
-          contentType: MediaType('application', 'pdf'), // Default to PDF for CV
         ),
       );
 
       final streamedResponse = await request.send();
       final http.Response response = await http.Response.fromStream(streamedResponse);
+
+      print('DEBUG: CV Upload Status: ${response.statusCode}');
+      print('DEBUG: CV Upload Body: ${response.body}');
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         await fetchProfile();
@@ -169,17 +174,31 @@ class ProfileMeNotifier extends StateNotifier<AsyncValue<ProfileMe>> {
       );
 
       final http.MultipartRequest request = http.MultipartRequest('POST', uri);
-      request.headers['Authorization'] = 'Bearer $token';
+      request.headers.addAll({
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      });
+
+      final String extension = filePath.split('.').last.toLowerCase();
+      MediaType? contentType;
+      if (extension == 'png') contentType = MediaType('image', 'png');
+      else if (extension == 'jpg' || extension == 'jpeg') contentType = MediaType('image', 'jpeg');
+      else if (extension == 'gif') contentType = MediaType('image', 'gif');
+      else if (extension == 'webp') contentType = MediaType('image', 'webp');
 
       request.files.add(
         await http.MultipartFile.fromPath(
-          'file', // Use 'file' as key, modify if the API strictly requires something else.
+          'file',
           filePath,
+          contentType: contentType,
         ),
       );
 
       final streamedResponse = await request.send();
       final http.Response response = await http.Response.fromStream(streamedResponse);
+      
+      print('DEBUG: Avatar Upload Status: ${response.statusCode}');
+      print('DEBUG: Avatar Upload Body: ${response.body}');
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         await fetchProfile(); // refresh profile details after upload

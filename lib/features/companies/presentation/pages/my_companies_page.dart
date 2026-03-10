@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:linkedin_clone/core/theme/app_colors.dart';
@@ -15,12 +17,15 @@ class MyCompaniesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    
     final companiesAsync = ref.watch(myCompaniesProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Mening kompaniyalarim'),
+        title: Text(l10n.myCompaniesTitle),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
@@ -33,11 +38,11 @@ class MyCompaniesPage extends ConsumerWidget {
             children: [
               const Icon(Icons.error_outline, size: 64, color: AppColors.error),
               const SizedBox(height: 16),
-              Text('${'Xatolik yuz berdi'}: $err', textAlign: TextAlign.center),
+              Text('${l10n.errorOccurred}: $err', textAlign: TextAlign.center),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.refresh(myCompaniesProvider),
-                child: Text('Qayta urinish'),
+                child: Text(l10n.employeesRetry),
               ),
             ],
           ),
@@ -47,7 +52,7 @@ class MyCompaniesPage extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: PrimaryButton(
-                text: 'Kompaniya qo\'shish',
+                text: l10n.myCompaniesAddBtn,
                 icon: Icons.add,
                 onPressed: () => context.push('/companies/add'),
               ),
@@ -61,7 +66,7 @@ class MyCompaniesPage extends ConsumerWidget {
                       const Icon(Icons.business_outlined, size: 80, color: AppColors.textTertiary),
                       const SizedBox(height: 16),
                       Text(
-                        'Hozircha kompaniyalar yo\'q',
+                        l10n.myCompaniesEmpty,
                         style: const TextStyle(color: AppColors.textSecondary, fontSize: 16),
                       ),
                     ],
@@ -92,6 +97,8 @@ class _CompanyCard extends ConsumerWidget {
   const _CompanyCard({required this.company});
 
   void _showActionSheet(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -113,7 +120,7 @@ class _CompanyCard extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.settings_outlined, color: AppColors.primary),
-              title: Text('Tahrirlash', style: const TextStyle(fontWeight: FontWeight.w600)),
+              title: Text(l10n.jobActionEdit, style: const TextStyle(fontWeight: FontWeight.w600)),
               onTap: () {
                 context.pop();
                 context.push('/companies/edit/${company.id}', extra: company);
@@ -121,16 +128,16 @@ class _CompanyCard extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
-              title: Text('O\'chirish', style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w600)),
+              title: Text(l10n.jobActionDelete, style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w600)),
               onTap: () async {
                 context.pop();
                 final confirmed = await showDialog<bool>(
                   context: context,
                   builder: (context) => ConfirmDialog(
-                    title: 'Kompaniyani o\'chirish',
-                    message: '${company.name} ${'Ushbu kompaniyani o\'chirishga ishonchingiz komilmi?'}',
-                    confirmText: 'O\'chirish',
-                    cancelText: 'Bekor qilish',
+                    title: l10n.myCompaniesDeleteTitle,
+                    message: '${company.name} ${l10n.myCompaniesDeleteConfirm}',
+                    confirmText: l10n.jobActionDelete,
+                    cancelText: l10n.cancel,
                   ),
                 );
                 
@@ -138,7 +145,7 @@ class _CompanyCard extends ConsumerWidget {
                   final success = await ref.read(myCompaniesProvider.notifier).deleteCompany(company.id);
                   if (context.mounted) {
                     context.showSnackBar(
-                      success ? 'Kompaniya o\'chirildi' : 'Xatolik yuz berdi',
+                      success ? 'Kompaniya o\'chirildi' : l10n.errorOccurred,
                       isError: !success,
                     );
                   }
@@ -153,6 +160,9 @@ class _CompanyCard extends ConsumerWidget {
   }
 
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -213,40 +223,20 @@ class _CompanyCard extends ConsumerWidget {
             style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Flexible(
-                child: Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textTertiary),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        company.location,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Icon(Icons.people_outline, size: 14, color: AppColors.textTertiary),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${company.size} xodim',
-                      style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
+              _buildSmallIconText(Icons.location_on_outlined, company.location),
+              _buildSmallIconText(Icons.people_outline, l10n.myCompaniesEmployeesCount(company.size)),
+              
               TextButton.icon(
                 onPressed: () => context.go('/jobs/add', extra: {'companyId': company.id}),
                 icon: const Icon(Icons.add_circle_outline, size: 18, color: AppColors.primary),
-                label: const Text(
-                  "Vakansiya qo'sh",
-                  style: TextStyle(
+                label: Text(
+                  l10n.myCompaniesAddJob,
+                  style: const TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
@@ -262,6 +252,19 @@ class _CompanyCard extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+  Widget _buildSmallIconText(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: AppColors.textTertiary),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+        ),
+      ],
     );
   }
 }

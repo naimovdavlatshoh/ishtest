@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -33,6 +35,7 @@ class _InvitationsScreenState extends ConsumerState<InvitationsScreen>
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(invitationsProvider);
+    final l10n = AppLocalizations.of(context)!;
     final receivedCount = state.received.length;
     final sentCount = state.sent.length;
 
@@ -64,14 +67,14 @@ class _InvitationsScreenState extends ConsumerState<InvitationsScreen>
                       ),
                       const SizedBox(width: 14),
                       Text(
-                        'Taklifnomalar',
+                        l10n.invitationsTitle,
                         style: AppTextStyles.h2.copyWith(fontSize: 26, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Chat orqali mutaxassislar bilan bog\'laning',
+                    l10n.invitationsSubtitle,
                     style: TextStyle(
                       fontSize: 13.5,
                       color: Colors.grey[500],
@@ -111,7 +114,7 @@ class _InvitationsScreenState extends ConsumerState<InvitationsScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text('Qabul qilingan'),
+                              Text(l10n.invitationsTabReceived),
                               if (receivedCount > 0) ...[
                                 const SizedBox(width: 6),
                                 Container(
@@ -133,7 +136,7 @@ class _InvitationsScreenState extends ConsumerState<InvitationsScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text('Yuborilgan'),
+                              Text(l10n.invitationsTabSent),
                               if (sentCount > 0) ...[
                                 const SizedBox(width: 6),
                                 Container(
@@ -185,11 +188,12 @@ class _ReceivedTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     if (state.isLoadingReceived) {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.received.isEmpty) {
-      return _buildEmpty("Qabul qilingan taklifnomalar yo'q", Icons.mark_email_unread_outlined);
+      return _buildEmpty(l10n.invitationsEmptyReceived, Icons.mark_email_unread_outlined);
     }
     return RefreshIndicator(
       onRefresh: () => ref.read(invitationsProvider.notifier).loadReceived(),
@@ -234,11 +238,12 @@ class _SentTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     if (state.isLoadingSent) {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.sent.isEmpty) {
-      return _buildEmpty("Yuborilgan taklifnomalar yo'q", Icons.send_outlined);
+      return _buildEmpty(l10n.invitationsEmptySent, Icons.send_outlined);
     }
     return RefreshIndicator(
       onRefresh: () => ref.read(invitationsProvider.notifier).loadSent(),
@@ -292,6 +297,7 @@ class _ReceivedCardState extends ConsumerState<_ReceivedCard> {
   @override
   Widget build(BuildContext context) {
     final inv = widget.invitation;
+    final l10n = AppLocalizations.of(context)!;
     final from = inv.fromUser;
     final avatarUrl = from?.avatar?.fullImageUrl;
     final initials = from?.initials ?? '?';
@@ -341,7 +347,7 @@ class _ReceivedCardState extends ConsumerState<_ReceivedCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${from?.fullName ?? 'Noma\'lum'} siz bilan chat ochmoqchi',
+                        l10n.invitationsWantsToChat(from?.fullName ?? l10n.invitationsUnknownUser),
                         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF101828)),
                       ),
                       const SizedBox(height: 5),
@@ -381,7 +387,7 @@ class _ReceivedCardState extends ConsumerState<_ReceivedCard> {
                 children: [
                   Expanded(
                     child: _ActionButton(
-                      label: 'Qabul qilish',
+                      label: l10n.invitationsAccept,
                       icon: Icons.check_rounded,
                       isPrimary: true,
                       isLoading: _isAccepting,
@@ -398,7 +404,7 @@ class _ReceivedCardState extends ConsumerState<_ReceivedCard> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: _ActionButton(
-                      label: 'Rad etish',
+                      label: l10n.invitationsReject,
                       icon: Icons.close_rounded,
                       isPrimary: false,
                       isLoading: _isRejecting,
@@ -432,6 +438,7 @@ class _SentCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final inv = invitation;
     final to = inv.toUser;
     final avatarUrl = to?.avatar?.fullImageUrl;
@@ -478,7 +485,7 @@ class _SentCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Taklifnoma: ${to?.fullName ?? 'Noma\'lum'}',
+                    l10n.invitationsPrefix(to?.fullName ?? l10n.invitationsUnknownUser),
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF101828)),
                   ),
                   const SizedBox(height: 6),
@@ -501,7 +508,7 @@ class _SentCard extends ConsumerWidget {
                       Icon(Icons.send_rounded, size: 12, color: Colors.grey[400]),
                       const SizedBox(width: 4),
                       Text(
-                        'Yuborildi: ${_formatDate(inv.createdAt)}',
+                        l10n.invitationsSentAt(_formatDate(inv.createdAt)),
                         style: TextStyle(fontSize: 12, color: Colors.grey[400]),
                       ),
                     ],
@@ -527,7 +534,7 @@ class _SentCard extends ConsumerWidget {
                             children: [
                               const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 15),
                               const SizedBox(width: 6),
-                              Text('Chatni ochish', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
+                              Text(l10n.invitationsOpenChat, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13)),
                             ],
                           ),
                         ),
@@ -637,19 +644,19 @@ class _StatusBadge extends StatelessWidget {
           case 'accepted':
             color = const Color(0xFF059669);
             bg = const Color(0xFFECFDF5);
-            label = 'Qabul qilindi';
+            label = AppLocalizations.of(context)!.invitationsAccepted;
             icon = Icons.check_circle_outline_rounded;
             break;
           case 'rejected':
             color = const Color(0xFFDC2626);
             bg = const Color(0xFFFEF2F2);
-            label = 'Rad etildi';
+            label = AppLocalizations.of(context)!.invitationsRejected;
             icon = Icons.cancel_outlined;
             break;
           default:
             color = const Color(0xFFF59E0B);
             bg = const Color(0xFFFFFBEB);
-            label = 'Kutilmoqda';
+            label = AppLocalizations.of(context)!.invitationsPending;
             icon = Icons.schedule_rounded;
         }
 

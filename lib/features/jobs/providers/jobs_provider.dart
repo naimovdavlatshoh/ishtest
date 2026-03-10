@@ -12,6 +12,8 @@ class JobsFilters {
   final int? salaryMin;
   final int? salaryMax;
   final String? dateFrom;
+  final String? search;
+
 
   JobsFilters({
     this.jobType,
@@ -20,6 +22,7 @@ class JobsFilters {
     this.salaryMin,
     this.salaryMax,
     this.dateFrom,
+    this.search,
   });
 
   JobsFilters copyWith({
@@ -29,12 +32,14 @@ class JobsFilters {
     int? salaryMin,
     int? salaryMax,
     String? dateFrom,
+    String? search,
     bool clearJobType = false,
     bool clearLocation = false,
     bool clearIsRemote = false,
     bool clearSalaryMin = false,
     bool clearSalaryMax = false,
     bool clearDateFrom = false,
+    bool clearSearch = false,
   }) {
     return JobsFilters(
       jobType: clearJobType ? null : (jobType ?? this.jobType),
@@ -43,6 +48,7 @@ class JobsFilters {
       salaryMin: clearSalaryMin ? null : (salaryMin ?? this.salaryMin),
       salaryMax: clearSalaryMax ? null : (salaryMax ?? this.salaryMax),
       dateFrom: clearDateFrom ? null : (dateFrom ?? this.dateFrom),
+      search: clearSearch ? null : (search ?? this.search),
     );
   }
 
@@ -54,6 +60,7 @@ class JobsFilters {
     if (salaryMin != null) params['salary_min'] = salaryMin!.toString();
     if (salaryMax != null) params['salary_max'] = salaryMax!.toString();
     if (dateFrom != null && dateFrom!.isNotEmpty) params['date_from'] = dateFrom!;
+    if (search != null && search!.isNotEmpty) params['search'] = search!;
     return params;
   }
 }
@@ -245,6 +252,15 @@ class JobsNotifier extends StateNotifier<JobsState> {
 
   void clearFilters() {
     state = state.copyWith(filters: JobsFilters(), skip: 0);
+    loadJobs();
+  }
+
+  void setSearch(String? search) {
+    if (state.filters.search == search) return;
+    state = state.copyWith(
+      filters: state.filters.copyWith(search: search, clearSearch: search == null),
+      skip: 0,
+    );
     loadJobs();
   }
 

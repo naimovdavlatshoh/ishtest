@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -131,6 +133,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final profileAsync = ref.watch(profileMeProvider);
 
     return Scaffold(
@@ -143,7 +146,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'Profil sozlamalari',
+          l10n.profileSettingsTitle,
           style: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
         ),
       ),
@@ -157,29 +160,29 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'profile_edit_subtitle',
+                l10n.profileSettingsSubtitle,
                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 20),
-              _buildUserPreview(profile),
+              _buildUserPreview(profile, l10n),
               const SizedBox(height: 20),
               Theme(
                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                 child: Column(
                   children: [
-                    _buildAsosiySection(),
+                    _buildAsosiySection(l10n),
                     const SizedBox(height: 12),
-                    _buildSkillsSection(),
+                    _buildSkillsSection(l10n),
                     const SizedBox(height: 12),
-                    _buildTajribaSection(profile),
+                    _buildTajribaSection(profile, l10n),
                     const SizedBox(height: 12),
-                    _buildTalimSection(profile),
+                    _buildTalimSection(profile, l10n),
                     const SizedBox(height: 12),
-                    SizedBox(key: _keyRezyume, child: _buildRezyumeSection(profile)),
+                    SizedBox(key: _keyRezyume, child: _buildRezyumeSection(profile, l10n)),
                     const SizedBox(height: 12),
-                    SizedBox(key: _keyKorinish, child: _buildKorinishSection()),
+                    SizedBox(key: _keyKorinish, child: _buildKorinishSection(l10n)),
                     const SizedBox(height: 12),
-                    _buildAkkauntSection(),
+                    _buildAkkauntSection(l10n),
                   ],
                 ),
               ),
@@ -191,7 +194,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildUserPreview(ProfileMe profile) {
+  Widget _buildUserPreview(ProfileMe profile, AppLocalizations l10n) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -211,12 +214,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               );
               if (result != null && result.files.isNotEmpty && result.files.first.path != null) {
                 final filePath = result.files.first.path!;
+                final extension = filePath.split('.').last.toLowerCase();
+                final allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                
+                if (!allowedExtensions.contains(extension)) {
+                  if (mounted) {
+                    context.showSnackBar(l10n.profileImageUploadError, isError: true);
+                  }
+                  return;
+                }
+
                 if (mounted) {
-                  context.showSnackBar('uploading_image', isError: false);
+                  context.showSnackBar(l10n.profileUploadingImage, isError: false);
                   final success = await ref.read(profileMeProvider.notifier).uploadAvatar(filePath);
                   if (mounted) {
                     context.showSnackBar(
-                      success ? 'image_uploaded' : 'image_upload_error',
+                      success ? l10n.profileImageUploaded : l10n.profileImageUploadError,
                       isError: !success,
                     );
                   }
@@ -257,7 +270,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(height: 16),
           Text(profile.fullName, style: AppTextStyles.h3),
-          Text(profile.city ?? 'location_not_set', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+          Text(profile.city ?? l10n.profileLocationNotSet, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
           Text(profile.title, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
           const SizedBox(height: 12),
           Container(
@@ -273,7 +286,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 const Icon(Icons.check_circle_outline, size: 14, color: Colors.green),
                 const SizedBox(width: 4),
                 Text(
-                  'complete',
+                  l10n.profileCompleteBadge,
                   style: AppTextStyles.caption.copyWith(color: Colors.green, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -284,19 +297,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildAsosiySection() {
+  Widget _buildAsosiySection(AppLocalizations l10n) {
     return _buildExpansionCard(
-      title: 'main_section',
+      title: l10n.profileMainSection,
       icon: Icons.person_outline,
       children: [
-        _buildTextField(label: 'full_name_required', controller: _nameController),
+        _buildTextField(label: l10n.profileFullNameReq, controller: _nameController),
         const SizedBox(height: 16),
-        _buildTextField(label: 'city_required', controller: _cityController),
+        _buildTextField(label: l10n.profileCityReq, controller: _cityController),
         const SizedBox(height: 16),
-        _buildTextField(label: 'position', controller: _titleController),
+        _buildTextField(label: l10n.profilePosition, controller: _titleController),
         const SizedBox(height: 16),
         _buildTextField(
-          label: 'about_me',
+          label: l10n.profileAboutMe,
           controller: _bioController,
           maxLines: 4,
           hint: 'Python/Js Software Engineer',
@@ -305,13 +318,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            '${_bioController.text.length} ${'characters'}',
+            '${_bioController.text.length} ${l10n.profileCharacters}',
             style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
           ),
         ),
         const SizedBox(height: 20),
         PrimaryButton(
-          text: 'Saqlash',
+          text: l10n.profileSave,
           onPressed: () async {
             final success = await ref.read(profileMeProvider.notifier).updateProfile({
               'fullName': _nameController.text,
@@ -332,9 +345,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildSkillsSection() {
+  Widget _buildSkillsSection(AppLocalizations l10n) {
     return _buildExpansionCard(
-      title: 'Ko\'nikmalar',
+      title: l10n.profileSkills,
       icon: Icons.work_outline,
       children: [
         Row(
@@ -342,7 +355,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           children: [
             Expanded(
               child: _buildTextField(
-                label: 'Ko\'nikma qo\'shing...',
+                label: l10n.profileAddSkill,
                 controller: _skillController,
                 hint: 'React',
               ),
@@ -373,7 +386,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            '${'your_skills'} (${_skills.length})',
+            '${l10n.profileYourSkills} (${_skills.length})',
             style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
@@ -385,7 +398,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ),
         const SizedBox(height: 24),
         PrimaryButton(
-          text: 'save_skills',
+          text: l10n.profileSaveSkills,
           onPressed: () async {
             final success = await ref.read(profileMeProvider.notifier).updateProfile({
               'skills': _skills,
@@ -428,18 +441,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildTajribaSection(ProfileMe profile) {
+  Widget _buildTajribaSection(ProfileMe profile, AppLocalizations l10n) {
     return _buildExpansionCard(
-      title: 'Tajriba',
+      title: l10n.profileExperience,
       icon: Icons.business_center_outlined,
       children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text('work_experience', style: AppTextStyles.h4),
+          child: Text(l10n.profileWorkExperience, style: AppTextStyles.h4),
         ),
         const SizedBox(height: 16),
         PrimaryButton(
-          text: 'add_experience',
+          text: l10n.profileAddExperience,
           onPressed: () {
             setState(() {
               _experiences.add(Experience(
@@ -456,11 +469,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ..._experiences.asMap().entries.map((entry) {
           final index = entry.key;
           final exp = entry.value;
-          return _buildExperienceEditItem(exp, index);
+          return _buildExperienceEditItem(exp, index, l10n);
         }),
         const SizedBox(height: 12),
         PrimaryButton(
-          text: 'save_experience',
+          text: l10n.profileSaveExperience,
           onPressed: () async {
             final success = await ref.read(profileMeProvider.notifier).updateProfile({
               'experience': _experiences.map((e) => e.toJson()).toList(),
@@ -478,7 +491,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildExperienceEditItem(Experience exp, int index) {
+  Widget _buildExperienceEditItem(Experience exp, int index, AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -491,7 +504,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTextField(
-            label: 'position_required',
+            label: l10n.profilePositionReq,
             initialValue: exp.title,
             onChanged: (v) {
               setState(() {
@@ -509,7 +522,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(height: 16),
           _buildTextField(
-            label: 'company_required',
+            label: l10n.profileCompanyReq,
             initialValue: exp.company,
             onChanged: (v) {
               setState(() {
@@ -527,7 +540,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(height: 16),
           _buildTextField(
-            label: 'address',
+            label: l10n.profileAddress,
             initialValue: exp.location ?? '',
             onChanged: (v) {
               setState(() {
@@ -565,7 +578,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             },
             child: AbsorbPointer(
               child: _buildTextField(
-                label: 'start_date_required',
+                label: l10n.profileStartDateReq,
                 initialValue: exp.startDate,
                 suffixIcon: const Icon(Icons.calendar_today, size: 18),
               ),
@@ -593,7 +606,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               },
               child: AbsorbPointer(
                 child: _buildTextField(
-                  label: 'end_date',
+                  label: l10n.profileEndDate,
                   initialValue: exp.endDate ?? '',
                   suffixIcon: const Icon(Icons.calendar_today, size: 18),
                 ),
@@ -620,12 +633,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   });
                 },
               ),
-              Text('currently_working_here'),
+              Text(l10n.profileCurrentlyWorkingHere),
             ],
           ),
           const SizedBox(height: 16),
           _buildTextField(
-            label: 'description',
+            label: l10n.profileDescription,
             initialValue: exp.description ?? '',
             maxLines: 3,
             onChanged: (v) {
@@ -653,7 +666,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 });
               },
               icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
-              label: Text('O\'chirish', style: const TextStyle(color: Colors.red)),
+              label: Text(l10n.profileDelete, style: const TextStyle(color: Colors.red)),
             ),
           ),
         ],
@@ -661,18 +674,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildTalimSection(ProfileMe profile) {
+  Widget _buildTalimSection(ProfileMe profile, AppLocalizations l10n) {
     return _buildExpansionCard(
-      title: 'education',
+      title: l10n.profileEducation,
       icon: Icons.school_outlined,
       children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text('education', style: AppTextStyles.h4),
+          child: Text(l10n.profileEducation, style: AppTextStyles.h4),
         ),
         const SizedBox(height: 16),
         PrimaryButton(
-          text: 'add_education',
+          text: l10n.profileAddEducation,
           onPressed: () {
             setState(() {
               _educations.add(Education(
@@ -691,14 +704,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ..._educations.asMap().entries.map((entry) {
           final index = entry.key;
           final edu = entry.value;
-          return _buildEducationEditItem(edu, index);
+          return _buildEducationEditItem(edu, index, l10n);
         }),
         const SizedBox(height: 12),
         PrimaryButton(
-          text: 'save_education',
+          text: l10n.profileSaveEducation,
           onPressed: () async {
             final success = await ref.read(profileMeProvider.notifier).updateProfile({
-              'education': _educations.map((e) => e.toJson()).toList(),
+              l10n.profileEducation: _educations.map((e) => e.toJson()).toList(),
             });
             if (context.mounted) {
               context.showSnackBar(
@@ -713,7 +726,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildEducationEditItem(Education edu, int index) {
+  Widget _buildEducationEditItem(Education edu, int index, AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -726,7 +739,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTextField(
-            label: 'school_required',
+            label: l10n.profileSchoolReq,
             initialValue: edu.school,
             onChanged: (v) {
               setState(() {
@@ -744,7 +757,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(height: 16),
           _buildTextField(
-            label: 'degree_required',
+            label: l10n.profileDegreeReq,
             initialValue: edu.degree,
             onChanged: (v) {
               setState(() {
@@ -762,7 +775,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           const SizedBox(height: 16),
           _buildTextField(
-            label: 'specialization',
+            label: l10n.profileSpecialization,
             initialValue: edu.field,
             onChanged: (v) {
               setState(() {
@@ -825,7 +838,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               },
               child: AbsorbPointer(
                 child: _buildTextField(
-                  label: 'end_date',
+                  label: l10n.profileEndDate,
                   initialValue: edu.endDate ?? '',
                   suffixIcon: const Icon(Icons.calendar_today, size: 18),
                 ),
@@ -864,7 +877,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 });
               },
               icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
-              label: Text('O\'chirish', style: const TextStyle(color: Colors.red)),
+              label: Text(l10n.profileDelete, style: const TextStyle(color: Colors.red)),
             ),
           ),
         ],
@@ -872,19 +885,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildKorinishSection() {
+  Widget _buildKorinishSection(AppLocalizations l10n) {
     return _buildExpansionCard(
-      title: 'Ko\'rinish',
+      title: l10n.profileAppearance,
       icon: Icons.visibility_outlined,
       children: [
         Align(
           alignment: Alignment.centerLeft,
-          child: Text('profile_visibility', style: AppTextStyles.h4),
+          child: Text(l10n.profileVisibility, style: AppTextStyles.h4),
         ),
         const SizedBox(height: 16),
         _buildVisibilityToggle(
-          title: 'Ko\'rinish',
-          description: 'open_to_work_desc',
+          l10n: l10n,
+          title: l10n.profileAppearance,
+          description: l10n.profileOpenToWorkDesc,
           value: _isPublic,
           onChanged: (v) async {
             setState(() => _isPublic = v);
@@ -894,7 +908,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             });
             if (context.mounted) {
               context.showSnackBar(
-                success ? 'visibility_updated' : 'Xatolik yuz berdi',
+                success ? l10n.profileVisibilityUpdated : l10n.profileVisibilityError,
                 isError: !success,
               );
             }
@@ -905,6 +919,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Widget _buildVisibilityToggle({
+    required AppLocalizations l10n,
     required String title,
     required String description,
     required bool value,
@@ -952,7 +967,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'show_on_this_page',
+                    l10n.profileShowOnThisPage,
                     style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                   ),
                 ),
@@ -964,11 +979,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildAkkauntSection() {
+  Widget _buildAkkauntSection(AppLocalizations l10n) {
     final userMeAsync = ref.watch(userMeProvider);
 
     return _buildExpansionCard(
-      title: 'account',
+      title: l10n.profileAccount,
       icon: Icons.link,
       children: [
         const Align(
@@ -998,9 +1013,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Telegramga ulangan',
-                            style: TextStyle(
+                          Text(
+                            l10n.profileTelegramConnected,
+                            style: const TextStyle(
                               color: Colors.green,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -1029,7 +1044,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Telegramni ulang — bot orqali kod bilan kiring (parolsiz).',
+                    l10n.profileTelegramConnectDesc,
                     style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                   ),
                   const SizedBox(height: 16),
@@ -1096,14 +1111,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 
-  Widget _buildRezyumeSection(ProfileMe profile) {
+  Widget _buildRezyumeSection(ProfileMe profile, AppLocalizations l10n) {
     return _buildExpansionCard(
-      title: 'Rezyume',
+      title: l10n.profileResume,
       icon: Icons.description_outlined,
       children: [
-        const Align(
+        Align(
           alignment: Alignment.centerLeft,
-          child: Text('Rezyumeni yuklash', style: AppTextStyles.h4),
+          child: Text(l10n.profileResumeUploadTitle, style: AppTextStyles.h4),
         ),
         const SizedBox(height: 16),
         Container(
@@ -1118,13 +1133,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             children: [
               const Icon(Icons.cloud_upload_outlined, size: 48, color: AppColors.textTertiary),
               const SizedBox(height: 12),
-              const Text('Rezyumeni yuklang (PDF, DOC, DOCX)', style: AppTextStyles.bodyMedium),
-              const Text('Maks. hajmi: 5MB', style: AppTextStyles.caption),
+              Text(l10n.profileResumeUploadDesc, style: AppTextStyles.bodyMedium),
+              Text(l10n.profileMaxFileSize, style: AppTextStyles.caption),
               const SizedBox(height: 16),
-              SizedBox(
-                width: 200,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: PrimaryButton(
-                  text: 'Fayl tanlash',
+                  text: l10n.profileChooseFile,
                   onPressed: () async {
                     FilePickerResult? result = await FilePicker.platform.pickFiles(
                       type: FileType.custom,
@@ -1138,7 +1153,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       
                       if (context.mounted) {
                         context.showSnackBar(
-                          success ? 'Fayl muvaffaqiyatli yuklandi' : 'Yuklashda xatolik',
+                          success ? l10n.profileFileUploadSuccess : l10n.profileFileUploadError,
                           isError: !success,
                         );
                       }
@@ -1167,7 +1182,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Rezyume yuklandi', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                      Text(l10n.profileResumeUploadedBadge, style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
                       Text(profile.cvFile!.split('/').last, style: AppTextStyles.caption.copyWith(color: Colors.green)),
                     ],
                   ),
@@ -1180,7 +1195,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     });
                     if (context.mounted) {
                       context.showSnackBar(
-                        success ? 'Fayl o\'chirildi' : 'Xatolik yuz berdi',
+                        success ? 'Fayl o\'chirildi' : l10n.profileVisibilityError,
                         isError: !success,
                       );
                     }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -13,6 +15,7 @@ class ProfileMeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final AsyncValue<ProfileMe> profileAsync = ref.watch(profileMeProvider);
 
     return Scaffold(
@@ -23,7 +26,7 @@ class ProfileMeScreen extends ConsumerWidget {
         automaticallyImplyLeading: false,
         leading: null,
         title: Text(
-          'Mening profilim',
+          l10n.profileTitle,
           style: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
         ),
         actions: const [],
@@ -37,11 +40,11 @@ class ProfileMeScreen extends ConsumerWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               children: [
-                _buildHeader(context, ref, profile),
-                _buildSkills(ref, profile),
-                _buildExperience(ref, profile),
-                _buildEducation(ref, profile),
-                _buildResume(ref, profile),
+                _buildHeader(context, ref, profile, l10n),
+                _buildSkills(ref, profile, l10n),
+                _buildExperience(ref, profile, l10n),
+                _buildEducation(ref, profile, l10n),
+                _buildResume(ref, profile, l10n),
                 const SizedBox(height: 32),
               ],
             ),
@@ -51,7 +54,7 @@ class ProfileMeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, WidgetRef ref, ProfileMe profile) {
+  Widget _buildHeader(BuildContext context, WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -97,7 +100,7 @@ class ProfileMeScreen extends ConsumerWidget {
                 OutlinedButton.icon(
                   onPressed: () => context.push('/profile/edit'),
                   icon: const Icon(Icons.edit_outlined, size: 18),
-                  label: Text('profile_edit'),
+                  label: Text(l10n.profileEditBtn),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primary,
                     side: const BorderSide(color: AppColors.primary),
@@ -171,7 +174,7 @@ class ProfileMeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSkills(WidgetRef ref, ProfileMe profile) {
+  Widget _buildSkills(WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
     if (profile.skills.isEmpty) return const SizedBox.shrink();
     
     return Container(
@@ -190,7 +193,7 @@ class ProfileMeScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.code, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              Text('Ko\'nikmalar', style: AppTextStyles.h3),
+              Text(l10n.profileSkills, style: AppTextStyles.h3),
             ],
           ),
           const SizedBox(height: 16),
@@ -217,7 +220,7 @@ class ProfileMeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildExperience(WidgetRef ref, ProfileMe profile) {
+  Widget _buildExperience(WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
     if (profile.experience.isEmpty) return const SizedBox.shrink();
 
     return Container(
@@ -236,7 +239,7 @@ class ProfileMeScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.work_outline, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              Text('Tajriba', style: AppTextStyles.h3),
+              Text(l10n.profileExperience, style: AppTextStyles.h3),
             ],
           ),
           const SizedBox(height: 24),
@@ -317,7 +320,7 @@ class ProfileMeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEducation(WidgetRef ref, ProfileMe profile) {
+  Widget _buildEducation(WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
     if (profile.education.isEmpty) return const SizedBox.shrink();
 
     return Container(
@@ -336,7 +339,7 @@ class ProfileMeScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.school_outlined, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              Text('education', style: AppTextStyles.h3),
+              Text(l10n.profileEducation, style: AppTextStyles.h3),
             ],
           ),
           const SizedBox(height: 24),
@@ -383,7 +386,7 @@ class ProfileMeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildResume(WidgetRef ref, ProfileMe profile) {
+  Widget _buildResume(WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
     if (profile.cvFile == null) return const SizedBox.shrink();
 
     return Container(
@@ -402,7 +405,7 @@ class ProfileMeScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.description_outlined, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              Text('resume', style: AppTextStyles.h3),
+              Text(l10n.profileResume, style: AppTextStyles.h3),
             ],
           ),
           const SizedBox(height: 16),
@@ -432,7 +435,7 @@ class ProfileMeScreen extends ConsumerWidget {
                         style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        'uploaded_cv',
+                        l10n.profileUploadedCv,
                         style: AppTextStyles.caption,
                       ),
                     ],
@@ -441,7 +444,7 @@ class ProfileMeScreen extends ConsumerWidget {
                 ElevatedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.open_in_new, size: 16),
-                  label: Text('Profilni ko\'rish'),
+                  label: Text(l10n.profileViewBtn),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,

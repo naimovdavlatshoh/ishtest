@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
@@ -25,6 +27,9 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    
     final state = ref.watch(myApplicationsProvider);
 
     return Scaffold(
@@ -58,11 +63,11 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Mening arizalarim',
+                            l10n.myAppsTitle,
                             style: AppTextStyles.h2.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            'Arizalaringizni kuzating',
+                            l10n.myAppsSubtitle,
                             style: TextStyle(fontSize: 13, color: Colors.grey[500]),
                           ),
                         ],
@@ -105,23 +110,27 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
   }
 
   Widget _buildStatsRow(List<ApplicationModel> apps) {
+    final l10n = AppLocalizations.of(context)!;
+    
     final pending = apps.where((a) => a.status == 'pending').length;
     final accepted = apps.where((a) => a.status == 'accepted').length;
     final rejected = apps.where((a) => a.status == 'rejected').length;
     return Row(
       children: [
-        Expanded(child: _StatChip(label: 'total', value: apps.length, color: const Color(0xFF1D4ED8))),
+        Expanded(child: _StatChip(label: l10n.myAppsTotal, value: apps.length, color: const Color(0xFF1D4ED8))),
         const SizedBox(width: 10),
-        Expanded(child: _StatChip(label: 'pending', value: pending, color: const Color(0xFFF59E0B))),
+        Expanded(child: _StatChip(label: l10n.myAppsPending, value: pending, color: const Color(0xFFF59E0B))),
         const SizedBox(width: 10),
-        Expanded(child: _StatChip(label: 'accepted', value: accepted, color: const Color(0xFF059669))),
+        Expanded(child: _StatChip(label: l10n.myAppsAccepted, value: accepted, color: const Color(0xFF059669))),
         const SizedBox(width: 10),
-        Expanded(child: _StatChip(label: 'rejected', value: rejected, color: const Color(0xFFDC2626))),
+        Expanded(child: _StatChip(label: l10n.myAppsRejected, value: rejected, color: const Color(0xFFDC2626))),
       ],
     );
   }
 
   Widget _buildEmpty() {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -136,10 +145,10 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
             child: const Icon(Icons.description_outlined, size: 44, color: AppColors.primary),
           ),
           const SizedBox(height: 20),
-          Text('Hali arizalar yo\'q', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(l10n.myAppsEmpty, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text(
-            'Vakansiyalar bo\'limidan ariza topshiring',
+            l10n.myAppsEmptySubtitle,
             style: TextStyle(color: Colors.grey[500], fontSize: 14),
           ),
           const SizedBox(height: 24),
@@ -151,7 +160,7 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
                 gradient: const LinearGradient(colors: [Color(0xFF1D4ED8), Color(0xFF3B82F6)]),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text('Vakansiyalarga o\'tish', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+              child: Text(l10n.myAppsGoToJobs, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -171,6 +180,9 @@ class _StatChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
@@ -207,6 +219,7 @@ class _ApplicationCard extends ConsumerStatefulWidget {
 }
 
 class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
+    
   bool _isWithdrawing = false;
 
   Future<void> _callViewApi(int jobId) async {
@@ -226,6 +239,9 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    
     final app = widget.application;
     final job = app.job;
 
@@ -278,7 +294,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          job?.title ?? 'Vakansiya',
+                          job?.title ?? l10n.vacanciesNoJobs,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -299,7 +315,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                               _InfoChip(icon: Icons.location_on_outlined, text: job.location),
                             _InfoChip(
                               icon: Icons.calendar_today_outlined,
-                              text: 'Ariza yuborildi: ${_formatDate(app.createdAt)}',
+                              text: l10n.myAppsSentAt(_formatDate(app.createdAt)),
                             ),
                           ],
                         ),
@@ -349,7 +365,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                                   const Icon(Icons.delete_outline_rounded, size: 15, color: Color(0xFFDC2626)),
                                   const SizedBox(width: 5),
                                   Text(
-                                    'withdraw',
+                                    l10n.myAppsWithdraw,
                                     style: const TextStyle( // Added const
                                       color: Color(0xFFDC2626),
                                       fontSize: 13,
@@ -369,7 +385,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                 const Divider(height: 1, color: Color(0xFFF2F4F7)),
                 const SizedBox(height: 12),
                 Text(
-                  'Arizadagi maktub:',
+                  l10n.myAppsCoverLetterLabel,
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey[400]),
                 ),
                 const SizedBox(height: 4),
@@ -386,6 +402,8 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
   }
 
   Future<bool?> _showConfirmDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return showDialog<bool>(
       context: context,
       barrierColor: Colors.black.withOpacity(0.4),
@@ -408,13 +426,13 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Arizani qaytarib olish',
+                l10n.myAppsWithdrawTitle,
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // Added const
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'Arizani qaytarib olmoqchimisiz?',
+                l10n.myAppsWithdrawConfirm,
                 style: TextStyle(fontSize: 13.5, color: Colors.grey[500], height: 1.5),
                 textAlign: TextAlign.center,
               ),
@@ -433,7 +451,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                         ),
                         child: Center( // Removed const
                           child: Text(
-                            'Bekor qilish',
+                            l10n.cancel,
                             style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF344054)), // Added const
                           ),
                         ),
@@ -452,7 +470,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                         ),
                         child: Center( // Removed const
                           child: Text(
-                            'Ha, qaytarib olish',
+                            l10n.myAppsWithdrawConfirmBtn,
                             style: const TextStyle( // Added const
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
@@ -490,6 +508,8 @@ class _StatusBadge extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    
     Color color;
     Color bg;
     Color border;
@@ -501,21 +521,21 @@ class _StatusBadge extends ConsumerWidget {
         color = const Color(0xFF059669);
         bg = const Color(0xFFECFDF5);
         border = const Color(0xFFBBF7D0);
-        label = 'Qabul qilindi';
+        label = l10n.myAppsAccepted;
         icon = Icons.check_circle_outline_rounded;
         break;
       case 'rejected':
         color = const Color(0xFFDC2626);
         bg = const Color(0xFFFEF2F2);
         border = const Color(0xFFFFCDD2);
-        label = 'Rad etildi';
+        label = l10n.myAppsRejected;
         icon = Icons.cancel_outlined;
         break;
       default:
         color = const Color(0xFFD97706);
         bg = const Color(0xFFFFFBEB);
         border = const Color(0xFFFDE68A);
-        label = 'Ko\'rib chiqilmoqda';
+        label = l10n.invitationsPending;
         icon = Icons.schedule_rounded;
     }
 
@@ -547,6 +567,9 @@ class _InfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

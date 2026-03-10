@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/job_applications_provider.dart';
 import '../../../shared/models/application_model.dart';
@@ -29,6 +31,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(jobApplicationsProvider);
 
     return Scaffold(
@@ -41,7 +44,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'back',
+          l10n.jobAppBack,
           style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textPrimary),
         ),
         titleSpacing: 0,
@@ -68,7 +71,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        'applications_for'.replaceAll('{}', widget.jobTitle),
+                                        l10n.jobAppTitle(widget.jobTitle),
                                         style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
                                       ),
                                     ),
@@ -76,7 +79,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'applications_for_desc',
+                                  l10n.jobAppSubtitle,
                                   style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                                 ),
                               ],
@@ -114,6 +117,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
   }
 
   Widget _buildApplicationCard(WidgetRef ref, ApplicationModel app) {
+    final l10n = AppLocalizations.of(context)!;
     final initials = (app.applicant?.firstName.substring(0, 1).toUpperCase() ?? '') +
                      (app.applicant?.lastName.substring(0, 1).toUpperCase() ?? '');
     
@@ -190,33 +194,33 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
           const SizedBox(height: 16),
 
           // Action Buttons
-          if (app.status.toLowerCase() == 'pending' || app.status.toLowerCase() == 'reviewed')
+          if (app.status.toLowerCase() == l10n.jobAppStatusPending || app.status.toLowerCase() == 'reviewed')
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  if (app.status.toLowerCase() == 'pending')
+                  if (app.status.toLowerCase() == l10n.jobAppStatusPending)
                     Expanded(
                       child: _buildActionButton(
-                        label: 'status_pending',
+                        label: l10n.jobAppActionReview,
                         bgColor: AppColors.primary.withOpacity(0.08),
                         textColor: AppColors.primary,
                         onTap: () => _updateStatus(app.id, 'reviewed'),
                       ),
                     ),
-                  if (app.status.toLowerCase() == 'pending') const SizedBox(width: 12),
+                  if (app.status.toLowerCase() == l10n.jobAppStatusPending) const SizedBox(width: 12),
                   Expanded(
                     child: _buildActionButton(
-                      label: 'accept',
+                      label: l10n.jobAppActionAccept,
                       bgColor: const Color(0xFFECFDF5),
                       textColor: const Color(0xFF10B981),
-                      onTap: () => _updateStatus(app.id, 'accepted'),
+                      onTap: () => _updateStatus(app.id, l10n.jobAppStatusAccepted),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildActionButton(
-                      label: 'reject',
+                      label: l10n.jobAppActionReject,
                       bgColor: const Color(0xFFFEF2F2),
                       textColor: const Color(0xFFEF4444),
                       onTap: () => _updateStatus(app.id, 'rejected'),
@@ -238,12 +242,12 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                   children: [
                     const Icon(Icons.description_outlined, size: 18, color: AppColors.textTertiary),
                     const SizedBox(width: 8),
-                    Text('Cover Letter', style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.bold)),
+                    Text(l10n.jobAppCoverLetter, style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.bold)),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  app.coverLetter.isEmpty ? 'not_available' : app.coverLetter,
+                  app.coverLetter.isEmpty ? l10n.jobAppNotAvailable : app.coverLetter,
                   style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                 ),
               ],
@@ -264,7 +268,7 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
                   const Icon(Icons.person_outline, size: 20, color: AppColors.primary),
                   const SizedBox(width: 8),
                   Text(
-                    'full_profile',
+                    l10n.jobAppFullProfile,
                     style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -290,26 +294,27 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
   }
 
   Widget _buildStatusBadge(WidgetRef ref, String status) {
+    final l10n = AppLocalizations.of(context)!;
     String label = 'new';
     Color color = const Color(0xFFF59E0B);
     Color bgColor = const Color(0xFFFFFBEB);
 
     switch (status.toLowerCase()) {
       case 'pending':
-        label = 'status_pending';
+        label = l10n.jobAppStatusPending;
         break;
       case 'reviewed':
-        label = 'status_pending';
+        label = l10n.jobAppStatusPending;
         color = AppColors.primary;
         bgColor = AppColors.primary.withOpacity(0.08);
         break;
       case 'accepted':
-        label = 'status_accepted';
+        label = l10n.jobAppStatusAccepted;
         color = const Color(0xFF10B981);
         bgColor = const Color(0xFFECFDF5);
         break;
       case 'rejected':
-        label = 'status_rejected';
+        label = l10n.jobAppStatusRejected;
         color = const Color(0xFFEF4444);
         bgColor = const Color(0xFFFEF2F2);
         break;
@@ -366,24 +371,25 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
   }
 
   Widget _buildStatsGrid(WidgetRef ref, dynamic state) {
-    final pending = state.applications.where((a) => a.status == 'pending').length;
-    final accepted = state.applications.where((a) => a.status == 'accepted').length;
+    final l10n = AppLocalizations.of(context)!;
+    final pending = state.applications.where((a) => a.status == l10n.jobAppStatusPending).length;
+    final accepted = state.applications.where((a) => a.status == l10n.jobAppStatusAccepted).length;
 
     return Column(
       children: [
         Row(
           children: [
-            Expanded(child: _buildStatItem('${state.applications.length}', 'total')),
+            Expanded(child: _buildStatItem('${state.applications.length}', l10n.jobAppTotal)),
             const SizedBox(width: 16),
-            Expanded(child: _buildStatItem('$pending', 'pending', valueColor: const Color(0xFFF59E0B))),
+            Expanded(child: _buildStatItem('$pending', l10n.jobAppStatusPending, valueColor: const Color(0xFFF59E0B))),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: _buildStatItem('0', 'pending')),
+            Expanded(child: _buildStatItem('0', l10n.jobAppStatusPending)),
             const SizedBox(width: 16),
-            Expanded(child: _buildStatItem('$accepted', 'accepted', valueColor: const Color(0xFF10B981))),
+            Expanded(child: _buildStatItem('$accepted', l10n.jobAppStatusAccepted, valueColor: const Color(0xFF10B981))),
           ],
         ),
       ],
@@ -415,10 +421,11 @@ class _JobApplicationsScreenState extends ConsumerState<JobApplicationsScreen> {
   }
 
   Future<void> _updateStatus(int appId, String status) async {
+    final l10n = AppLocalizations.of(context)!;
     final success = await ref.read(jobApplicationsProvider.notifier).updateApplicationStatus(appId, status);
     if (mounted) {
       context.showSnackBar(
-        success ? 'data_saved' : 'Xatolik yuz berdi',
+        success ? l10n.jobAppDataSaved : l10n.errorOccurred,
         isError: !success,
       );
     }

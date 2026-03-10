@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/models/job_model.dart';
 import '../../../core/theme/app_colors.dart';
@@ -16,21 +18,22 @@ class JobCard extends ConsumerWidget {
     this.trailing,
   });
 
-  String _formatSalary(int? min, int? max, String currency) {
-    if (min == null && max == null) return 'Kelishiladi';
+  String _formatSalary(int? min, int? max, String currency, AppLocalizations l10n) {
+    if (min == null && max == null) return l10n.vacanciesSalaryNegotiable;
     if (min != null && max != null) {
       return '$min - $max $currency';
     } else if (min != null) {
-      return '$min dan $currency';
+      return '${l10n.vacanciesSalaryFrom} $min $currency';
     } else {
-      return '$max gacha $currency';
+      return '$max $currency ${l10n.vacanciesSalaryTo}';
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final companyName = job.company?.name ?? 'Kompaniya';
-    final companyIndustry = job.company?.industry ?? "Soha ko'rsatilmagan";
+    final l10n = AppLocalizations.of(context)!;
+    final companyName = job.company?.name ?? l10n.vacanciesCompany;
+    final companyIndustry = job.company?.industry ?? l10n.vacanciesIndustryNotSpecified;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -103,14 +106,14 @@ class JobCard extends ConsumerWidget {
                   runSpacing: 6,
                   children: [
                     _buildTag(Icons.location_on_outlined, job.location, maxWidth: 220),
-                    _buildTag(Icons.work_outline, _getJobTypeName(job.jobType)),
+                    _buildTag(Icons.work_outline, _getJobTypeName(job.jobType, l10n)),
                     if (job.isRemote)
-                      _buildTag(Icons.home_outlined, 'Masofaviy', color: AppColors.success),
+                      _buildTag(Icons.home_outlined, l10n.vacanciesFilterRemote, color: AppColors.success),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  _formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency),
+                  _formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency, l10n),
                   style: AppTextStyles.label.copyWith(
                     color: AppColors.success,
                     fontWeight: FontWeight.w700,
@@ -121,7 +124,7 @@ class JobCard extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      _formatDate(job.createdAt),
+                      _formatDate(job.createdAt, l10n),
                       style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
                     ),
                     Row(
@@ -144,25 +147,25 @@ class JobCard extends ConsumerWidget {
     );
   }
 
-  String _getJobTypeName(String type) {
+  String _getJobTypeName(String type, AppLocalizations l10n) {
     switch (type.toLowerCase()) {
-      case 'full-time': return "To'liq kun";
-      case 'part-time': return 'Yarim kun';
-      case 'internship': return 'Amaliyot';
-      case 'contract': return 'Kontrakt';
+      case 'full-time': return l10n.vacanciesFullTime;
+      case 'part-time': return l10n.vacanciesPartTime;
+      case 'internship': return l10n.vacanciesInternship;
+      case 'contract': return l10n.vacanciesContract;
       default: return type;
     }
   }
 
-  String _formatDate(String dateStr) {
+  String _formatDate(String dateStr, AppLocalizations l10n) {
     try {
       final date = DateTime.parse(dateStr);
       final now = DateTime.now();
       final diff = now.difference(date);
 
-      if (diff.inDays == 0) return 'Bugun';
-      if (diff.inDays == 1) return 'Kecha';
-      if (diff.inDays < 7) return '${diff.inDays} kun oldin';
+      if (diff.inDays == 0) return l10n.feedToday;
+      if (diff.inDays == 1) return l10n.messagesYesterday;
+      if (diff.inDays < 7) return '${diff.inDays} ${l10n.feedDaysAgo}';
       return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
     } catch (_) {
       return dateStr;

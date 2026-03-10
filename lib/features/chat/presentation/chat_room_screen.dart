@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/extensions.dart';
@@ -59,6 +61,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
     final UserMe? userMe = ref.watch(userMeProvider).valueOrNull;
     final int myId = userMe?.id ?? 0;
     final ParticipantModel? other = state.conversation?.otherParticipant(myId);
+    final l10n = AppLocalizations.of(context)!;
 
     // Scroll to bottom when messages arrive
     if (state.messages.isNotEmpty) _scrollToBottom();
@@ -117,7 +120,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
                         ),
                       ),
                       Text(
-                        state.isConnected ? 'online' : 'loading',
+                        state.isConnected ? l10n.messagesOnline : l10n.messagesLoading,
                         style: TextStyle(
                           fontSize: 12,
                           color: state.isConnected ? const Color(0xFF10B981) : Colors.grey[400],
@@ -151,7 +154,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            'Bugun',
+                            l10n.messagesToday,
                             style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                           ),
                         ),
@@ -164,7 +167,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
                 // Messages
                 Expanded(
                   child: state.messages.isEmpty
-                      ? _buildEmptyChat()
+                      ? _buildEmptyChat(l10n)
                       : ListView.builder(
                           controller: _scrollController,
                           padding: const EdgeInsets.only(bottom: 8, top: 4),
@@ -195,7 +198,7 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
     );
   }
 
-  Widget _buildEmptyChat() {
+  Widget _buildEmptyChat(l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -210,9 +213,9 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
             child: const Icon(Icons.chat_bubble_outline_rounded, size: 38, color: AppColors.primary),
           ),
           const SizedBox(height: 16),
-          Text('no_messages_yet', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+          Text(l10n.messagesNoMessagesYetRoom, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          Text('send_first_message', style: TextStyle(color: Colors.grey[400], fontSize: 14)),
+          Text(l10n.messagesSendFirstMessage, style: TextStyle(color: Colors.grey[400], fontSize: 14)),
         ],
       ),
     );

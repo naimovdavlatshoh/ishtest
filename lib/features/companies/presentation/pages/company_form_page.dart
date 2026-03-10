@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:linkedin_clone/core/theme/app_colors.dart';
@@ -78,25 +80,28 @@ class _CompanyFormPageState extends ConsumerState<CompanyFormPage> {
     }
 
     if (context.mounted) {
+      final l10n = AppLocalizations.of(context)!;
       setState(() => _isLoading = false);
       if (success) {
         context.showSnackBar(
-          widget.company != null ? 'Kompaniya ma\'lumotlari yangilandi' : 'Kompaniya muvaffaqiyatli yaratildi',
+          widget.company != null ? l10n.companyFormUpdated : l10n.companyFormCreated,
         );
         context.pop();
       } else {
-        context.showSnackBar('Xatolik yuz berdi', isError: true);
+        context.showSnackBar(l10n.errorOccurred, isError: true);
       }
     }
   }
 
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     final isEditing = widget.company != null;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(isEditing ? 'Kompaniyani tahrirlash' : 'Yangi kompaniya'),
+        title: Text(isEditing ? l10n.companyFormTitleEdit : l10n.companyFormTitleNew),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -111,53 +116,53 @@ class _CompanyFormPageState extends ConsumerState<CompanyFormPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle('Kompaniya haqida'),
+              _buildSectionTitle(l10n.companyFormSectionAbout),
               const SizedBox(height: 16),
               _buildTextField(
-                label: 'Nomi *',
+                label: l10n.companyFormLabelName,
                 controller: _nameController,
-                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldirish shart' : null,
+                validator: (v) => v!.isEmpty ? l10n.fieldRequired : null,
               ),
               const SizedBox(height: 16),
               _buildTextField(
-                label: 'Tavsif *',
+                label: l10n.companyFormLabelDescription,
                 controller: _descriptionController,
                 maxLines: 4,
-                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldirish shart' : null,
+                validator: (v) => v!.isEmpty ? l10n.fieldRequired : null,
               ),
               const SizedBox(height: 24),
-              _buildSectionTitle('Tafsilotlar'),
+              _buildSectionTitle(l10n.companyFormSectionDetails),
               const SizedBox(height: 16),
               _buildTextField(
-                label: 'Veb-sayt *',
+                label: l10n.companyFormLabelWebsite,
                 controller: _websiteController,
                 hint: 'https://example.com',
-                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldirish shart' : null,
+                validator: (v) => v!.isEmpty ? l10n.fieldRequired : null,
               ),
               const SizedBox(height: 16),
               _buildTextField(
-                label: 'Manzil *',
+                label: l10n.companyFormLabelLocation,
                 controller: _locationController,
-                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldirish shart' : null,
+                validator: (v) => v!.isEmpty ? l10n.fieldRequired : null,
               ),
               const SizedBox(height: 16),
               _buildTextField(
-                label: 'Soha *',
+                label: l10n.companyFormLabelIndustry,
                 controller: _industryController,
-                hint: 'masalan: IT, Moliya, Tibbiyot',
-                validator: (v) => v!.isEmpty ? 'Maydonni to\'ldirish shart' : null,
+                hint: l10n.companyFormHintIndustry,
+                validator: (v) => v!.isEmpty ? l10n.fieldRequired : null,
               ),
               const SizedBox(height: 16),
               _buildDropdownField(
-                label: 'Kompaniya hajmi *',
+                label: l10n.companyFormLabelSize,
                 value: _sizeController.text.isEmpty ? null : _sizeController.text,
                 items: const ['1-10', '11-50', '51-200', '200-500', '500+'],
                 onChanged: (v) => setState(() => _sizeController.text = v ?? ''),
-                validator: (v) => v == null || v.isEmpty ? 'Iltimos tanlang' : null,
+                validator: (v) => v == null || v.isEmpty ? l10n.pleaseSelect : null,
               ),
               const SizedBox(height: 40),
               PrimaryButton(
-                text: isEditing ? 'Saqlash' : 'Yaratish',
+                text: isEditing ? l10n.save : l10n.employeesAddBtn,
                 isLoading: _isLoading,
                 onPressed: _submit,
               ),
@@ -165,7 +170,7 @@ class _CompanyFormPageState extends ConsumerState<CompanyFormPage> {
               Center(
                 child: TextButton(
                   onPressed: () => context.pop(),
-                  child: Text('Bekor qilish', style: const TextStyle(color: AppColors.textSecondary)),
+                  child: Text(l10n.cancel, style: const TextStyle(color: AppColors.textSecondary)),
                 ),
               ),
             ],

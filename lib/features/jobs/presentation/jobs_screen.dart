@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -18,6 +21,8 @@ class JobsScreen extends ConsumerStatefulWidget {
 
 class _JobsScreenState extends ConsumerState<JobsScreen> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
   bool _showFilters = false;
 
   @override
@@ -30,7 +35,20 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (query.length >= 2) {
+        ref.read(jobsProvider.notifier).setSearch(query);
+      } else if (query.isEmpty) {
+        ref.read(jobsProvider.notifier).setSearch(null);
+      }
+    });
   }
 
   void _onScroll() {
@@ -45,6 +63,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
   @override
   Widget build(BuildContext context) {
     final jobsState = ref.watch(jobsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -52,41 +71,41 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        title: Text(
-          'Vakansiyalar',
-          style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
-        ),
-        actions: [
-          IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: _showFilters ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.tune,
-                color: _showFilters ? AppColors.primary : AppColors.textPrimary,
-                size: 22,
-              ),
-            ),
-            onPressed: () => setState(() => _showFilters = !_showFilters),
+        title: Container(
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(20),
           ),
-          const SizedBox(width: 8),
+          child: TextField(
+            controller: _searchController,
+            onChanged: _onSearchChanged,
+            decoration: InputDecoration(
+              hintText: '${l10n.vacanciesSearchHint}...',
+              hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textTertiary, fontSize: 13),
+              prefixIcon: const Icon(Icons.search, color: AppColors.iconSecondary, size: 18),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(vertical: 10),
+            ),
+            style: AppTextStyles.bodyMedium.copyWith(fontSize: 13),
+          ),
+        ),
+        actions: const [
+          SizedBox(width: 4),
         ],
       ),
       body: Column(
         children: [
-          _buildFiltersSection(jobsState),
+          _buildFiltersSection(jobsState, l10n),
           Expanded(
-            child: _buildJobsList(jobsState),
+            child: _buildJobsList(jobsState, l10n),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFiltersSection(JobsState state) {
+  Widget _buildFiltersSection(JobsState state, AppLocalizations l10n) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -106,45 +125,45 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
             child: Row(
               children: [
                 _buildFilterChip(
-                  label: state.filters.jobType ?? 'Ish turi',
+                  label: state.filters.jobType ?? l10n.vacanciesFilterType,
                   isSelected: state.filters.jobType != null,
-                  onTap: () => _showJobTypeDialog(state.filters),
+                  onTap: () => _showJobTypeDialog(state.filters, l10n),
                   onClear: state.filters.jobType != null 
                     ? () => ref.read(jobsProvider.notifier).updateFilters(state.filters.copyWith(clearJobType: true))
                     : null,
                 ),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                  label: state.filters.location ?? 'Viloyat',
+                  label: state.filters.location ?? l10n.vacanciesFilterLocation,
                   isSelected: state.filters.location != null,
-                  onTap: () => _showLocationDialog(state.filters),
+                  onTap: () => _showLocationDialog(state.filters, l10n),
                   onClear: state.filters.location != null 
                     ? () => ref.read(jobsProvider.notifier).updateFilters(state.filters.copyWith(clearLocation: true))
                     : null,
                 ),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                  label: state.filters.isRemote == true ? 'Masofaviy' : 'Ofisda',
+                  label: state.filters.isRemote == true ? l10n.vacanciesFilterRemote : l10n.vacanciesFilterOffice,
                   isSelected: state.filters.isRemote != null,
-                  onTap: () => _showRemoteDialog(state.filters),
+                  onTap: () => _showRemoteDialog(state.filters, l10n),
                   onClear: state.filters.isRemote != null 
                     ? () => ref.read(jobsProvider.notifier).updateFilters(state.filters.copyWith(clearIsRemote: true))
                     : null,
                 ),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                  label: _formatSalaryLabel(state.filters),
+                  label: _formatSalaryLabel(state.filters, l10n),
                   isSelected: state.filters.salaryMin != null || state.filters.salaryMax != null,
-                  onTap: () => _showSalaryDialog(state.filters),
+                  onTap: () => _showSalaryDialog(state.filters, l10n),
                   onClear: state.filters.salaryMin != null || state.filters.salaryMax != null
                     ? () => ref.read(jobsProvider.notifier).updateFilters(state.filters.copyWith(clearSalaryMin: true, clearSalaryMax: true))
                     : null,
                 ),
                 const SizedBox(width: 8),
                 _buildFilterChip(
-                  label: state.filters.dateFrom ?? 'Sana',
+                  label: state.filters.dateFrom ?? l10n.vacanciesFilterDate,
                   isSelected: state.filters.dateFrom != null,
-                  onTap: () => _showDateDialog(state.filters),
+                  onTap: () => _showDateDialog(state.filters, l10n),
                   onClear: state.filters.dateFrom != null 
                     ? () => ref.read(jobsProvider.notifier).updateFilters(state.filters.copyWith(clearDateFrom: true))
                     : null,
@@ -157,7 +176,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
             Row(
               children: [
                 Text(
-                  '${state.total} ta natija topildi',
+                  l10n.vacanciesResultsFound(state.total),
                   style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary, fontSize: 11),
                 ),
                 const Spacer(),
@@ -165,7 +184,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
                   GestureDetector(
                     onTap: () => ref.read(jobsProvider.notifier).clearFilters(),
                     child: Text(
-                      'Tozalash', 
+                      l10n.vacanciesClear, 
                       style: AppTextStyles.label.copyWith(color: AppColors.error, fontSize: 13, fontWeight: FontWeight.w600)
                     ),
                   ),
@@ -177,10 +196,10 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
     );
   }
 
-  String _formatSalaryLabel(JobsFilters filters) {
+  String _formatSalaryLabel(JobsFilters filters, AppLocalizations l10n) {
     final min = filters.salaryMin;
     final max = filters.salaryMax;
-    if (min == null && max == null) return 'Maosh';
+    if (min == null && max == null) return l10n.vacanciesFilterSalary;
     if (min != null && max != null) return '${min ~/ 1000}k - ${max ~/ 1000}k';
     if (min != null) return '>${min ~/ 1000}k';
     return '<${max! ~/ 1000}k';
@@ -231,7 +250,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
     );
   }
 
-  Widget _buildJobsList(JobsState state) {
+  Widget _buildJobsList(JobsState state, AppLocalizations l10n) {
     if (state.isLoading) {
       return const AppLoader();
     }
@@ -239,9 +258,9 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
     if (state.jobs.isEmpty) {
       return EmptyState(
         icon: Icons.work_outline,
-        title: 'Vakansiyalar topilmadi',
-        message: 'Filtrlarni o\'zgartirin',
-        actionText: 'Yangilash',
+        title: l10n.vacanciesNotFound,
+        message: l10n.vacanciesChangeFilters,
+        actionText: l10n.vacanciesRefresh,
         onAction: () => ref.read(jobsProvider.notifier).refreshJobs(),
       );
     }
@@ -300,10 +319,10 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
     );
   }
 
-  void _showJobTypeDialog(JobsFilters current) {
+  void _showJobTypeDialog(JobsFilters current, AppLocalizations l10n) {
     final options = ['full-time', 'part-time', 'internship', 'contract'];
     _showCustomDialog(
-      title: 'Ish turi',
+      title: l10n.vacanciesFilterType,
       content: (dialogContext) => Column(
         mainAxisSize: MainAxisSize.min,
         children: options.map((opt) => ListTile(
@@ -318,15 +337,15 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
     );
   }
 
-  void _showLocationDialog(JobsFilters current) {
+  void _showLocationDialog(JobsFilters current, AppLocalizations l10n) {
     final controller = TextEditingController(text: current.location);
     _showCustomDialog(
-      title: 'Manzil qidirish',
+      title: l10n.vacanciesSearchLocation,
       content: (dialogContext) => TextField(
         controller: controller,
         autofocus: true,
         decoration: InputDecoration(
-          hintText: 'Masalan: Toshkent',
+          hintText: l10n.vacanciesSearchHint,
           prefixIcon: const Icon(Icons.search),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           filled: true,
@@ -334,28 +353,28 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
         ),
       ),
       actions: (dialogContext) => [
-        TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: Text('Bekor qilish')),
+        TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: Text(l10n.vacanciesCancel)),
         ElevatedButton(
           onPressed: () {
             ref.read(jobsProvider.notifier).updateFilters(current.copyWith(location: controller.text));
             Navigator.of(dialogContext).pop();
           },
           style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
-          child: const Text('Qidirish'),
+          child: Text(l10n.vacanciesSearchBtn),
         ),
       ],
     );
   }
 
-  void _showRemoteDialog(JobsFilters current) {
+  void _showRemoteDialog(JobsFilters current, AppLocalizations l10n) {
     _showCustomDialog(
-      title: 'Ish joyi',
+      title: l10n.vacanciesWorkPlace,
       content: (dialogContext) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
             leading: const Icon(Icons.home_outlined),
-            title: Text('Masofaviy'),
+            title: Text(l10n.vacanciesFilterRemote),
             onTap: () {
               ref.read(jobsProvider.notifier).updateFilters(current.copyWith(isRemote: true));
               Navigator.of(dialogContext).pop();
@@ -363,7 +382,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.location_city_outlined),
-            title: const Text('Ofisda'),
+            title: Text(l10n.vacanciesFilterOffice),
             onTap: () {
               ref.read(jobsProvider.notifier).updateFilters(current.copyWith(isRemote: false));
               Navigator.of(dialogContext).pop();
@@ -374,11 +393,11 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
     );
   }
 
-  void _showSalaryDialog(JobsFilters current) {
+  void _showSalaryDialog(JobsFilters current, AppLocalizations l10n) {
     final minController = TextEditingController(text: current.salaryMin?.toString());
     final maxController = TextEditingController(text: current.salaryMax?.toString());
     _showCustomDialog(
-      title: 'Maosh diapazoni',
+      title: l10n.vacanciesSalaryRange,
       content: (dialogContext) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -386,7 +405,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
             controller: minController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              labelText: 'Minimum (so\'m)',
+              labelText: l10n.vacanciesMinSalary,
               labelStyle: const TextStyle(fontSize: 14),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               prefixIcon: const Icon(Icons.remove_circle_outline, size: 20),
@@ -397,7 +416,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
             controller: maxController,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
-              labelText: 'Maksimum (so\'m)',
+              labelText: l10n.vacanciesMaxSalary,
               labelStyle: const TextStyle(fontSize: 14),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               prefixIcon: const Icon(Icons.add_circle_outline, size: 20),
@@ -408,7 +427,7 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
       actions: (dialogContext) => [
         TextButton(
           onPressed: () => Navigator.of(dialogContext).pop(), 
-          child: Text('Bekor qilish', style: TextStyle(color: Colors.grey[600]))
+          child: Text(l10n.vacanciesCancel, style: TextStyle(color: Colors.grey[600]))
         ),
         ElevatedButton(
           onPressed: () {
@@ -424,13 +443,13 @@ class _JobsScreenState extends ConsumerState<JobsScreen> {
             elevation: 0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
           ),
-          child: Text('Saqlash'),
+          child: Text(l10n.vacanciesSave),
         ),
       ],
     );
   }
 
-  void _showDateDialog(JobsFilters current) async {
+  void _showDateDialog(JobsFilters current, AppLocalizations l10n) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),

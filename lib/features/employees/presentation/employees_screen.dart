@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -26,6 +28,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(employeesProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -40,14 +43,14 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                   const Icon(Icons.business_center, color: AppColors.primary, size: 36),
                   const SizedBox(width: 12),
                   Text(
-                    'Xodimlar',
+                    l10n.employeesTitle,
                     style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
               Text(
-                'Mutaxassislarni qidiring',
+                l10n.employeesSubtitle,
                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 24),
@@ -74,7 +77,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                         const Icon(Icons.filter_list, size: 20, color: AppColors.textSecondary),
                         const SizedBox(width: 8),
                         Text(
-                          '${state.total} ${'mutaxassis'}',
+                          l10n.employeesCount(state.total),
                           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
                         ),
                       ],
@@ -85,7 +88,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                         const Icon(Icons.code, size: 18, color: AppColors.textSecondary),
                         const SizedBox(width: 8),
                         Text(
-                          'Ko\'nikmalar',
+                          l10n.employeesSkillsHeader,
                           style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
                         ),
                       ],
@@ -97,7 +100,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                           child: TextField(
                             controller: _skillController,
                             decoration: InputDecoration(
-                              hintText: 'Ko\'nikma qo\'shing...',
+                              hintText: l10n.employeesAddSkillHint,
                               filled: true,
                               fillColor: Colors.grey[50],
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -125,7 +128,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          child: Text('Qo\'shish', style: const TextStyle(color: Colors.white)),
+                          child: Text(l10n.employeesAddBtn, style: const TextStyle(color: Colors.white)),
                         ),
                       ],
                     ),
@@ -157,7 +160,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
               else if (state.employees.isEmpty)
                 Center(child: Padding(
                   padding: const EdgeInsets.all(40),
-                  child: Text('Mutaxassislar topilmadi'),
+                  child: Text(l10n.employeesNotFound),
                 ))
               else
                 ListView.builder(
@@ -213,6 +216,7 @@ class _EmployeeCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(20),
@@ -259,7 +263,7 @@ class _EmployeeCard extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        'Ishga tayyor',
+                        l10n.employeesReadyToWork,
                         style: const TextStyle(color: Color(0xFF10B981), fontSize: 13, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -299,7 +303,7 @@ class _EmployeeCard extends ConsumerWidget {
                     );
                   },
                   icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                  label: Text('Xabar'),
+                  label: Text(l10n.employeesActionChat),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF039855),
                     foregroundColor: Colors.white,
@@ -324,7 +328,7 @@ class _EmployeeCard extends ConsumerWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     side: BorderSide(color: Colors.grey[300]!),
                   ),
-                  child: Text('Profil', style: const TextStyle(color: AppColors.textPrimary)),
+                  child: Text(l10n.employeesActionProfile, style: const TextStyle(color: AppColors.textPrimary)),
                 ),
               ),
             ],

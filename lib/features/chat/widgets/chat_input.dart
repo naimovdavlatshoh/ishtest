@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -45,6 +47,7 @@ class _ChatInputState extends State<ChatInput> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -79,7 +82,7 @@ class _ChatInputState extends State<ChatInput> {
                     textInputAction: TextInputAction.newline,
                     style: AppTextStyles.bodyMedium.copyWith(fontSize: 15),
                     decoration: InputDecoration(
-                      hintText: 'Xabar yozing...',
+                      hintText: l10n.messagesTypeMessage,
                       hintStyle: TextStyle(color: Colors.grey[400], fontSize: 15),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),

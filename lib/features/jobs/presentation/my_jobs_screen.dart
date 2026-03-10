@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/my_jobs_provider.dart';
@@ -34,6 +36,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(myJobsProvider);
 
     return Scaffold(
@@ -54,7 +57,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                'Mening vakansiyalarim',
+                                l10n.myJobsTitle,
                                 overflow: TextOverflow.ellipsis,
                                 style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
                               ),
@@ -63,7 +66,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "Vakansiya qo'shish",
+                          l10n.myJobsAddSubtitle,
                           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                         ),
                         const SizedBox(height: 24),
@@ -83,7 +86,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                                 const Icon(Icons.add, color: Colors.white, size: 24),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Vakansiya qo\'shish',
+                                  l10n.myJobsAddBtn,
                                   style: AppTextStyles.button.copyWith(color: Colors.white, fontSize: 16),
                                 ),
                               ],
@@ -105,7 +108,8 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
   }
 
   Widget _buildJobCard(JobModel job) {
-    final bool isDraft = job.status == 'Qoralama' || job.status == 'pending';
+    final l10n = AppLocalizations.of(context)!;
+    final bool isDraft = job.status == 'Qoralama' || job.status == 'pending' || job.status == 'draft';
     final bool isClosed = job.status == 'closed';
     final bool isActive = job.status == 'Faol';
 
@@ -153,85 +157,82 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            Row(
+            Wrap(
+              spacing: 16,
+              runSpacing: 8,
               children: [
                 _buildSmallIconText(Icons.location_on_outlined, job.location),
-                const SizedBox(width: 16),
                 _buildSmallIconText(Icons.business_center_outlined, _translateJobType(job.jobType)),
-                const SizedBox(width: 16),
                 _buildSmallIconText(Icons.calendar_today_outlined, _formatDate(job.createdAt)),
               ],
             ),
             const SizedBox(height: 20),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  if (isDraft)
-                    _buildBadge(
-                      icon: Icons.edit_note,
-                      label: 'Qoralama',
-                      color: const Color(0xFF6B7280),
-                      bgColor: const Color(0xFFF3F4F6),
-                    )
-                  else if (isClosed)
-                    _buildBadge(
-                      icon: Icons.cancel_outlined,
-                      label: 'closed',
-                      color: const Color(0xFFEF4444),
-                      bgColor: const Color(0xFFFEE2E2),
-                    )
-                  else
-                    _buildBadge(
-                      icon: Icons.check_circle_outline,
-                      label: 'Faol',
-                      color: const Color(0xFF10B981),
-                      bgColor: const Color(0xFFECFDF5),
-                    ),
-                  
-                  const SizedBox(width: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                if (isDraft)
                   _buildBadge(
-                    icon: Icons.people_outline,
-                    label: 'applications',
-                    color: AppColors.primary,
-                    bgColor: AppColors.primary.withOpacity(0.1),
-                    onTap: () => context.push('/jobs/${job.id}/applications', extra: job.title),
+                    icon: Icons.edit_note,
+                    label: l10n.jobStatusDraft,
+                    color: const Color(0xFF6B7280),
+                    bgColor: const Color(0xFFF3F4F6),
+                  )
+                else if (isClosed)
+                  _buildBadge(
+                    icon: Icons.cancel_outlined,
+                    label: l10n.jobStatusClosed,
+                    color: const Color(0xFFEF4444),
+                    bgColor: const Color(0xFFFEE2E2),
+                  )
+                else
+                  _buildBadge(
+                    icon: Icons.check_circle_outline,
+                    label: l10n.jobStatusActive,
+                    color: const Color(0xFF10B981),
+                    bgColor: const Color(0xFFECFDF5),
                   ),
-                  
-                  if (isDraft) ...[
-                    const SizedBox(width: 8),
-                    _buildBadge(
-                      icon: Icons.send,
-                      label: 'publish',
-                      color: Colors.white,
-                      bgColor: const Color(0xFF10B981),
-                      onTap: () => _updateStatus(job.id, 'Faol'),
-                    ),
-                  ] else if (isActive) ...[
-                    const SizedBox(width: 8),
-                    _buildBadge(
-                      icon: Icons.block,
-                      label: 'close_job',
-                      color: Colors.white,
-                      bgColor: const Color(0xFFF59E0B),
-                      onTap: () => _updateStatus(job.id, 'closed'),
-                    ),
-                  ],
-                  
-                  const SizedBox(width: 16),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.visibility_outlined, size: 18, color: AppColors.textTertiary),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${job.viewsCount}',
-                        style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
-                      ),
-                    ],
+                
+                _buildBadge(
+                  icon: Icons.people_outline,
+                  label: l10n.jobApplications,
+                  color: AppColors.primary,
+                  bgColor: AppColors.primary.withOpacity(0.1),
+                  onTap: () => context.push('/jobs/${job.id}/applications', extra: job.title),
+                ),
+                
+                if (isDraft) ...[
+                  _buildBadge(
+                    icon: Icons.send,
+                    label: l10n.jobActionPublish,
+                    color: Colors.white,
+                    bgColor: const Color(0xFF10B981),
+                    onTap: () => _updateStatus(job.id, 'Faol'),
+                  ),
+                ] else if (isActive) ...[
+                  _buildBadge(
+                    icon: Icons.block,
+                    label: l10n.jobActionClose,
+                    color: Colors.white,
+                    bgColor: const Color(0xFFF59E0B),
+                    onTap: () => _updateStatus(job.id, 'closed'),
                   ),
                 ],
-              ),
+                
+                const SizedBox(width: 8),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.visibility_outlined, size: 18, color: AppColors.textTertiary),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${job.viewsCount}',
+                      style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -240,6 +241,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
   }
 
   void _showJobActions(JobModel job) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -257,7 +259,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
           children: [
             _buildActionItem(
               icon: Icons.visibility_outlined,
-              label: "Ko'rish",
+              label: l10n.jobActionView,
               onTap: () {
                 Navigator.pop(context);
                 context.push('/jobs/${job.id}', extra: job);
@@ -266,7 +268,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
             ListTile(
               leading: const Icon(Icons.edit_outlined, color: Color(0xFF10B981)),
               title: Text(
-                'Tahrirlash',
+                l10n.jobActionEdit,
                 style: AppTextStyles.bodyLarge.copyWith(
                   color: const Color(0xFF10B981),
                   fontWeight: FontWeight.w500,
@@ -284,7 +286,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
             if (job.status == 'Qoralama' || job.status == 'pending')
               _buildActionItem(
                 icon: Icons.send_outlined,
-                label: 'publish',
+                label: l10n.jobActionPublish,
                 color: const Color(0xFF10B981),
                 onTap: () {
                   Navigator.pop(context);
@@ -294,7 +296,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
             else if (job.status == 'Faol')
               _buildActionItem(
                 icon: Icons.block_outlined,
-                label: 'close_job',
+                label: l10n.jobActionClose,
                 color: const Color(0xFFF59E0B),
                 onTap: () {
                   Navigator.pop(context);
@@ -304,7 +306,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
             const Divider(indent: 20, endIndent: 20),
             _buildActionItem(
               icon: Icons.delete_outline,
-              label: 'O\'chirish',
+              label: l10n.jobActionDelete,
               color: Colors.red,
               onTap: () {
                 Navigator.pop(context);
@@ -337,35 +339,37 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
   }
 
   void _updateStatus(int jobId, String status) async {
+    final l10n = AppLocalizations.of(context)!;
     final success = await ref.read(myJobsProvider.notifier).updateJobStatus(jobId, status);
     if (context.mounted) {
       context.showSnackBar(
-        success ? 'Holat yangilandi' : 'Xatolik yuz berdi',
+        success ? l10n.jobStatusUpdated : l10n.errorOccurred,
         isError: !success,
       );
     }
   }
 
   void _showDeleteConfirmation(int jobId) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('O\'chirish'),
-        content: Text('Ushbu vakansiyani o\'chirmoqchimisiz?'),
+        title: Text(l10n.jobActionDelete),
+        content: Text(l10n.jobDeleteConfirm),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('Bekor qilish')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.vacanciesCancel)),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
               final success = await ref.read(myJobsProvider.notifier).deleteJob(jobId);
               if (context.mounted) {
                 context.showSnackBar(
-                  success ? 'Vakansiya o\'chirildi' : 'O\'chirishda xatolik',
+                  success ? l10n.jobDeleted : l10n.jobDeleteError,
                   isError: !success,
                 );
               }
             },
-            child: Text('O\'chirish', style: const TextStyle(color: Colors.red)),
+            child: Text(l10n.jobActionDelete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -420,6 +424,7 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
   }
 
   Widget _buildStatsSection(dynamic state) {
+    final l10n = AppLocalizations.of(context)!;
     final activeCount = state.jobs.where((j) => j.status == 'Faol').length;
     final draftCount = state.jobs.where((j) => j.status == 'Qoralama' || j.status == 'pending').length;
     final totalViews = state.jobs.fold(0, (sum, j) => sum + (j.viewsCount ?? 0));
@@ -427,17 +432,17 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
       children: [
         Row(
           children: [
-            Expanded(child: _buildStatItem('${state.jobs.length}', 'Jami')),
+            Expanded(child: _buildStatItem('${state.jobs.length}', l10n.statsTotal)),
             const SizedBox(width: 16),
-            Expanded(child: _buildStatItem('$activeCount', 'Faol')),
+            Expanded(child: _buildStatItem('$activeCount', l10n.statsActive)),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: _buildStatItem('$draftCount', 'Qoralama')),
+            Expanded(child: _buildStatItem('$draftCount', l10n.statsDraft)),
             const SizedBox(width: 16),
-            Expanded(child: _buildStatItem('$totalViews', 'Ko\'rishlar', isViews: true)),
+            Expanded(child: _buildStatItem('$totalViews', l10n.statsViews, isViews: true)),
           ],
         ),
       ],
@@ -472,11 +477,12 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
   }
 
   String _translateJobType(String type) {
+    final l10n = AppLocalizations.of(context)!;
     switch (type.toLowerCase()) {
-      case 'full-time': return 'To\'liq kun';
-      case 'part-time': return 'Yarim kun';
-      case 'internship': return 'Amaliyot';
-      case 'contract': return 'Kontrakt';
+      case 'full-time': return l10n.vacanciesFullTime;
+      case 'part-time': return l10n.vacanciesPartTime;
+      case 'internship': return l10n.vacanciesInternship;
+      case 'contract': return l10n.vacanciesContract;
       default: return type;
     }
   }

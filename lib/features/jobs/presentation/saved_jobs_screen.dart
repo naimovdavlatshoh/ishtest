@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/saved_jobs_provider.dart';
@@ -22,12 +24,13 @@ class _SavedJobsScreenState extends ConsumerState<SavedJobsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(savedJobsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Saqlanganlar'),
+        title: Text(l10n.savedJobsTitle),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -44,7 +47,7 @@ class _SavedJobsScreenState extends ConsumerState<SavedJobsScreen> {
                           Icon(Icons.bookmark_border, size: 64, color: AppColors.textTertiary.withOpacity(0.5)),
                           const SizedBox(height: 16),
                           Text(
-                            "Saqlangan vakansiyalar yo'q",
+                            l10n.savedJobsEmpty,
                             style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
                           ),
                         ],

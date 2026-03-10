@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -49,6 +51,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     
     if (_isChecking) {
       return AlertDialog(
@@ -59,7 +62,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
             const SizedBox(height: 8),
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
-            Text('Tekshirilmoqda...'),
+            Text(l10n.employeesInvitationChecking),
             const SizedBox(height: 8),
           ],
         ),
@@ -81,7 +84,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                 children: [
                   Expanded(
                     child: Text(
-                      '{} ga xabar'.replaceFirst('{}', widget.userName),
+                      l10n.employeesInvitationTitle(widget.userName),
                       style: AppTextStyles.h3.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -106,7 +109,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Siz allaqachon muloqot boshlagan edingiz',
+                        l10n.employeesAlreadyInChat,
                         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary),
                       ),
                     ),
@@ -122,7 +125,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                     context.push('/chat/$convoId');
                   },
                   icon: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 18),
-                  label: Text('Chatni ochish', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  label: Text(l10n.invitationsOpenChat, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -151,7 +154,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                 children: [
                   Expanded(
                     child: Text(
-                      '{} ga xabar'.replaceFirst('{}', widget.userName),
+                      l10n.employeesInvitationTitle(widget.userName),
                       style: AppTextStyles.h3.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -180,7 +183,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Taklif kutilmoqda',
+                            l10n.employeesInvitationPending,
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: const Color(0xFF92400E),
                               fontWeight: FontWeight.bold,
@@ -188,7 +191,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Sizning taklifingiz ko\'rib chiqilmoqda',
+                            l10n.employeesInvitationPendingDesc,
                             style: AppTextStyles.bodySmall.copyWith(
                               color: const Color(0xFF92400E),
                               height: 1.4,
@@ -211,7 +214,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                     side: BorderSide(color: Colors.grey[300]!),
                   ),
                   child: Text(
-                    'Yopish',
+                    l10n.employeesClose,
                     style: const TextStyle(color: Color(0xFF101828), fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
@@ -235,7 +238,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
               children: [
                 Expanded(
                   child: Text(
-                    '{} ga xabar'.replaceFirst('{}', widget.userName),
+                    l10n.employeesInvitationTitle(widget.userName),
                     style: AppTextStyles.h3.copyWith(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -249,7 +252,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Xabar yuboring, agar qabul qilinsa chat ochiladi',
+              l10n.employeesInvitationSubtitle,
               style: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF475467), height: 1.5),
             ),
             const SizedBox(height: 20),
@@ -257,7 +260,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
               controller: _messageController,
               maxLines: 4,
               decoration: InputDecoration(
-                hintText: 'Xabar (ixtiyoriy)...',
+                hintText: l10n.employeesInvitationHint,
                 hintStyle: TextStyle(color: Colors.grey[400]),
                 filled: true,
                 fillColor: Colors.white,
@@ -291,10 +294,10 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                             _messageController.text.trim(),
                           );
                           if (success && mounted) {
-                            context.showSnackBar('Taklif yuborildi');
+                            context.showSnackBar(l10n.employeesInvitationSent);
                             context.pop();
                           } else if (mounted) {
-                            context.showSnackBar('Taklif yuborishda xatolik', isError: true);
+                            context.showSnackBar(l10n.employeesInvitationError, isError: true);
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -305,7 +308,7 @@ class _ChatInvitationDialogState extends ConsumerState<ChatInvitationDialog> {
                         ),
                         child: state.isLoading
                           ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : Text('Taklif yuborish', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                          : Text(l10n.employeesInvitationBtn, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                       ),
                     ),
                   ],

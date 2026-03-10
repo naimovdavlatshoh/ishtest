@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../core/providers/locale_provider.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -27,9 +30,10 @@ class MainScreen extends ConsumerWidget {
     final profile = profileAsync.asData?.value;
     // Initialize and watch global chat for unread badge
     final totalUnread = ref.watch(totalUnreadProvider);
+    final l10n = AppLocalizations.of(context)!;
     final displayName =
-        profile?.fullName ?? currentUser?.name ?? 'Foydalanuvchi';
-    final displayTitle = profile?.title ?? currentUser?.headline ?? 'Mutaxassis';
+        profile?.fullName ?? currentUser?.name ?? l10n.defaultUser;
+    final displayTitle = profile?.title ?? currentUser?.headline ?? l10n.defaultExpert;
 
     final userInitial = displayName.isNotEmpty
         ? displayName[0].toUpperCase()
@@ -104,7 +108,7 @@ class MainScreen extends ConsumerWidget {
 
               // ASOSIY section
               Text(
-                'Yangiliklar'.toUpperCase(),
+                l10n.drawerNews,
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.8,
@@ -114,21 +118,21 @@ class MainScreen extends ConsumerWidget {
               _buildDrawerItem(
                 context,
                 Icons.space_dashboard_rounded,
-                'Boshqaruv paneli',
+                l10n.drawerDashboard,
                 '/feed',
                 0,
               ),
               _buildDrawerItem(
                 context,
                 Icons.account_circle_outlined,
-                'Mening profilim',
+                l10n.drawerMyProfile,
                 '/profile/me',
                 1,
               ),
               _buildDrawerItemWithBadge(
                 context,
                 Icons.chat_bubble_outline_rounded,
-                'Xabarlar',
+                l10n.mainNavMessages,
                 '/chat',
                 3,
                 totalUnread,
@@ -136,14 +140,14 @@ class MainScreen extends ConsumerWidget {
               _buildDrawerItem(
                 context,
                 Icons.mark_email_read_outlined,
-                'Taklifnomalar',
+                l10n.drawerInvitations,
                 '/invitations',
                 9,
               ),
               _buildDrawerItem(
                 context,
                 Icons.badge_outlined,
-                'Xodimlar',
+                l10n.drawerEmployees,
                 '/employees',
                 2,
               ),
@@ -152,7 +156,7 @@ class MainScreen extends ConsumerWidget {
 
               // ISHLAR section
               Text(
-                'Vakansiyalar'.toUpperCase(),
+                l10n.drawerVacanciesGroup,
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.8,
@@ -162,28 +166,28 @@ class MainScreen extends ConsumerWidget {
               _buildDrawerItem(
                 context,
                 Icons.work_outline_rounded,
-                'Vakansiyalar',
+                l10n.mainNavVacancies,
                 '/jobs',
                 4,
               ),
               _buildDrawerItem(
                 context,
                 Icons.bookmark_border,
-                'Saqlanganlar',
+                l10n.drawerSaved,
                 '/jobs/saved',
                 6,
               ),
               _buildDrawerItem(
                 context,
                 Icons.add_box_outlined,
-                'Vakansiya qo\'shish',
+                l10n.drawerAddVacancy,
                 '/jobs/add',
                 8,
               ),
               _buildDrawerItem(
                 context,
                 Icons.article_outlined,
-                'Mening vakansiyalarim',
+                l10n.drawerMyVacancies,
                 '/jobs/my-jobs',
                 7,
               ),
@@ -192,7 +196,7 @@ class MainScreen extends ConsumerWidget {
 
               // ARIZALAR section
               Text(
-                'Mening arizalarim'.toUpperCase(),
+                l10n.drawerMyApplicationsGroup,
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.8,
@@ -202,7 +206,7 @@ class MainScreen extends ConsumerWidget {
               _buildDrawerItem(
                 context,
                 Icons.send_outlined,
-                'Mening arizalarim',
+                l10n.drawerMyApplications,
                 '/my-applications',
                 10,
               ),
@@ -211,7 +215,7 @@ class MainScreen extends ConsumerWidget {
 
               // KOMPANIYALAR section
               Text(
-                'Kompaniyalar'.toUpperCase(),
+                l10n.drawerCompaniesGroup,
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.8,
@@ -221,7 +225,7 @@ class MainScreen extends ConsumerWidget {
               _buildDrawerItem(
                 context,
                 Icons.apartment_outlined,
-                'Mening kompaniyalarim',
+                l10n.drawerMyCompanies,
                 '/companies',
                 5,
               ),
@@ -230,7 +234,7 @@ class MainScreen extends ConsumerWidget {
 
               // SOZLAMALAR section
               Text(
-                'Sozlamalar'.toUpperCase(),
+                l10n.drawerSettingsGroup,
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.8,
@@ -248,7 +252,7 @@ class MainScreen extends ConsumerWidget {
                   size: 20,
                 ),
                 title: Text(
-                  'Profil sozlamalari',
+                  l10n.drawerProfileSettings,
                   style: AppTextStyles.bodyMedium.copyWith(fontSize: 13),
                 ),
                 onTap: () {
@@ -267,7 +271,7 @@ class MainScreen extends ConsumerWidget {
                   size: 20,
                 ),
                 title: Text(
-                  'Ko\'rinish',
+                  l10n.drawerAppearance,
                   style: AppTextStyles.bodyMedium.copyWith(fontSize: 13),
                 ),
                 onTap: () {
@@ -286,7 +290,7 @@ class MainScreen extends ConsumerWidget {
                   size: 20,
                 ),
                 title: Text(
-                  'Mening rezyumem',
+                  l10n.drawerMyResume,
                   style: AppTextStyles.bodyMedium.copyWith(fontSize: 13),
                 ),
                 onTap: () {
@@ -309,7 +313,7 @@ class MainScreen extends ConsumerWidget {
                   color: Colors.red,
                 ),
                 title: Text(
-                  'Chiqish',
+                  l10n.drawerLogout,
                   style: const TextStyle(
                     color: Colors.red,
                     fontWeight: FontWeight.w500,
@@ -365,36 +369,12 @@ class MainScreen extends ConsumerWidget {
           ],
         ),
         actions: [
-          // Globe — language picker
-          // Chat badge button
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.chat_bubble_outline_rounded, size: 22, color: AppColors.iconPrimary),
-                onPressed: () => context.go('/chat'),
-              ),
-              if (totalUnread > 0)
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    width: 16,
-                    height: 16,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFEF4444),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        totalUnread > 9 ? '9+' : '$totalUnread',
-                        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+          IconButton(
+            icon: const Icon(Icons.language, color: AppColors.iconPrimary, size: 22),
+            onPressed: () => _showLanguageModal(context, ref),
           ),
+
+
 
           Builder(
             builder: (context) => IconButton(
@@ -412,11 +392,11 @@ class MainScreen extends ConsumerWidget {
         ],
       ),
       body: child,
-      bottomNavigationBar: _buildBottomNavBar(context, totalUnread),
+      bottomNavigationBar: _buildBottomNavBar(context, totalUnread, l10n),
     );
   }
 
-  Widget _buildBottomNavBar(BuildContext context, int totalUnread) {
+  Widget _buildBottomNavBar(BuildContext context, int totalUnread, AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -441,10 +421,10 @@ class MainScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-           _buildNavItem(context, Icons.space_dashboard_rounded, 'Asosiy', 0, '/feed', 0),
-           _buildNavItem(context, Icons.chat_bubble_outline_rounded, 'Xabarlar', 3, '/chat', totalUnread),
-           _buildNavItem(context, Icons.work_outline_rounded, 'Vakansiyalar', 4, '/jobs', 0),
-           _buildNavItem(context, Icons.account_circle_outlined, 'Profil', 1, '/profile/me', 0),
+           _buildNavItem(context, Icons.space_dashboard_rounded, l10n.mainNavHome, 0, '/feed', 0),
+           _buildNavItem(context, Icons.chat_bubble_outline_rounded, l10n.mainNavMessages, 3, '/chat', totalUnread),
+           _buildNavItem(context, Icons.work_outline_rounded, l10n.mainNavVacancies, 4, '/jobs', 0),
+           _buildNavItem(context, Icons.account_circle_outlined, l10n.mainNavProfile, 1, '/profile/me', 0),
         ],
       ),
     );
@@ -611,6 +591,90 @@ class MainScreen extends ConsumerWidget {
           Navigator.of(context).pop();
           context.go(route);
         },
+      ),
+    );
+  }
+
+  void _showLanguageModal(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+        final currentLocale = ref.watch(localeProvider);
+
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  l10n.selectLanguage,
+                  style: AppTextStyles.h3.copyWith(fontSize: 18),
+                ),
+                const SizedBox(height: 16),
+                _buildLanguageItem(context, ref, '🇺🇿', "O'zbekcha", 'uz', currentLocale.languageCode == 'uz'),
+                _buildLanguageItem(context, ref, '🇷🇺', 'Русский', 'ru', currentLocale.languageCode == 'ru'),
+                _buildLanguageItem(context, ref, '🇺🇸', 'English', 'en', currentLocale.languageCode == 'en'),
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLanguageItem(
+    BuildContext context,
+    WidgetRef ref,
+    String flag,
+    String label,
+    String code,
+    bool isSelected,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: isSelected ? AppColors.primary.withOpacity(0.05) : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isSelected ? AppColors.primary.withOpacity(0.2) : Colors.transparent,
+        ),
+      ),
+      child: ListTile(
+        leading: Text(flag, style: const TextStyle(fontSize: 24)),
+        title: Text(
+          label,
+          style: AppTextStyles.bodyMedium.copyWith(
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            color: isSelected ? AppColors.primary : AppColors.textPrimary,
+          ),
+        ),
+        trailing: isSelected
+            ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
+            : null,
+        onTap: () {
+          ref.read(localeProvider.notifier).setLocale(Locale(code));
+          Navigator.pop(context);
+        },
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -32,6 +34,7 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(userProfileProvider(widget.userId));
 
     return Scaffold(
@@ -39,14 +42,14 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.errorMessage != null
-              ? _buildError(state.errorMessage!)
+              ? _buildError(state.errorMessage!, l10n)
               : state.profile == null
-                  ? const Center(child: Text('Profil topilmadi'))
-                  : _buildProfile(state.profile!),
+                  ? Center(child: Text(l10n.employeesProfileNotFound))
+                  : _buildProfile(state.profile!, l10n),
     );
   }
 
-  Widget _buildError(String message) {
+  Widget _buildError(String message, AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -57,14 +60,14 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () => ref.read(userProfileProvider(widget.userId).notifier).loadProfile(widget.userId),
-            child: const Text('Qayta urinish'),
+            child: Text(l10n.employeesRetry),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProfile(UserProfileModel profile) {
+  Widget _buildProfile(UserProfileModel profile, AppLocalizations l10n) {
     final initials = profile.fullName.isNotEmpty
         ? profile.fullName.trim().split(' ').map((e) => e.isNotEmpty ? e[0].toUpperCase() : '').take(2).join()
         : '?';
@@ -209,11 +212,11 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
                 Row(
                   children: [
                     if (profile.openToJobSeeker)
-                      _buildStatusChip('Ishga ochiq', const Color(0xFF10B981), const Color(0xFFE9FFF2)),
+                      _buildStatusChip(l10n.employeesOpenToJob, const Color(0xFF10B981), const Color(0xFFE9FFF2)),
                     if (profile.openToJobSeeker && profile.openToEmployer)
                       const SizedBox(width: 8),
                     if (profile.openToEmployer)
-                      _buildStatusChip('Ishchi qidirmoqda', const Color(0xFF3B82F6), const Color(0xFFEFF6FF)),
+                      _buildStatusChip(l10n.employeesLookingForWorker, const Color(0xFF3B82F6), const Color(0xFFEFF6FF)),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -233,7 +236,7 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
                           );
                         },
                         icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                        label: const Text('Xabar yuborish'),
+                        label: Text(l10n.employeesSendMessage),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
@@ -251,7 +254,7 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
                   const SizedBox(height: 28),
                   _buildSectionCard(
                     icon: Icons.person_outline,
-                    title: 'Haqida',
+                    title: l10n.employeesAbout,
                     child: Text(
                       profile.bio!,
                       style: AppTextStyles.bodyMedium.copyWith(
@@ -267,7 +270,7 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
                   const SizedBox(height: 16),
                   _buildSectionCard(
                     icon: Icons.code,
-                    title: 'Ko\'nikmalar',
+                    title: l10n.employeesSkillsHeader,
                     child: Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -296,7 +299,7 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
                   const SizedBox(height: 16),
                   _buildSectionCard(
                     icon: Icons.work_outline,
-                    title: 'Ish tajribasi',
+                    title: l10n.employeesExperience,
                     child: Column(
                       children: profile.experience!.asMap().entries.map((entry) {
                         final exp = entry.value as Map<String, dynamic>;
@@ -320,7 +323,7 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
                   const SizedBox(height: 16),
                   _buildSectionCard(
                     icon: Icons.school_outlined,
-                    title: 'Ta\'lim',
+                    title: l10n.employeesEducation,
                     child: Column(
                       children: profile.education!.asMap().entries.map((entry) {
                         final edu = entry.value as Map<String, dynamic>;
@@ -359,7 +362,7 @@ class _EmployeeProfileScreenState extends ConsumerState<EmployeeProfileScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Profil hali to\'ldirilmagan',
+                          l10n.employeesProfileNotFilled,
                           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                         ),
                       ],

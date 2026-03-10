@@ -110,8 +110,8 @@ extension ContextExtension on BuildContext {
     final screenHeight = MediaQuery.of(this).size.height;
     final topPadding = MediaQuery.of(this).padding.top;
     
-    // Safely position at the top, even lower
-    final bottomMargin = screenHeight - topPadding - 160;
+    // Position it slightly lower than before (was 160, now 220 from top)
+    final bottomMargin = screenHeight - topPadding - 220;
 
     messenger.showSnackBar(
       SnackBar(

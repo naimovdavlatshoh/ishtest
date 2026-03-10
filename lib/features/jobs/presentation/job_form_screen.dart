@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -58,12 +60,13 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
 
   @override
   void didChangeDependencies() {
+    final l10n = AppLocalizations.of(context)!;
     super.didChangeDependencies();
     _jobTypes = [
-      {'value': 'full-time', 'label': 'To\'liq kun'},
-      {'value': 'part-time', 'label': 'Yarim kun'},
-      {'value': 'internship', 'label': 'Amaliyot'},
-      {'value': 'contract', 'label': 'Kontrakt'},
+      {'value': 'full-time', 'label': l10n.vacanciesFullTime},
+      {'value': 'part-time', 'label': l10n.vacanciesPartTime},
+      {'value': 'internship', 'label': l10n.vacanciesInternship},
+      {'value': 'contract', 'label': l10n.vacanciesContract},
     ];
   }
 
@@ -81,6 +84,7 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
@@ -115,12 +119,13 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
         context.showSnackBar(widget.job != null ? 'Vakansiya tahrirlandi' : 'Vakansiya yaratildi');
         context.pop();
       } else {
-        context.showSnackBar('Xatolik yuz berdi', isError: true);
+        context.showSnackBar(l10n.errorOccurred, isError: true);
       }
     }
   }
 
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final companiesAsync = ref.watch(myCompaniesProvider);
 
     final content = SingleChildScrollView(
@@ -132,28 +137,28 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
           children: [
             if (widget.job == null) ...[
               Text(
-                'Yangi vakansiya',
+                l10n.jobFormTitleNew,
                 style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
               Text(
-                'Barcha ma\'lumotlarni to\'ldiring',
+                l10n.jobFormSubtitle,
                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 24),
             ],
-            _buildSectionTitle('Asosiy ma\'lumotlar'),
+            _buildSectionTitle(l10n.jobFormSectionBasic),
             const SizedBox(height: 16),
             
             // Company Select
             companiesAsync.when(
               data: (companies) => _buildDropdownField<int>(
-                label: 'Kompaniya',
+                label: l10n.jobFormLabelCompany,
                 value: _selectedCompanyId,
                 items: [
                   DropdownMenuItem(
                     value: -1,
-                    child: const Text('Shaxsiy (kompaniyasiz)'),
+                    child: Text(l10n.jobFormCompanyPersonal),
                   ),
                   ...companies.map((c) => DropdownMenuItem(
                     value: c.id,
@@ -161,23 +166,23 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
                   )).toList(),
                 ],
                 onChanged: (val) => setState(() => _selectedCompanyId = val),
-                hint: 'Kompaniyani tanlang',
+                hint: l10n.jobFormHintCompany,
               ),
               loading: () => const LinearProgressIndicator(),
-              error: (_, __) => const Text('Kompaniyalarni yuklashda xatolik'),
+              error: (_, __) => Text(l10n.jobFormErrorLoadingCompanies),
             ),
             const SizedBox(height: 20),
 
             _buildTextField(
-              label: 'Lavozim nomi',
+              label: l10n.jobFormLabelTitle,
               controller: _titleController,
-              hint: 'Masalan: Flutter Developer',
-              validator: (val) => val == null || val.isEmpty ? 'Majburiy maydon' : null,
+              hint: l10n.jobFormHintTitle,
+              validator: (val) => val == null || val.isEmpty ? l10n.jobFormErrorRequired : null,
             ),
             const SizedBox(height: 20),
 
             _buildDropdownField<String>(
-              label: 'Ish turi',
+              label: l10n.jobFormLabelType,
               value: _selectedJobType,
               items: _jobTypes.map((t) => DropdownMenuItem(
                 value: t['value'],
@@ -188,10 +193,10 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
             const SizedBox(height: 20),
 
             _buildTextField(
-              label: 'Joylashuv',
+              label: l10n.jobFormLabelLocation,
               controller: _locationController,
-              hint: 'Masalan: Toshkent',
-              validator: (val) => val == null || val.isEmpty ? 'Majburiy maydon' : null,
+              hint: l10n.jobFormHintLocation,
+              validator: (val) => val == null || val.isEmpty ? l10n.jobFormErrorRequired : null,
             ),
             const SizedBox(height: 12),
 
@@ -204,22 +209,22 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
               child: SwitchListTile(
                 value: _isRemote,
                 onChanged: (val) => setState(() => _isRemote = val),
-                title: const Text('Masofaviy ish', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
-                subtitle: const Text('Xodim uydan ishlashi mumkin', style: const TextStyle(fontSize: 12)),
+                title: Text(l10n.jobFormLabelRemote, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                subtitle: Text(l10n.jobFormSubtitleRemote, style: const TextStyle(fontSize: 12)),
                 activeColor: AppColors.primary,
                 dense: true,
               ),
             ),
 
             const SizedBox(height: 32),
-            _buildSectionTitle('Maosh va valyuta'),
+            _buildSectionTitle(l10n.jobFormSectionSalary),
             const SizedBox(height: 16),
 
             Row(
               children: [
                 Expanded(
                   child: _buildTextField(
-                    label: 'Minimum maosh',
+                    label: l10n.jobFormLabelMinSalary,
                     controller: _salaryMinController,
                     keyboardType: TextInputType.number,
                     hint: '0',
@@ -228,7 +233,7 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: _buildTextField(
-                    label: 'Maksimum maosh',
+                    label: l10n.jobFormLabelMaxSalary,
                     controller: _salaryMaxController,
                     keyboardType: TextInputType.number,
                     hint: '0',
@@ -239,7 +244,7 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
             const SizedBox(height: 20),
 
             _buildDropdownField<String>(
-              label: 'Valyuta',
+              label: l10n.jobFormLabelCurrency,
               value: _selectedCurrency,
               items: _currencies.map((c) => DropdownMenuItem(
                 value: c,
@@ -249,28 +254,28 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
             ),
 
             const SizedBox(height: 32),
-            _buildSectionTitle('Tafsilotlar'),
+            _buildSectionTitle(l10n.jobFormSectionDetails),
             const SizedBox(height: 16),
 
             _buildTextField(
-              label: 'Tavsif',
+              label: l10n.jobFormLabelDescription,
               controller: _descriptionController,
               maxLines: 5,
-              hint: 'Vakansiya haqida batafsil...',
-              validator: (val) => val == null || val.isEmpty ? 'Majburiy maydon' : null,
+              hint: l10n.jobFormHintDescription,
+              validator: (val) => val == null || val.isEmpty ? l10n.jobFormErrorRequired : null,
             ),
             const SizedBox(height: 20),
 
             _buildTextField(
-              label: 'Talablar',
+              label: l10n.jobFormLabelRequirements,
               controller: _requirementsController,
               maxLines: 5,
-              hint: 'Har qatorga bitta talab...',
+              hint: l10n.jobFormHintRequirements,
             ),
 
             const SizedBox(height: 40),
             PrimaryButton(
-              text: widget.job != null ? 'Saqlash' : 'E\'lon yaratish',
+              text: widget.job != null ? l10n.vacanciesSave : l10n.jobFormBtnCreate,
               isLoading: _isLoading,
               onPressed: _submit,
             ),
@@ -290,7 +295,7 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Vakansiyani tahrirlash'),
+        title: Text(l10n.jobFormTitleEdit),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:linkedin_clone/core/theme/app_colors.dart';
 import 'package:linkedin_clone/core/theme/app_text_styles.dart';
@@ -97,14 +99,14 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
     }
   }
 
-  String _formatSalary(int? min, int? max, String currency) {
-    if (min == null && max == null) return 'Maosh kelishiladi';
+  String _formatSalary(int? min, int? max, String currency, AppLocalizations l10n) {
+    if (min == null && max == null) return l10n.vacanciesSalaryNegotiable;
     if (min != null && max != null) {
       return '${min.toString()} - ${max.toString()} $currency';
     } else if (min != null) {
-      return 'dan ${min.toString()} $currency';
+      return '${l10n.vacanciesSalaryFrom} ${min.toString()} $currency';
     } else {
-      return '${max.toString()} $currency gacha';
+      return '${max.toString()} $currency ${l10n.vacanciesSalaryTo}';
     }
   }
 
@@ -117,7 +119,7 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
     }
   }
 
-  void _showApplicationsModal() {
+  void _showApplicationsModal(AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -137,7 +139,7 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
               padding: const EdgeInsets.fromLTRB(24, 20, 16, 16),
               child: Row(
                 children: [
-                  Text('Arizalar ro\'yxati', style: AppTextStyles.h3),
+                  Text(l10n.vacanciesApplicationsList, style: AppTextStyles.h3),
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
@@ -149,7 +151,7 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
             const Divider(height: 1),
             Expanded(
               child: _applications.isEmpty
-                ? const Center(child: Text('Arizalar mavjud emas'))
+                ? Center(child: Text(l10n.vacanciesNoApplications))
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: _applications.length,
@@ -211,7 +213,7 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
                             ),
                             if (app.coverLetter.isNotEmpty) ...[
                               const SizedBox(height: 16),
-                              Text('Qo\'shimcha xat:', style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.bold)),
+                              Text(l10n.vacanciesCoverLetterLabel, style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.bold)),
                               const SizedBox(height: 4),
                               Text(app.coverLetter, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
                             ],
@@ -232,7 +234,7 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
     );
   }
 
-  void _showApplyModal() {
+  void _showApplyModal(AppLocalizations l10n) {
     final TextEditingController coverLetterController = TextEditingController(text: "test");
     bool isSubmitting = false;
 
@@ -263,10 +265,10 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Ushbu ishga ariza yuborish', style: AppTextStyles.h3.copyWith(fontSize: 20)),
+                          Text(l10n.vacanciesApplyTitle, style: AppTextStyles.h3.copyWith(fontSize: 20)),
                           const SizedBox(height: 8),
                           Text(
-                            '🍔 ${_job!.company?.name?.toUpperCase() ?? 'KOMPANIYA'} JAMOASIGA ISHGA TAKLIF QILAMIZ! 🍟',
+                            l10n.vacanciesApplyInvite(_job!.company?.name?.toUpperCase() ?? l10n.vacanciesCompany),
                             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.w500),
                           ),
                         ],
@@ -285,13 +287,13 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Qo\'shimcha xat (ixtiyoriy)', style: AppTextStyles.label.copyWith(fontWeight: FontWeight.bold)),
+                    Text(l10n.vacanciesCoverLetter, style: AppTextStyles.label.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     TextField(
                       controller: coverLetterController,
                       maxLines: 6,
                       decoration: InputDecoration(
-                        hintText: 'Shu yerga yozing...',
+                        hintText: l10n.vacanciesWriteHereHint,
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
@@ -299,15 +301,16 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
                     ),
                     const SizedBox(height: 24),
                     PrimaryButton(
-                      text: 'Ariza yuborish',
+                      text: l10n.vacanciesApplyBtn,
                       isLoading: isSubmitting,
                       onPressed: () async {
+                        final l10n = AppLocalizations.of(context)!;
                         setModalState(() => isSubmitting = true);
                         final success = await ref.read(jobsProvider.notifier).applyToJob(_job!.id, coverLetterController.text);
                         if (context.mounted) {
                           Navigator.pop(context);
                           context.showSnackBar(
-                            success ? 'Ariza muvaffaqiyatli yuborildi' : 'Siz bu ishga ariza topshirgansiz',
+                            success ? l10n.vacanciesApplySuccess : l10n.vacanciesApplyError,
                             isError: !success,
                           );
                           if (success) _fetchApplications();
@@ -326,8 +329,9 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_isLoadingJob) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    if (_job == null) return Scaffold(appBar: AppBar(), body: Center(child: Text('no_jobs')));
+    if (_job == null) return Scaffold(appBar: AppBar(), body: Center(child: Text(l10n.vacanciesNoJobs)));
 
     final profileAsync = ref.watch(profileMeProvider);
     final currentUserId = profileAsync.asData?.value.userId;
@@ -374,7 +378,7 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
                         children: [
                           Text(_job!.title, style: AppTextStyles.h2.copyWith(fontSize: 22)),
                           const SizedBox(height: 4),
-                          Text(_job!.company?.name ?? 'Kompaniya', style: AppTextStyles.bodyLarge.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600)),
+                          Text(_job!.company?.name ?? l10n.vacanciesCompany, style: AppTextStyles.bodyLarge.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ),
@@ -386,21 +390,21 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
                   children: [
                     _buildIconLabel(Icons.location_on_outlined, _job!.location),
                     _buildIconLabel(Icons.work_outline, _job!.jobType.toUpperCase()),
-                    if (_job!.isRemote) _buildIconLabel(Icons.home_outlined, 'Masofaviy', color: AppColors.success),
+                    if (_job!.isRemote) _buildIconLabel(Icons.home_outlined, l10n.vacanciesFilterRemote, color: AppColors.success),
                     _buildIconLabel(Icons.calendar_today_outlined, _formatDate(_job!.createdAt)),
                   ],
                 ),
                 const Padding(padding: EdgeInsets.symmetric(vertical: 24), child: Divider()),
-                Text('salary', style: AppTextStyles.h3),
+                Text(l10n.vacanciesSalaryLabel, style: AppTextStyles.h3),
                 const SizedBox(height: 8),
-                Text(_formatSalary(_job!.salaryMin, _job!.salaryMax, _job!.salaryCurrency), style: AppTextStyles.h2.copyWith(color: AppColors.success, fontSize: 20)),
+                Text(_formatSalary(_job!.salaryMin, _job!.salaryMax, _job!.salaryCurrency, l10n), style: AppTextStyles.h2.copyWith(color: AppColors.success, fontSize: 20)),
                 const SizedBox(height: 32),
-                Text('job_description', style: AppTextStyles.h3),
+                Text(l10n.vacanciesDescriptionLabel, style: AppTextStyles.h3),
                 const SizedBox(height: 12),
                 Text(_job!.description, style: AppTextStyles.bodyMedium.copyWith(height: 1.6, color: AppColors.textPrimary.withOpacity(0.8))),
                 const SizedBox(height: 32),
                 if (_job!.requirements.isNotEmpty) ...[
-                  Text('requirements', style: AppTextStyles.h3),
+                  Text(l10n.vacanciesRequirementsLabel, style: AppTextStyles.h3),
                   const SizedBox(height: 12),
                   ..._job!.requirements.map((req) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -423,8 +427,8 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
               decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -4))]),
               child: PrimaryButton(
-                text: (_hasApplied || isAuthor) ? 'see_applications' : 'apply',
-                onPressed: (_hasApplied || isAuthor) ? _showApplicationsModal : _showApplyModal,
+                text: (_hasApplied || isAuthor) ? l10n.vacanciesSeeApplications : l10n.vacanciesApplyBtn,
+                onPressed: (_hasApplied || isAuthor) ? () => _showApplicationsModal(l10n) : () => _showApplyModal(l10n),
               ),
             ),
           ),
