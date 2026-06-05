@@ -1,4 +1,4 @@
-package com.example.linkedin_clone
+package uz.ish.app
 
 import io.flutter.embedding.android.FlutterActivity
 
