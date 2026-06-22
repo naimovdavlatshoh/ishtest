@@ -2056,6 +2056,12 @@ abstract class AppLocalizations {
   /// **'Ro\'yxatdan o\'tish'**
   String get authSignUp;
 
+  /// No description provided for @authSignUpSubtitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshlash uchun yangi akkaunt yarating'**
+  String get authSignUpSubtitle;
+
   /// No description provided for @authFirstName.
   ///
   /// In uz, this message translates to:

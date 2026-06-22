@@ -326,6 +326,7 @@
   "authOr": "ИЛИ",
   "authNoAccount": "Нет аккаунта?",
   "authSignUp": "Регистрация",
+  "authSignUpSubtitle": "Создайте новый аккаунт, чтобы начать",
   "authFirstName": "Имя",
   "authEnterFirstName": "Введите ваше имя",
   "authLastName": "Фамилия",

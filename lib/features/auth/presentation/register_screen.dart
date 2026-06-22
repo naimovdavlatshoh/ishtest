@@ -116,7 +116,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Text(l10n.authSignUp, style: AppTextStyles.h1),
                 const SizedBox(height: 8),
                 Text(
-                  l10n.authSignUp,
+                  l10n.authSignUpSubtitle,
                   style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 40),

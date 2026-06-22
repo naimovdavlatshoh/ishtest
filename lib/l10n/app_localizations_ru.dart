@@ -1015,6 +1015,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get authSignUp => 'Регистрация';
 
   @override
+  String get authSignUpSubtitle => 'Создайте новый аккаунт, чтобы начать';
+
+  @override
   String get authFirstName => 'Имя';
 
   @override

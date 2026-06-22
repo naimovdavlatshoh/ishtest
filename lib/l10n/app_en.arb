@@ -326,6 +326,7 @@
   "authOr": "OR",
   "authNoAccount": "Don't have an account?",
   "authSignUp": "Sign Up",
+  "authSignUpSubtitle": "Create a new account to get started",
   "authFirstName": "First Name",
   "authEnterFirstName": "Enter your first name",
   "authLastName": "Last Name",

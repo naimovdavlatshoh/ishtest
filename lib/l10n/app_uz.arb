@@ -326,6 +326,7 @@
   "authOr": "YOKI",
   "authNoAccount": "Akkauntingiz yo'qmi?",
   "authSignUp": "Ro'yxatdan o'tish",
+  "authSignUpSubtitle": "Boshlash uchun yangi akkaunt yarating",
   "authFirstName": "Ism",
   "authEnterFirstName": "Ismingizni kiriting",
   "authLastName": "Familiya",

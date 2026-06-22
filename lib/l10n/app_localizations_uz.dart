@@ -1020,6 +1020,9 @@ class AppLocalizationsUz extends AppLocalizations {
   String get authSignUp => 'Ro\'yxatdan o\'tish';
 
   @override
+  String get authSignUpSubtitle => 'Boshlash uchun yangi akkaunt yarating';
+
+  @override
   String get authFirstName => 'Ism';
 
   @override
