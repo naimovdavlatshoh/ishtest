@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/extensions.dart';
@@ -30,6 +31,7 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Cover Image
@@ -143,14 +145,14 @@ class ProfileHeader extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    '${connections.compactFormat} connections',
+                    l10n.profileConnectionsCount(connections.compactFormat),
                     style: AppTextStyles.label.copyWith(
                       color: AppColors.primary,
                     ),
                   ),
                   const SizedBox(width: 16),
                   Text(
-                    '${followers.compactFormat} followers',
+                    l10n.profileFollowersCount(followers.compactFormat),
                     style: AppTextStyles.label,
                   ),
                 ],
@@ -168,7 +170,7 @@ class ProfileHeader extends StatelessWidget {
                           // TODO: Connect
                         },
                         icon: const Icon(Icons.person_add_outlined, size: 20),
-                        label: const Text('Connect'),
+                        label: Text(l10n.profileConnectBtn),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -178,7 +180,7 @@ class ProfileHeader extends StatelessWidget {
                           // TODO: Message
                         },
                         icon: const Icon(Icons.message_outlined, size: 20),
-                        label: const Text('Message'),
+                        label: Text(l10n.profileMessageBtn),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: AppColors.primary),
                         ),

@@ -985,4 +985,201 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileImageUploadError => 'Error uploading image';
+
+  @override
+  String get authWelcome => 'Welcome';
+
+  @override
+  String get authSignIn => 'Sign In';
+
+  @override
+  String get authPhoneNumber => 'Phone Number';
+
+  @override
+  String get authPhoneHint => '998 90 123 45 67';
+
+  @override
+  String get authPassword => 'Password';
+
+  @override
+  String get authEnterPassword => 'Enter password';
+
+  @override
+  String get authForgotPassword => 'Forgot password?';
+
+  @override
+  String get authOr => 'OR';
+
+  @override
+  String get authNoAccount => 'Don\'t have an account?';
+
+  @override
+  String get authSignUp => 'Sign Up';
+
+  @override
+  String get authFirstName => 'First Name';
+
+  @override
+  String get authEnterFirstName => 'Enter your first name';
+
+  @override
+  String get authLastName => 'Last Name';
+
+  @override
+  String get authEnterLastName => 'Enter your last name';
+
+  @override
+  String get authEmail => 'Email Address';
+
+  @override
+  String get authEnterEmail => 'Enter email';
+
+  @override
+  String get authConfirmPassword => 'Confirm Password';
+
+  @override
+  String get authReEnterPassword => 'Re-enter password';
+
+  @override
+  String get authHasAccount => 'Already have an account?';
+
+  @override
+  String feedCommentsCount(String count) {
+    return '$count comments';
+  }
+
+  @override
+  String feedSharesCount(String count) {
+    return '$count shares';
+  }
+
+  @override
+  String get feedActionLike => 'Like';
+
+  @override
+  String get feedActionComment => 'Comment';
+
+  @override
+  String get feedActionShare => 'Share';
+
+  @override
+  String profileConnectionsCount(String count) {
+    return '$count connections';
+  }
+
+  @override
+  String profileFollowersCount(String count) {
+    return '$count followers';
+  }
+
+  @override
+  String get profileConnectBtn => 'Connect';
+
+  @override
+  String get profileMessageBtn => 'Message';
+
+  @override
+  String get profileSkillsSaved => 'Skills saved';
+
+  @override
+  String get profileExperienceSaved => 'Experience saved';
+
+  @override
+  String get profileEducationSaved => 'Education saved';
+
+  @override
+  String get profileFileDeleted => 'File deleted';
+
+  @override
+  String get profileTelegramLink => 'Connect';
+
+  @override
+  String get profileTelegramEnterCode => 'Enter code';
+
+  @override
+  String get profileTelegramLinkedSuccess => 'Telegram connected successfully';
+
+  @override
+  String get profileTelegramLinkError => 'Error: code may be incorrect';
+
+  @override
+  String get profileCurrentlyStudyingHere => 'I currently study here';
+
+  @override
+  String get profileEnterFullName => 'Please enter your full name';
+
+  @override
+  String get profileSelectCityRequired => 'Please select a city';
+
+  @override
+  String get profileBioRequired => 'Please enter your bio';
+
+  @override
+  String get profileBioMinLength => 'Must be at least 20 characters';
+
+  @override
+  String get profileMinCharacters => 'min characters';
+
+  @override
+  String get profileCharactersCount => 'characters';
+
+  @override
+  String get profileContinue => 'Continue';
+
+  @override
+  String get profileStartDate => 'Start date';
+
+  @override
+  String get profilePicture => 'Profile picture';
+
+  @override
+  String get profileUploadPicture => 'Upload picture';
+
+  @override
+  String get profileUploadPictureDesc => 'Square image (JPG or PNG)';
+
+  @override
+  String get profileTelegramConnectStep1 =>
+      'Open the Telegram bot and click «Link code».';
+
+  @override
+  String get profileTelegramConnectStep2 => 'Enter the code below.';
+
+  @override
+  String get deleteAccountTitle => 'Delete Account';
+
+  @override
+  String get deleteAccountSubtitle =>
+      'This action cannot be undone. All your data will be permanently deleted.';
+
+  @override
+  String get deleteAccountBtn => 'Delete Account';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Are you sure?';
+
+  @override
+  String get deleteAccountConfirmMsg =>
+      'Your account and all associated data will be permanently deleted. This action cannot be reversed.';
+
+  @override
+  String get deleteAccountConfirmBtn => 'Yes, delete my account';
+
+  @override
+  String get deleteAccountSuccess => 'Account successfully deleted';
+
+  @override
+  String get deleteAccountError => 'Failed to delete account';
+
+  @override
+  String get dangerZone => 'Danger Zone';
+
+  @override
+  String get deleteAccountPasswordLabel => 'Enter your password';
+
+  @override
+  String get deleteAccountPasswordHint => 'Enter your password to confirm';
+
+  @override
+  String get deleteAccountPasswordRequired => 'Password is required';
 }

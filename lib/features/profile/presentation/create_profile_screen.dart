@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
+import '../../../l10n/app_localizations.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -96,7 +97,8 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
       setState(() {
         _isUploadingAvatar = true;
       });
-      if (mounted) context.showSnackBar('uploading_image', isError: false);
+      final l10n = AppLocalizations.of(context)!;
+      if (mounted) context.showSnackBar(l10n.profileUploadingImage, isError: false);
 
       try {
         const tokenStorage = TokenStorage();
@@ -117,12 +119,12 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
           setState(() {
             _localAvatarPath = filePath;
           });
-          if (mounted) context.showSnackBar('image_uploaded_success');
+          if (mounted) context.showSnackBar(l10n.profileImageUploaded);
         } else {
           throw Exception('Failed upload');
         }
       } catch (e) {
-        if (mounted) context.showSnackBar('image_upload_error', isError: true);
+        if (mounted) context.showSnackBar(l10n.profileImageUploadError, isError: true);
       } finally {
         if (mounted) {
           setState(() {
@@ -134,10 +136,11 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
 
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCity == null) {
-      context.showSnackBar('select_city_required', isError: true);
+      context.showSnackBar(l10n.profileSelectCityRequired, isError: true);
       return;
     }
 
@@ -168,7 +171,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
         ref.invalidate(userMeProvider);
         ref.read(authProvider.notifier).completeProfileCreation();
       } else {
-        String msg = 'error_occurred';
+        String msg = l10n.errorOccurred;
         try {
           final errData = jsonDecode(response.body);
           msg = errData['message'] ?? errData['detail'] ?? msg;
@@ -176,7 +179,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
         if (mounted) context.showSnackBar(msg, isError: true);
       }
     } catch (e) {
-      if (mounted) context.showSnackBar('${'error'}: $e', isError: true);
+      if (mounted) context.showSnackBar('${l10n.errorOccurred}: $e', isError: true);
     } finally {
       if (mounted) {
         setState(() {
@@ -189,6 +192,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final userMeAsync = ref.watch(userMeFutureProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -221,12 +225,12 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'complete_profile_title',
+                      l10n.feedCompleteProfile,
                       style: AppTextStyles.h2.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'complete_profile_subtitle_long',
+                      l10n.feedCompleteProfileDesc,
                       style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                       textAlign: TextAlign.center,
                     ),
@@ -253,7 +257,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
                     padding: EdgeInsets.all(32.0),
                     child: CircularProgressIndicator(),
                   )),
-                  error: (err, stack) => Center(child: Text('${'error'}: $err')),
+                  error: (err, stack) => Center(child: Text('${l10n.errorOccurred}: $err')),
                   data: (userData) {
                     if (!_userDataLoaded) {
                       final firstName = userData['first_name'] ?? '';
@@ -269,7 +273,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('profile_picture', style: AppTextStyles.h3),
+                          Text(l10n.profilePicture, style: AppTextStyles.h3),
                           const SizedBox(height: 16),
                           Row(
                             children: [
@@ -301,7 +305,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
                                     OutlinedButton.icon(
                                       onPressed: _isUploadingAvatar ? null : _pickAndUploadAvatar,
                                       icon: const Icon(Icons.upload_file, size: 18, color: AppColors.textSecondary),
-                                      label: Text('upload_picture', style: AppTextStyles.button.copyWith(color: AppColors.textSecondary)),
+                                      label: Text(l10n.profileUploadPicture, style: AppTextStyles.button.copyWith(color: AppColors.textSecondary)),
                                       style: OutlinedButton.styleFrom(
                                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -309,7 +313,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      'upload_picture_desc',
+                                      l10n.profileUploadPictureDesc,
                                       style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
                                     ),
                                   ],
@@ -319,25 +323,25 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
                           ),
                           const SizedBox(height: 24),
                           
-                          Text('full_name', style: AppTextStyles.h3),
+                          Text(l10n.profileFullNameReq, style: AppTextStyles.h3),
                           const SizedBox(height: 8),
                           TextFormField(
                             controller: _nameController,
                             decoration: InputDecoration(
-                              hintText: 'full_name',
+                              hintText: l10n.profileFullNameReq,
                               prefixIcon: const Icon(Icons.person_outline),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             ),
-                            validator: (v) => v == null || v.isEmpty ? 'enter_full_name' : null,
+                            validator: (v) => v == null || v.isEmpty ? l10n.fieldRequired : null,
                           ),
                           const SizedBox(height: 24),
                           
-                          Text('city', style: AppTextStyles.h3),
+                          Text(l10n.profileCityReq, style: AppTextStyles.h3),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
                             value: _selectedCity,
                             decoration: InputDecoration(
-                              hintText: 'select_city',
+                              hintText: l10n.pleaseSelect,
                               prefixIcon: const Icon(Icons.location_on_outlined),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             ),
@@ -352,22 +356,22 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
                                 _selectedCity = val;
                               });
                             },
-                            validator: (v) => v == null ? 'select_city_required' : null,
+                            validator: (v) => v == null ? l10n.profileSelectCityRequired : null,
                           ),
                           const SizedBox(height: 24),
                           
-                          Text('bio', style: AppTextStyles.h3),
+                          Text(l10n.profileAboutMe, style: AppTextStyles.h3),
                           const SizedBox(height: 8),
                           TextFormField(
                             controller: _bioController,
                             maxLines: 4,
                             decoration: InputDecoration(
-                              hintText: 'bio_hint',
+                              hintText: l10n.vacanciesWriteHereHint,
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             validator: (v) {
-                              if (v == null || v.isEmpty) return 'bio_required';
-                              if (v.length < 20) return 'bio_min_length';
+                              if (v == null || v.isEmpty) return l10n.profileBioRequired;
+                              if (v.length < 20) return l10n.profileBioMinLength;
                               return null;
                             },
                             onChanged: (val) {
@@ -379,11 +383,11 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '20 ${'min_characters'}',
+                                '20 ${l10n.profileMinCharacters}',
                                 style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
                               ),
                               Text(
-                                '${_bioController.text.length} ${'characters'}',
+                                '${_bioController.text.length} ${l10n.profileCharactersCount}',
                                 style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
                               ),
                             ],
@@ -404,7 +408,7 @@ class _CreateProfileScreenState extends ConsumerState<CreateProfileScreen> {
                                   : Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text('continue', style: AppTextStyles.button.copyWith(color: Colors.white, fontSize: 16)),
+                                        Text(l10n.profileContinue, style: AppTextStyles.button.copyWith(color: Colors.white, fontSize: 16)),
                                         const SizedBox(width: 8),
                                         const Icon(Icons.arrow_forward, color: Colors.white, size: 20),
                                       ],

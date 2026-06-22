@@ -983,4 +983,201 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get profileImageUploadError => 'Ошибка при загрузке изображения';
+
+  @override
+  String get authWelcome => 'Добро пожаловать';
+
+  @override
+  String get authSignIn => 'Вход в систему';
+
+  @override
+  String get authPhoneNumber => 'Номер телефона';
+
+  @override
+  String get authPhoneHint => '998 90 123 45 67';
+
+  @override
+  String get authPassword => 'Пароль';
+
+  @override
+  String get authEnterPassword => 'Введите пароль';
+
+  @override
+  String get authForgotPassword => 'Забыли пароль?';
+
+  @override
+  String get authOr => 'ИЛИ';
+
+  @override
+  String get authNoAccount => 'Нет аккаунта?';
+
+  @override
+  String get authSignUp => 'Регистрация';
+
+  @override
+  String get authFirstName => 'Имя';
+
+  @override
+  String get authEnterFirstName => 'Введите ваше имя';
+
+  @override
+  String get authLastName => 'Фамилия';
+
+  @override
+  String get authEnterLastName => 'Введите вашу фамилию';
+
+  @override
+  String get authEmail => 'Электронная почта';
+
+  @override
+  String get authEnterEmail => 'Введите email';
+
+  @override
+  String get authConfirmPassword => 'Подтвердите пароль';
+
+  @override
+  String get authReEnterPassword => 'Введите пароль еще раз';
+
+  @override
+  String get authHasAccount => 'Есть аккаунт?';
+
+  @override
+  String feedCommentsCount(String count) {
+    return '$count коммент.';
+  }
+
+  @override
+  String feedSharesCount(String count) {
+    return '$count поделились';
+  }
+
+  @override
+  String get feedActionLike => 'Нравится';
+
+  @override
+  String get feedActionComment => 'Комментировать';
+
+  @override
+  String get feedActionShare => 'Поделиться';
+
+  @override
+  String profileConnectionsCount(String count) {
+    return '$count контактов';
+  }
+
+  @override
+  String profileFollowersCount(String count) {
+    return '$count подписчиков';
+  }
+
+  @override
+  String get profileConnectBtn => 'Установить контакт';
+
+  @override
+  String get profileMessageBtn => 'Сообщение';
+
+  @override
+  String get profileSkillsSaved => 'Навыки сохранены';
+
+  @override
+  String get profileExperienceSaved => 'Опыт сохранен';
+
+  @override
+  String get profileEducationSaved => 'Образование сохранено';
+
+  @override
+  String get profileFileDeleted => 'Файл удален';
+
+  @override
+  String get profileTelegramLink => 'Связать';
+
+  @override
+  String get profileTelegramEnterCode => 'Введите код';
+
+  @override
+  String get profileTelegramLinkedSuccess => 'Telegram успешно привязан';
+
+  @override
+  String get profileTelegramLinkError => 'Ошибка: код может быть неверным';
+
+  @override
+  String get profileCurrentlyStudyingHere => 'Я сейчас здесь учусь';
+
+  @override
+  String get profileEnterFullName => 'Пожалуйста, введите ваше полное имя';
+
+  @override
+  String get profileSelectCityRequired => 'Пожалуйста, выберите город';
+
+  @override
+  String get profileBioRequired => 'Пожалуйста, введите информацию о себе';
+
+  @override
+  String get profileBioMinLength => 'Должно быть не менее 20 символов';
+
+  @override
+  String get profileMinCharacters => 'символов минимум';
+
+  @override
+  String get profileCharactersCount => 'символов';
+
+  @override
+  String get profileContinue => 'Продолжить';
+
+  @override
+  String get profileStartDate => 'Дата начала';
+
+  @override
+  String get profilePicture => 'Фото профиля';
+
+  @override
+  String get profileUploadPicture => 'Загрузить фото';
+
+  @override
+  String get profileUploadPictureDesc => 'Квадратное изображение (JPG или PNG)';
+
+  @override
+  String get profileTelegramConnectStep1 =>
+      'Откройте Telegram-бот и нажмите «Код связи».';
+
+  @override
+  String get profileTelegramConnectStep2 => 'Введите код ниже.';
+
+  @override
+  String get deleteAccountTitle => 'Удалить аккаунт';
+
+  @override
+  String get deleteAccountSubtitle =>
+      'Это действие нельзя отменить. Все ваши данные будут удалены.';
+
+  @override
+  String get deleteAccountBtn => 'Удалить аккаунт';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Вы уверены?';
+
+  @override
+  String get deleteAccountConfirmMsg =>
+      'Ваш аккаунт и все связанные данные будут удалены навсегда. Это действие нельзя отменить.';
+
+  @override
+  String get deleteAccountConfirmBtn => 'Да, удалить';
+
+  @override
+  String get deleteAccountSuccess => 'Аккаунт успешно удалён';
+
+  @override
+  String get deleteAccountError => 'Не удалось удалить аккаунт';
+
+  @override
+  String get dangerZone => 'Опасная зона';
+
+  @override
+  String get deleteAccountPasswordLabel => 'Введите пароль';
+
+  @override
+  String get deleteAccountPasswordHint => 'Введите пароль для подтверждения';
+
+  @override
+  String get deleteAccountPasswordRequired => 'Пароль обязателен';
 }

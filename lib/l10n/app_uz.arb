@@ -315,5 +315,95 @@
   "selectLanguage": "Tilni tanlang",
   "profileUploadingImage": "Rasm yuklanmoqda...",
   "profileImageUploaded": "Rasm muvaffaqiyatli yuklandi",
-  "profileImageUploadError": "Rasmni yuklashda xatolik yuz berdi"
+  "profileImageUploadError": "Rasmni yuklashda xatolik yuz berdi",
+  "authWelcome": "Xush kelibsiz",
+  "authSignIn": "Tizimga kirish",
+  "authPhoneNumber": "Telefon raqami",
+  "authPhoneHint": "998 90 123 45 67",
+  "authPassword": "Parol",
+  "authEnterPassword": "Parolni kiriting",
+  "authForgotPassword": "Parolni unutdingizmi?",
+  "authOr": "YOKI",
+  "authNoAccount": "Akkauntingiz yo'qmi?",
+  "authSignUp": "Ro'yxatdan o'tish",
+  "authFirstName": "Ism",
+  "authEnterFirstName": "Ismingizni kiriting",
+  "authLastName": "Familiya",
+  "authEnterLastName": "Familiyangizni kiriting",
+  "authEmail": "Elektron pochta",
+  "authEnterEmail": "Emailingizni kiriting",
+  "authConfirmPassword": "Parolni tasdiqlang",
+  "authReEnterPassword": "Parolni qayta kiriting",
+  "authHasAccount": "Akkauntingiz bormi?",
+  "feedCommentsCount": "{count} ta izoh",
+  "@feedCommentsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "feedSharesCount": "{count} ta ulashish",
+  "@feedSharesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "feedActionLike": "Yoqdi",
+  "feedActionComment": "Izoh",
+  "feedActionShare": "Ulashish",
+  "profileConnectionsCount": "{count} ta aloqa",
+  "@profileConnectionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "profileFollowersCount": "{count} ta obunachi",
+  "@profileFollowersCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "profileConnectBtn": "Bog'lanish",
+  "profileMessageBtn": "Xabar",
+  "profileSkillsSaved": "Ko'nikmalar saqlandi",
+  "profileExperienceSaved": "Tajriba saqlandi",
+  "profileEducationSaved": "Ta'lim saqlandi",
+  "profileFileDeleted": "Fayl o'chirildi",
+  "profileTelegramLink": "Ulash",
+  "profileTelegramEnterCode": "Kodni kiriting",
+  "profileTelegramLinkedSuccess": "Telegram muvaffaqiyatli ulandi",
+  "profileTelegramLinkError": "Xatolik: kod noto'g'ri bo'lishi mumkin",
+  "profileCurrentlyStudyingHere": "Hozir shu yerda o'qiyman",
+  "profileEnterFullName": "To'liq ismingizni kiriting",
+  "profileSelectCityRequired": "Iltimos, shaharni tanlang",
+  "profileBioRequired": "Iltimos, o'zingiz haqida ma'lumot kiriting",
+  "profileBioMinLength": "Kamida 20 ta belgi bo'lishi kerak",
+  "profileMinCharacters": "belgi kamida",
+  "profileCharactersCount": "belgi",
+  "profileContinue": "Davom etish",
+  "profileStartDate": "Boshlanish sanasi",
+  "profilePicture": "Profil rasmi",
+  "profileUploadPicture": "Rasm yuklash",
+  "profileUploadPictureDesc": "Kvadrat shaklidagi rasm (JPG yoki PNG)",
+  "profileTelegramConnectStep1": "Telegram botini oching va «Link kodi»ni bosing.",
+  "profileTelegramConnectStep2": "Kodni quyida kiriting.",
+  "deleteAccountTitle": "Akkauntni o'chirish",
+  "deleteAccountSubtitle": "Bu amalni bekor qilib bo'lmaydi. Barcha ma'lumotlaringiz o'chiriladi.",
+  "deleteAccountBtn": "Akkauntni o'chirish",
+  "deleteAccountConfirmTitle": "Rostdan ham o'chirmoqchimisiz?",
+  "deleteAccountConfirmMsg": "Akkauntingiz va barcha ma'lumotlaringiz butunlay o'chiriladi. Bu amalni qaytarib bo'lmaydi.",
+  "deleteAccountConfirmBtn": "Ha, o'chirib yuborish",
+  "deleteAccountSuccess": "Akkaunt muvaffaqiyatli o'chirildi",
+  "deleteAccountError": "O'chirishda xatolik yuz berdi",
+  "dangerZone": "Xavfli zona",
+  "deleteAccountPasswordLabel": "Parolingizni kiriting",
+  "deleteAccountPasswordHint": "Tasdiqlash uchun parolingizni kiriting",
+  "deleteAccountPasswordRequired": "Parol kiritish shart"
 }

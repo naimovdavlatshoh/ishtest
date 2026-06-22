@@ -1995,6 +1995,378 @@ abstract class AppLocalizations {
   /// In uz, this message translates to:
   /// **'Rasmni yuklashda xatolik yuz berdi'**
   String get profileImageUploadError;
+
+  /// No description provided for @authWelcome.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xush kelibsiz'**
+  String get authWelcome;
+
+  /// No description provided for @authSignIn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tizimga kirish'**
+  String get authSignIn;
+
+  /// No description provided for @authPhoneNumber.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telefon raqami'**
+  String get authPhoneNumber;
+
+  /// No description provided for @authPhoneHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'998 90 123 45 67'**
+  String get authPhoneHint;
+
+  /// No description provided for @authPassword.
+  ///
+  /// In uz, this message translates to:
+  /// **'Parol'**
+  String get authPassword;
+
+  /// No description provided for @authEnterPassword.
+  ///
+  /// In uz, this message translates to:
+  /// **'Parolni kiriting'**
+  String get authEnterPassword;
+
+  /// No description provided for @authForgotPassword.
+  ///
+  /// In uz, this message translates to:
+  /// **'Parolni unutdingizmi?'**
+  String get authForgotPassword;
+
+  /// No description provided for @authOr.
+  ///
+  /// In uz, this message translates to:
+  /// **'YOKI'**
+  String get authOr;
+
+  /// No description provided for @authNoAccount.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkauntingiz yo\'qmi?'**
+  String get authNoAccount;
+
+  /// No description provided for @authSignUp.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ro\'yxatdan o\'tish'**
+  String get authSignUp;
+
+  /// No description provided for @authFirstName.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ism'**
+  String get authFirstName;
+
+  /// No description provided for @authEnterFirstName.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ismingizni kiriting'**
+  String get authEnterFirstName;
+
+  /// No description provided for @authLastName.
+  ///
+  /// In uz, this message translates to:
+  /// **'Familiya'**
+  String get authLastName;
+
+  /// No description provided for @authEnterLastName.
+  ///
+  /// In uz, this message translates to:
+  /// **'Familiyangizni kiriting'**
+  String get authEnterLastName;
+
+  /// No description provided for @authEmail.
+  ///
+  /// In uz, this message translates to:
+  /// **'Elektron pochta'**
+  String get authEmail;
+
+  /// No description provided for @authEnterEmail.
+  ///
+  /// In uz, this message translates to:
+  /// **'Emailingizni kiriting'**
+  String get authEnterEmail;
+
+  /// No description provided for @authConfirmPassword.
+  ///
+  /// In uz, this message translates to:
+  /// **'Parolni tasdiqlang'**
+  String get authConfirmPassword;
+
+  /// No description provided for @authReEnterPassword.
+  ///
+  /// In uz, this message translates to:
+  /// **'Parolni qayta kiriting'**
+  String get authReEnterPassword;
+
+  /// No description provided for @authHasAccount.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkauntingiz bormi?'**
+  String get authHasAccount;
+
+  /// No description provided for @feedCommentsCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta izoh'**
+  String feedCommentsCount(String count);
+
+  /// No description provided for @feedSharesCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta ulashish'**
+  String feedSharesCount(String count);
+
+  /// No description provided for @feedActionLike.
+  ///
+  /// In uz, this message translates to:
+  /// **'Yoqdi'**
+  String get feedActionLike;
+
+  /// No description provided for @feedActionComment.
+  ///
+  /// In uz, this message translates to:
+  /// **'Izoh'**
+  String get feedActionComment;
+
+  /// No description provided for @feedActionShare.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ulashish'**
+  String get feedActionShare;
+
+  /// No description provided for @profileConnectionsCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta aloqa'**
+  String profileConnectionsCount(String count);
+
+  /// No description provided for @profileFollowersCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'{count} ta obunachi'**
+  String profileFollowersCount(String count);
+
+  /// No description provided for @profileConnectBtn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bog\'lanish'**
+  String get profileConnectBtn;
+
+  /// No description provided for @profileMessageBtn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xabar'**
+  String get profileMessageBtn;
+
+  /// No description provided for @profileSkillsSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ko\'nikmalar saqlandi'**
+  String get profileSkillsSaved;
+
+  /// No description provided for @profileExperienceSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tajriba saqlandi'**
+  String get profileExperienceSaved;
+
+  /// No description provided for @profileEducationSaved.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ta\'lim saqlandi'**
+  String get profileEducationSaved;
+
+  /// No description provided for @profileFileDeleted.
+  ///
+  /// In uz, this message translates to:
+  /// **'Fayl o\'chirildi'**
+  String get profileFileDeleted;
+
+  /// No description provided for @profileTelegramLink.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ulash'**
+  String get profileTelegramLink;
+
+  /// No description provided for @profileTelegramEnterCode.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kodni kiriting'**
+  String get profileTelegramEnterCode;
+
+  /// No description provided for @profileTelegramLinkedSuccess.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram muvaffaqiyatli ulandi'**
+  String get profileTelegramLinkedSuccess;
+
+  /// No description provided for @profileTelegramLinkError.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xatolik: kod noto\'g\'ri bo\'lishi mumkin'**
+  String get profileTelegramLinkError;
+
+  /// No description provided for @profileCurrentlyStudyingHere.
+  ///
+  /// In uz, this message translates to:
+  /// **'Hozir shu yerda o\'qiyman'**
+  String get profileCurrentlyStudyingHere;
+
+  /// No description provided for @profileEnterFullName.
+  ///
+  /// In uz, this message translates to:
+  /// **'To\'liq ismingizni kiriting'**
+  String get profileEnterFullName;
+
+  /// No description provided for @profileSelectCityRequired.
+  ///
+  /// In uz, this message translates to:
+  /// **'Iltimos, shaharni tanlang'**
+  String get profileSelectCityRequired;
+
+  /// No description provided for @profileBioRequired.
+  ///
+  /// In uz, this message translates to:
+  /// **'Iltimos, o\'zingiz haqida ma\'lumot kiriting'**
+  String get profileBioRequired;
+
+  /// No description provided for @profileBioMinLength.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kamida 20 ta belgi bo\'lishi kerak'**
+  String get profileBioMinLength;
+
+  /// No description provided for @profileMinCharacters.
+  ///
+  /// In uz, this message translates to:
+  /// **'belgi kamida'**
+  String get profileMinCharacters;
+
+  /// No description provided for @profileCharactersCount.
+  ///
+  /// In uz, this message translates to:
+  /// **'belgi'**
+  String get profileCharactersCount;
+
+  /// No description provided for @profileContinue.
+  ///
+  /// In uz, this message translates to:
+  /// **'Davom etish'**
+  String get profileContinue;
+
+  /// No description provided for @profileStartDate.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshlanish sanasi'**
+  String get profileStartDate;
+
+  /// No description provided for @profilePicture.
+  ///
+  /// In uz, this message translates to:
+  /// **'Profil rasmi'**
+  String get profilePicture;
+
+  /// No description provided for @profileUploadPicture.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rasm yuklash'**
+  String get profileUploadPicture;
+
+  /// No description provided for @profileUploadPictureDesc.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kvadrat shaklidagi rasm (JPG yoki PNG)'**
+  String get profileUploadPictureDesc;
+
+  /// No description provided for @profileTelegramConnectStep1.
+  ///
+  /// In uz, this message translates to:
+  /// **'Telegram botini oching va «Link kodi»ni bosing.'**
+  String get profileTelegramConnectStep1;
+
+  /// No description provided for @profileTelegramConnectStep2.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kodni quyida kiriting.'**
+  String get profileTelegramConnectStep2;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkauntni o\'chirish'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountSubtitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bu amalni bekor qilib bo\'lmaydi. Barcha ma\'lumotlaringiz o\'chiriladi.'**
+  String get deleteAccountSubtitle;
+
+  /// No description provided for @deleteAccountBtn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkauntni o\'chirish'**
+  String get deleteAccountBtn;
+
+  /// No description provided for @deleteAccountConfirmTitle.
+  ///
+  /// In uz, this message translates to:
+  /// **'Rostdan ham o\'chirmoqchimisiz?'**
+  String get deleteAccountConfirmTitle;
+
+  /// No description provided for @deleteAccountConfirmMsg.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkauntingiz va barcha ma\'lumotlaringiz butunlay o\'chiriladi. Bu amalni qaytarib bo\'lmaydi.'**
+  String get deleteAccountConfirmMsg;
+
+  /// No description provided for @deleteAccountConfirmBtn.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ha, o\'chirib yuborish'**
+  String get deleteAccountConfirmBtn;
+
+  /// No description provided for @deleteAccountSuccess.
+  ///
+  /// In uz, this message translates to:
+  /// **'Akkaunt muvaffaqiyatli o\'chirildi'**
+  String get deleteAccountSuccess;
+
+  /// No description provided for @deleteAccountError.
+  ///
+  /// In uz, this message translates to:
+  /// **'O\'chirishda xatolik yuz berdi'**
+  String get deleteAccountError;
+
+  /// No description provided for @dangerZone.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xavfli zona'**
+  String get dangerZone;
+
+  /// No description provided for @deleteAccountPasswordLabel.
+  ///
+  /// In uz, this message translates to:
+  /// **'Parolingizni kiriting'**
+  String get deleteAccountPasswordLabel;
+
+  /// No description provided for @deleteAccountPasswordHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Tasdiqlash uchun parolingizni kiriting'**
+  String get deleteAccountPasswordHint;
+
+  /// No description provided for @deleteAccountPasswordRequired.
+  ///
+  /// In uz, this message translates to:
+  /// **'Parol kiritish shart'**
+  String get deleteAccountPasswordRequired;
 }
 
 class _AppLocalizationsDelegate

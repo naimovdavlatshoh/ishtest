@@ -145,7 +145,7 @@ class _CompanyCard extends ConsumerWidget {
                   final success = await ref.read(myCompaniesProvider.notifier).deleteCompany(company.id);
                   if (context.mounted) {
                     context.showSnackBar(
-                      success ? 'Kompaniya o\'chirildi' : l10n.errorOccurred,
+                      success ? l10n.myCompaniesDeleted : l10n.errorOccurred,
                       isError: !success,
                     );
                   }

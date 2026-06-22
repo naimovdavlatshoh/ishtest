@@ -315,5 +315,95 @@
   "selectLanguage": "Выберите язык",
   "profileUploadingImage": "Загрузка изображения...",
   "profileImageUploaded": "Изображение успешно загружено",
-  "profileImageUploadError": "Ошибка при загрузке изображения"
+  "profileImageUploadError": "Ошибка при загрузке изображения",
+  "authWelcome": "Добро пожаловать",
+  "authSignIn": "Вход в систему",
+  "authPhoneNumber": "Номер телефона",
+  "authPhoneHint": "998 90 123 45 67",
+  "authPassword": "Пароль",
+  "authEnterPassword": "Введите пароль",
+  "authForgotPassword": "Забыли пароль?",
+  "authOr": "ИЛИ",
+  "authNoAccount": "Нет аккаунта?",
+  "authSignUp": "Регистрация",
+  "authFirstName": "Имя",
+  "authEnterFirstName": "Введите ваше имя",
+  "authLastName": "Фамилия",
+  "authEnterLastName": "Введите вашу фамилию",
+  "authEmail": "Электронная почта",
+  "authEnterEmail": "Введите email",
+  "authConfirmPassword": "Подтвердите пароль",
+  "authReEnterPassword": "Введите пароль еще раз",
+  "authHasAccount": "Есть аккаунт?",
+  "feedCommentsCount": "{count} коммент.",
+  "@feedCommentsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "feedSharesCount": "{count} поделились",
+  "@feedSharesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "feedActionLike": "Нравится",
+  "feedActionComment": "Комментировать",
+  "feedActionShare": "Поделиться",
+  "profileConnectionsCount": "{count} контактов",
+  "@profileConnectionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "profileFollowersCount": "{count} подписчиков",
+  "@profileFollowersCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "profileConnectBtn": "Установить контакт",
+  "profileMessageBtn": "Сообщение",
+  "profileSkillsSaved": "Навыки сохранены",
+  "profileExperienceSaved": "Опыт сохранен",
+  "profileEducationSaved": "Образование сохранено",
+  "profileFileDeleted": "Файл удален",
+  "profileTelegramLink": "Связать",
+  "profileTelegramEnterCode": "Введите код",
+  "profileTelegramLinkedSuccess": "Telegram успешно привязан",
+  "profileTelegramLinkError": "Ошибка: код может быть неверным",
+  "profileCurrentlyStudyingHere": "Я сейчас здесь учусь",
+  "profileEnterFullName": "Пожалуйста, введите ваше полное имя",
+  "profileSelectCityRequired": "Пожалуйста, выберите город",
+  "profileBioRequired": "Пожалуйста, введите информацию о себе",
+  "profileBioMinLength": "Должно быть не менее 20 символов",
+  "profileMinCharacters": "символов минимум",
+  "profileCharactersCount": "символов",
+  "profileContinue": "Продолжить",
+  "profileStartDate": "Дата начала",
+  "profilePicture": "Фото профиля",
+  "profileUploadPicture": "Загрузить фото",
+  "profileUploadPictureDesc": "Квадратное изображение (JPG или PNG)",
+  "profileTelegramConnectStep1": "Откройте Telegram-бот и нажмите «Код связи».",
+  "profileTelegramConnectStep2": "Введите код ниже.",
+  "deleteAccountTitle": "Удалить аккаунт",
+  "deleteAccountSubtitle": "Это действие нельзя отменить. Все ваши данные будут удалены.",
+  "deleteAccountBtn": "Удалить аккаунт",
+  "deleteAccountConfirmTitle": "Вы уверены?",
+  "deleteAccountConfirmMsg": "Ваш аккаунт и все связанные данные будут удалены навсегда. Это действие нельзя отменить.",
+  "deleteAccountConfirmBtn": "Да, удалить",
+  "deleteAccountSuccess": "Аккаунт успешно удалён",
+  "deleteAccountError": "Не удалось удалить аккаунт",
+  "dangerZone": "Опасная зона",
+  "deleteAccountPasswordLabel": "Введите пароль",
+  "deleteAccountPasswordHint": "Введите пароль для подтверждения",
+  "deleteAccountPasswordRequired": "Пароль обязателен"
 }

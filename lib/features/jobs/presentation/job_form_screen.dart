@@ -116,7 +116,7 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     if (mounted) {
       setState(() => _isLoading = false);
       if (success) {
-        context.showSnackBar(widget.job != null ? 'Vakansiya tahrirlandi' : 'Vakansiya yaratildi');
+        context.showSnackBar(widget.job != null ? l10n.jobFormModified : l10n.jobFormCreated);
         context.pop();
       } else {
         context.showSnackBar(l10n.errorOccurred, isError: true);

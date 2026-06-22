@@ -988,4 +988,205 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get profileImageUploadError => 'Rasmni yuklashda xatolik yuz berdi';
+
+  @override
+  String get authWelcome => 'Xush kelibsiz';
+
+  @override
+  String get authSignIn => 'Tizimga kirish';
+
+  @override
+  String get authPhoneNumber => 'Telefon raqami';
+
+  @override
+  String get authPhoneHint => '998 90 123 45 67';
+
+  @override
+  String get authPassword => 'Parol';
+
+  @override
+  String get authEnterPassword => 'Parolni kiriting';
+
+  @override
+  String get authForgotPassword => 'Parolni unutdingizmi?';
+
+  @override
+  String get authOr => 'YOKI';
+
+  @override
+  String get authNoAccount => 'Akkauntingiz yo\'qmi?';
+
+  @override
+  String get authSignUp => 'Ro\'yxatdan o\'tish';
+
+  @override
+  String get authFirstName => 'Ism';
+
+  @override
+  String get authEnterFirstName => 'Ismingizni kiriting';
+
+  @override
+  String get authLastName => 'Familiya';
+
+  @override
+  String get authEnterLastName => 'Familiyangizni kiriting';
+
+  @override
+  String get authEmail => 'Elektron pochta';
+
+  @override
+  String get authEnterEmail => 'Emailingizni kiriting';
+
+  @override
+  String get authConfirmPassword => 'Parolni tasdiqlang';
+
+  @override
+  String get authReEnterPassword => 'Parolni qayta kiriting';
+
+  @override
+  String get authHasAccount => 'Akkauntingiz bormi?';
+
+  @override
+  String feedCommentsCount(String count) {
+    return '$count ta izoh';
+  }
+
+  @override
+  String feedSharesCount(String count) {
+    return '$count ta ulashish';
+  }
+
+  @override
+  String get feedActionLike => 'Yoqdi';
+
+  @override
+  String get feedActionComment => 'Izoh';
+
+  @override
+  String get feedActionShare => 'Ulashish';
+
+  @override
+  String profileConnectionsCount(String count) {
+    return '$count ta aloqa';
+  }
+
+  @override
+  String profileFollowersCount(String count) {
+    return '$count ta obunachi';
+  }
+
+  @override
+  String get profileConnectBtn => 'Bog\'lanish';
+
+  @override
+  String get profileMessageBtn => 'Xabar';
+
+  @override
+  String get profileSkillsSaved => 'Ko\'nikmalar saqlandi';
+
+  @override
+  String get profileExperienceSaved => 'Tajriba saqlandi';
+
+  @override
+  String get profileEducationSaved => 'Ta\'lim saqlandi';
+
+  @override
+  String get profileFileDeleted => 'Fayl o\'chirildi';
+
+  @override
+  String get profileTelegramLink => 'Ulash';
+
+  @override
+  String get profileTelegramEnterCode => 'Kodni kiriting';
+
+  @override
+  String get profileTelegramLinkedSuccess => 'Telegram muvaffaqiyatli ulandi';
+
+  @override
+  String get profileTelegramLinkError =>
+      'Xatolik: kod noto\'g\'ri bo\'lishi mumkin';
+
+  @override
+  String get profileCurrentlyStudyingHere => 'Hozir shu yerda o\'qiyman';
+
+  @override
+  String get profileEnterFullName => 'To\'liq ismingizni kiriting';
+
+  @override
+  String get profileSelectCityRequired => 'Iltimos, shaharni tanlang';
+
+  @override
+  String get profileBioRequired =>
+      'Iltimos, o\'zingiz haqida ma\'lumot kiriting';
+
+  @override
+  String get profileBioMinLength => 'Kamida 20 ta belgi bo\'lishi kerak';
+
+  @override
+  String get profileMinCharacters => 'belgi kamida';
+
+  @override
+  String get profileCharactersCount => 'belgi';
+
+  @override
+  String get profileContinue => 'Davom etish';
+
+  @override
+  String get profileStartDate => 'Boshlanish sanasi';
+
+  @override
+  String get profilePicture => 'Profil rasmi';
+
+  @override
+  String get profileUploadPicture => 'Rasm yuklash';
+
+  @override
+  String get profileUploadPictureDesc =>
+      'Kvadrat shaklidagi rasm (JPG yoki PNG)';
+
+  @override
+  String get profileTelegramConnectStep1 =>
+      'Telegram botini oching va «Link kodi»ni bosing.';
+
+  @override
+  String get profileTelegramConnectStep2 => 'Kodni quyida kiriting.';
+
+  @override
+  String get deleteAccountTitle => 'Akkauntni o\'chirish';
+
+  @override
+  String get deleteAccountSubtitle =>
+      'Bu amalni bekor qilib bo\'lmaydi. Barcha ma\'lumotlaringiz o\'chiriladi.';
+
+  @override
+  String get deleteAccountBtn => 'Akkauntni o\'chirish';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Rostdan ham o\'chirmoqchimisiz?';
+
+  @override
+  String get deleteAccountConfirmMsg =>
+      'Akkauntingiz va barcha ma\'lumotlaringiz butunlay o\'chiriladi. Bu amalni qaytarib bo\'lmaydi.';
+
+  @override
+  String get deleteAccountConfirmBtn => 'Ha, o\'chirib yuborish';
+
+  @override
+  String get deleteAccountSuccess => 'Akkaunt muvaffaqiyatli o\'chirildi';
+
+  @override
+  String get deleteAccountError => 'O\'chirishda xatolik yuz berdi';
+
+  @override
+  String get dangerZone => 'Xavfli zona';
+
+  @override
+  String get deleteAccountPasswordLabel => 'Parolingizni kiriting';
+
+  @override
+  String get deleteAccountPasswordHint =>
+      'Tasdiqlash uchun parolingizni kiriting';
+
+  @override
+  String get deleteAccountPasswordRequired => 'Parol kiritish shart';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/extensions.dart';
@@ -25,6 +26,7 @@ class PostActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Stats Row
@@ -48,14 +50,14 @@ class PostActions extends StatelessWidget {
                 const Spacer(),
                 if (comments > 0) ...[
                   Text(
-                    '${comments.compactFormat} comments',
+                    l10n.feedCommentsCount(comments.compactFormat),
                     style: AppTextStyles.caption,
                   ),
                   const SizedBox(width: 16),
                 ],
                 if (shares > 0)
                   Text(
-                    '${shares.compactFormat} shares',
+                    l10n.feedSharesCount(shares.compactFormat),
                     style: AppTextStyles.caption,
                   ),
               ],
@@ -72,18 +74,18 @@ class PostActions extends StatelessWidget {
             children: [
               _ActionButton(
                 icon: isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
-                label: 'Like',
+                label: l10n.feedActionLike,
                 onTap: onLike,
                 color: isLiked ? AppColors.like : AppColors.iconSecondary,
               ),
               _ActionButton(
                 icon: Icons.comment_outlined,
-                label: 'Comment',
+                label: l10n.feedActionComment,
                 onTap: onComment,
               ),
               _ActionButton(
                 icon: Icons.share_outlined,
-                label: 'Share',
+                label: l10n.feedActionShare,
                 onTap: onShare,
               ),
             ],

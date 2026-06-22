@@ -33,7 +33,7 @@ class ProfileMeScreen extends ConsumerWidget {
       ),
       body: profileAsync.when(
         loading: () => const Center(child: AppLoader()),
-        error: (error, stack) => Center(child: Text('Xatolik: $error')),
+        error: (error, stack) => Center(child: Text('${l10n.errorOccurred}: $error')),
         data: (profile) => RefreshIndicator(
           onRefresh: () => ref.read(profileMeProvider.notifier).fetchProfile(),
           child: SingleChildScrollView(

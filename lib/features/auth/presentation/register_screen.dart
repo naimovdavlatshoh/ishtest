@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/validators.dart';
@@ -80,6 +81,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final AuthState authState = ref.watch(authProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -111,32 +113,32 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                Text('Ro\'yxatdan o\'tish', style: AppTextStyles.h1),
+                Text(l10n.authSignUp, style: AppTextStyles.h1),
                 const SizedBox(height: 8),
                 Text(
-                  'Ro\'yxatdan o\'tish',
+                  l10n.authSignUp,
                   style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 40),
                 AuthTextField(
-                  label: 'Ism',
-                  hint: 'Ismingizni kiriting',
+                  label: l10n.authFirstName,
+                  hint: l10n.authEnterFirstName,
                   controller: _firstNameController,
                   validator: Validators.name,
                   prefixIcon: const Icon(Icons.person_outline),
                 ),
                 const SizedBox(height: 24),
                 AuthTextField(
-                  label: 'Familiya',
-                  hint: 'Familiyangizni kiriting',
+                  label: l10n.authLastName,
+                  hint: l10n.authEnterLastName,
                   controller: _lastNameController,
                   validator: Validators.name,
                   prefixIcon: const Icon(Icons.person_outline),
                 ),
                 const SizedBox(height: 24),
                 AuthTextField(
-                  label: 'Telefon raqami',
-                  hint: '998 90 123 45 67',
+                  label: l10n.authPhoneNumber,
+                  hint: l10n.authPhoneHint,
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   inputFormatters: [_phoneMaskFormatter],
@@ -145,8 +147,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 24),
                 AuthTextField(
-                  label: 'Elektron pochta',
-                  hint: 'Emailingizni kiriting',
+                  label: l10n.authEmail,
+                  hint: l10n.authEnterEmail,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: Validators.email,
@@ -154,8 +156,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 24),
                 AuthTextField(
-                  label: 'Parol',
-                  hint: 'Parolni kiriting',
+                  label: l10n.authPassword,
+                  hint: l10n.authEnterPassword,
                   controller: _passwordController,
                   isPassword: true,
                   validator: Validators.password,
@@ -163,8 +165,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 24),
                 AuthTextField(
-                  label: 'Parolni tasdiqlang',
-                  hint: 'Parolni qayta kiriting',
+                  label: l10n.authConfirmPassword,
+                  hint: l10n.authReEnterPassword,
                   controller: _confirmPasswordController,
                   isPassword: true,
                   validator: (value) => Validators.confirmPassword(value, _passwordController.text),
@@ -172,7 +174,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 32),
                 PrimaryButton(
-                  text: 'Ro\'yxatdan o\'tish',
+                  text: l10n.authSignUp,
                   onPressed: _handleRegister,
                   isLoading: authState.isLoading,
                 ),
@@ -180,10 +182,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("${'Akkauntingiz bormi?'} ", style: AppTextStyles.bodyMedium),
+                    Text("${l10n.authHasAccount} ", style: AppTextStyles.bodyMedium),
                     TextButton(
                       onPressed: () => context.go('/login'),
-                      child: Text('Tizimga kirish', style: AppTextStyles.link),
+                      child: Text(l10n.authSignIn, style: AppTextStyles.link),
                     ),
                   ],
                 ),

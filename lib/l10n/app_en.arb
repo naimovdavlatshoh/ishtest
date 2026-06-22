@@ -315,5 +315,95 @@
   "selectLanguage": "Select language",
   "profileUploadingImage": "Uploading image...",
   "profileImageUploaded": "Image uploaded successfully",
-  "profileImageUploadError": "Error uploading image"
+  "profileImageUploadError": "Error uploading image",
+  "authWelcome": "Welcome",
+  "authSignIn": "Sign In",
+  "authPhoneNumber": "Phone Number",
+  "authPhoneHint": "998 90 123 45 67",
+  "authPassword": "Password",
+  "authEnterPassword": "Enter password",
+  "authForgotPassword": "Forgot password?",
+  "authOr": "OR",
+  "authNoAccount": "Don't have an account?",
+  "authSignUp": "Sign Up",
+  "authFirstName": "First Name",
+  "authEnterFirstName": "Enter your first name",
+  "authLastName": "Last Name",
+  "authEnterLastName": "Enter your last name",
+  "authEmail": "Email Address",
+  "authEnterEmail": "Enter email",
+  "authConfirmPassword": "Confirm Password",
+  "authReEnterPassword": "Re-enter password",
+  "authHasAccount": "Already have an account?",
+  "feedCommentsCount": "{count} comments",
+  "@feedCommentsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "feedSharesCount": "{count} shares",
+  "@feedSharesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "feedActionLike": "Like",
+  "feedActionComment": "Comment",
+  "feedActionShare": "Share",
+  "profileConnectionsCount": "{count} connections",
+  "@profileConnectionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "profileFollowersCount": "{count} followers",
+  "@profileFollowersCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "profileConnectBtn": "Connect",
+  "profileMessageBtn": "Message",
+  "profileSkillsSaved": "Skills saved",
+  "profileExperienceSaved": "Experience saved",
+  "profileEducationSaved": "Education saved",
+  "profileFileDeleted": "File deleted",
+  "profileTelegramLink": "Connect",
+  "profileTelegramEnterCode": "Enter code",
+  "profileTelegramLinkedSuccess": "Telegram connected successfully",
+  "profileTelegramLinkError": "Error: code may be incorrect",
+  "profileCurrentlyStudyingHere": "I currently study here",
+  "profileEnterFullName": "Please enter your full name",
+  "profileSelectCityRequired": "Please select a city",
+  "profileBioRequired": "Please enter your bio",
+  "profileBioMinLength": "Must be at least 20 characters",
+  "profileMinCharacters": "min characters",
+  "profileCharactersCount": "characters",
+  "profileContinue": "Continue",
+  "profileStartDate": "Start date",
+  "profilePicture": "Profile picture",
+  "profileUploadPicture": "Upload picture",
+  "profileUploadPictureDesc": "Square image (JPG or PNG)",
+  "profileTelegramConnectStep1": "Open the Telegram bot and click «Link code».",
+  "profileTelegramConnectStep2": "Enter the code below.",
+  "deleteAccountTitle": "Delete Account",
+  "deleteAccountSubtitle": "This action cannot be undone. All your data will be permanently deleted.",
+  "deleteAccountBtn": "Delete Account",
+  "deleteAccountConfirmTitle": "Are you sure?",
+  "deleteAccountConfirmMsg": "Your account and all associated data will be permanently deleted. This action cannot be reversed.",
+  "deleteAccountConfirmBtn": "Yes, delete my account",
+  "deleteAccountSuccess": "Account successfully deleted",
+  "deleteAccountError": "Failed to delete account",
+  "dangerZone": "Danger Zone",
+  "deleteAccountPasswordLabel": "Enter your password",
+  "deleteAccountPasswordHint": "Enter your password to confirm",
+  "deleteAccountPasswordRequired": "Password is required"
 }

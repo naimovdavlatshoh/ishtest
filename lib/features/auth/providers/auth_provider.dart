@@ -255,6 +255,60 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = AuthState();
   }
 
+  Future<bool> deleteAccount(String password) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      if (Environment.useMockData) {
+        await Future.delayed(const Duration(seconds: 1));
+        await _tokenStorage.clear();
+        state = AuthState();
+        return true;
+      }
+
+      final token = await _tokenStorage.getAccessToken();
+      final Uri uri = Uri.parse(
+        '${Environment.apiBaseUrl}/api/${Environment.apiVersion}/users/me',
+      );
+
+      final http.Response response = await _client.delete(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'password': password}),
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        await _tokenStorage.clear();
+        state = AuthState();
+        return true;
+      } else {
+        String errorMessage = 'Failed to delete account. Please try again.';
+        try {
+          final Map<String, dynamic> errorData =
+              jsonDecode(response.body) as Map<String, dynamic>;
+          errorMessage = (errorData['message'] ??
+                  errorData['detail'] ??
+                  errorData['error'] ??
+                  errorMessage)
+              .toString();
+        } catch (_) {}
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: errorMessage,
+        );
+        return false;
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
   void completeProfileCreation() {
     state = state.copyWith(isNewUser: false);
   }

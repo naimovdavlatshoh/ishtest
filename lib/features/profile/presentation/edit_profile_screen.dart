@@ -152,7 +152,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       ),
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Xatolik: $err')),
+        error: (err, stack) => Center(child: Text('${l10n.errorOccurred}: $err')),
         data: (profile) => SingleChildScrollView(
           controller: _scrollController,
           padding: const EdgeInsets.all(16),
@@ -334,7 +334,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             });
             if (context.mounted) {
               context.showSnackBar(
-                success ? 'data_saved' : 'error',
+                success ? l10n.jobAppDataSaved : l10n.errorOccurred,
                 isError: !success,
               );
             }
@@ -405,7 +405,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             });
             if (context.mounted) {
               context.showSnackBar(
-                success ? 'skills_saved' : 'error',
+                success ? l10n.profileSkillsSaved : l10n.errorOccurred,
                 isError: !success,
               );
             }
@@ -480,7 +480,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             });
             if (context.mounted) {
               context.showSnackBar(
-                success ? 'experience_saved' : 'error',
+                success ? l10n.profileExperienceSaved : l10n.errorOccurred,
                 isError: !success,
               );
             }
@@ -715,7 +715,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             });
             if (context.mounted) {
               context.showSnackBar(
-                success ? 'education_saved' : 'error',
+                success ? l10n.profileEducationSaved : l10n.errorOccurred,
                 isError: !success,
               );
             }
@@ -811,7 +811,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             },
             child: AbsorbPointer(
               child: _buildTextField(
-                label: '${'start_date'} *',
+                label: '${l10n.profileStartDate} *',
                 initialValue: edu.startDate,
                 suffixIcon: const Icon(Icons.calendar_today, size: 18),
               ),
@@ -864,7 +864,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   });
                 },
               ),
-              const Text('Hozir shu yerda o\'qiyman'),
+              Text(l10n.profileCurrentlyStudyingHere),
             ],
           ),
           const SizedBox(height: 4),
@@ -993,7 +993,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         const SizedBox(height: 16),
         userMeAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, s) => Text('Xatolik: $e'),
+          error: (e, s) => Text('${l10n.errorOccurred}: $e'),
           data: (user) {
             final isLinked = user.telegramId != null;
 
@@ -1061,16 +1061,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         children: [
                           const TextSpan(text: '1. '),
                           TextSpan(
-                            text: 'Telegram botini oching',
+                            text: l10n.profileTelegramConnectStep1,
                             style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
                           ),
-                          const TextSpan(text: ' va «Link kodi»ni bosing.'),
                         ],
                       ),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text('2. Kodni quyida kiriting.', style: AppTextStyles.bodyMedium),
+                  Text('2. ${l10n.profileTelegramConnectStep2}', style: AppTextStyles.bodyMedium),
                   const SizedBox(height: 16),
                   _buildTextField(
                     label: '',
@@ -1079,18 +1078,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ),
                   const SizedBox(height: 20),
                   PrimaryButton(
-                    text: 'Ulash',
+                    text: l10n.profileTelegramLink,
                     onPressed: () async {
                       final code = _telegramCodeController.text.trim();
                       if (code.isEmpty) {
-                        context.showSnackBar('Kodni kiriting', isError: true);
+                        context.showSnackBar(l10n.profileTelegramEnterCode, isError: true);
                         return;
                       }
 
                       final success = await ref.read(profileMeProvider.notifier).linkTelegram(code);
                       if (context.mounted) {
                         context.showSnackBar(
-                          success ? 'Telegram muvaffaqiyatli ulandi' : 'Xatolik: kod noto\'g\'ri bo\'lishi mumkin',
+                          success ? l10n.profileTelegramLinkedSuccess : l10n.profileTelegramLinkError,
                           isError: !success,
                         );
                         if (success) {
@@ -1195,7 +1194,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     });
                     if (context.mounted) {
                       context.showSnackBar(
-                        success ? 'Fayl o\'chirildi' : l10n.profileVisibilityError,
+                        success ? l10n.profileFileDeleted : l10n.profileVisibilityError,
                         isError: !success,
                       );
                     }
