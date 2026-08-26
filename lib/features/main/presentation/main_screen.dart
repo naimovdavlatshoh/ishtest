@@ -11,7 +11,7 @@ import '../../auth/providers/auth_provider.dart';
 import '../../profile/providers/profile_me_provider.dart';
 import '../../../core/utils/extensions.dart';
 import '../../chat/providers/global_chat_provider.dart';
-import '../../../core/widgets/atlas/atlas_pattern.dart';
+import '../../../core/widgets/app_header/app_header.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MainScreen extends ConsumerWidget {
@@ -339,11 +339,8 @@ class MainScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
         titleSpacing: 12,
-        flexibleSpace: ClipPath(
-          clipper: const AtlasArchClipper(archDepth: 16, archCount: 4),
-          child: buildAtlasPatternLayer(),
-        ),
-        title: AtlasMedallion(
+        flexibleSpace: const AppHeaderBand(height: 96, borderRadius: 22),
+        title: AppLogoBadge(
           size: 80,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(9),

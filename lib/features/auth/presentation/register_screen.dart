@@ -8,7 +8,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/utils/extensions.dart';
 import '../../../core/widgets/buttons/primary_button.dart';
-import '../../../core/widgets/atlas/atlas_pattern.dart';
+import '../../../core/widgets/app_header/app_header.dart';
 import '../widgets/auth_text_field.dart';
 import '../providers/auth_provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -94,13 +94,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                const AtlasBand(height: 216, archDepth: 26, archCount: 3, tileSize: 115),
+                const AppHeaderBand(height: 216),
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 22,
                   left: 0,
                   right: 0,
                   child: Center(
-                    child: AtlasMedallion(
+                    child: AppLogoBadge(
                       size: 88,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(11),

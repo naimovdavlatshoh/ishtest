@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../core/widgets/atlas/atlas_pattern.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_header/app_header.dart';
 
 /// Shown briefly while the stored session is being checked at cold start
 /// (see authProvider._init and the '/splash' gate in app_router.dart) —
-/// the bold, full-bleed take on the atlas/ikat pattern.
+/// a flat brand-blue gradient background.
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
@@ -13,20 +14,19 @@ class SplashScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          buildAtlasPatternLayer(),
           const DecoratedBox(
             decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(0, -0.15),
-                radius: 0.9,
-                colors: [Color(0x0D000000), Color(0x47000000)],
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.primary, AppColors.primaryDark],
               ),
             ),
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AtlasMedallion(
+              AppLogoBadge(
                 size: 132,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(14),
