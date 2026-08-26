@@ -1,0 +1,657 @@
+import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/loaders/app_loader.dart';
+import '../providers/profile_me_provider.dart';
+import '../../../shared/models/profile_me_model.dart';
+import '../../../core/utils/extensions.dart';
+import '../../auth/providers/auth_provider.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+class ProfileMeScreen extends ConsumerWidget {
+  const ProfileMeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final AsyncValue<ProfileMe> profileAsync = ref.watch(profileMeProvider);
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        leading: null,
+        title: Text(
+          l10n.profileTitle,
+          style: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
+        ),
+        actions: const [],
+      ),
+      body: profileAsync.when(
+        loading: () => const Center(child: AppLoader()),
+        error: (error, stack) => Center(child: Text('${l10n.errorOccurred}: $error')),
+        data: (profile) => RefreshIndicator(
+          onRefresh: () => ref.read(profileMeProvider.notifier).fetchProfile(),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                _buildHeader(context, ref, profile, l10n),
+                _buildSkills(ref, profile, l10n),
+                _buildExperience(ref, profile, l10n),
+                _buildEducation(ref, profile, l10n),
+                _buildResume(ref, profile, l10n),
+                ..._buildDangerZone(context, ref, l10n),
+                const SizedBox(height: 32),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.divider.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Background / Space
+          const SizedBox(height: 60),
+          
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                // Avatar
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.2),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: profile.avatar != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(profile.avatar!.fullImageUrl, fit: BoxFit.cover),
+                        )
+                      : const Icon(LucideIcons.user, size: 50, color: Colors.white),
+                ),
+                const Spacer(),
+                // Edit Button
+                OutlinedButton.icon(
+                  onPressed: () => context.push('/profile/edit'),
+                  icon: const Icon(LucideIcons.pencil, size: 18),
+                  label: Text(l10n.profileEditBtn),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 20),
+          
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      profile.fullName,
+                      style: AppTextStyles.h2,
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(
+                      LucideIcons.circleCheck,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  profile.title,
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                if (profile.city != null)
+                  Row(
+                    children: [
+                      const Icon(LucideIcons.mapPin, size: 16, color: AppColors.textTertiary),
+                      const SizedBox(width: 4),
+                      Text(
+                        profile.city!,
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                      ),
+                    ],
+                  ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Divider(),
+                ),
+                if (profile.bio != null)
+                  Text(
+                    profile.bio!,
+                    style: AppTextStyles.bodyLarge,
+                  ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkills(WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
+    if (profile.skills.isEmpty) return const SizedBox.shrink();
+    
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.divider.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.code, color: AppColors.primary, size: 20),
+              const SizedBox(width: 8),
+              Text(l10n.profileSkills, style: AppTextStyles.h3),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 10,
+            children: profile.skills.map((skill) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                skill,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExperience(WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
+    if (profile.experience.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.divider.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.briefcase, color: AppColors.primary, size: 20),
+              const SizedBox(width: 8),
+              Text(l10n.profileExperience, style: AppTextStyles.h3),
+            ],
+          ),
+          const SizedBox(height: 24),
+          ...profile.experience.asMap().entries.map((entry) {
+            final isLast = entry.key == profile.experience.length - 1;
+            final exp = entry.value;
+            return IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    children: [
+                      Container(
+                        width: 12,
+                        height: 12,
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      if (!isLast)
+                        Expanded(
+                          child: Container(
+                            width: 2,
+                            color: AppColors.divider,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(exp.title, style: AppTextStyles.h4),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(LucideIcons.building2, size: 14, color: AppColors.textTertiary),
+                            const SizedBox(width: 4),
+                            Text(exp.company, style: AppTextStyles.bodyMedium),
+                            if (exp.location != null) ...[
+                              const SizedBox(width: 8),
+                              const Icon(LucideIcons.mapPin, size: 14, color: AppColors.textTertiary),
+                              const SizedBox(width: 4),
+                              Text(exp.location!, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                            ],
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(LucideIcons.calendar, size: 14, color: AppColors.textTertiary),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${exp.startDate} - ${exp.endDate ?? 'present'}',
+                              style: AppTextStyles.caption,
+                            ),
+                          ],
+                        ),
+                        if (exp.description != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            exp.description!,
+                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                          ),
+                        ],
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEducation(WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
+    if (profile.education.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.divider.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.graduationCap, color: AppColors.primary, size: 20),
+              const SizedBox(width: 8),
+              Text(l10n.profileEducation, style: AppTextStyles.h3),
+            ],
+          ),
+          const SizedBox(height: 24),
+          ...profile.education.map((edu) {
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 12,
+                  height: 12,
+                  margin: const EdgeInsets.only(top: 6),
+                  decoration: const BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(edu.school, style: AppTextStyles.h4),
+                      Text('${edu.degree} • ${edu.field}', style: AppTextStyles.bodyLarge),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(LucideIcons.calendar, size: 14, color: AppColors.textTertiary),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${edu.startDate} - ${edu.endDate ?? 'present'}',
+                            style: AppTextStyles.caption,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResume(WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
+    if (profile.cvFile == null) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.divider.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.fileText, color: AppColors.primary, size: 20),
+              const SizedBox(width: 8),
+              Text(l10n.profileResume, style: AppTextStyles.h3),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.background.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(LucideIcons.fileText, color: Colors.red),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        profile.cvFile?.split('/').last ?? 'resume_pdf',
+                        style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        l10n.profileUploadedCv,
+                        style: AppTextStyles.caption,
+                      ),
+                    ],
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(LucideIcons.externalLink, size: 16),
+                  label: Text(l10n.profileViewBtn),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildDangerZone(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    return [
+      const SizedBox(height: 24),
+      const Divider(height: 1),
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(LucideIcons.triangleAlert,
+                    color: AppColors.error, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.dangerZone,
+                  style: AppTextStyles.h3.copyWith(color: AppColors.error),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.error.withValues(alpha: 0.4)),
+                borderRadius: BorderRadius.circular(8),
+                color: AppColors.error.withValues(alpha: 0.05),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.deleteAccountTitle,
+                    style: AppTextStyles.username.copyWith(
+                      color: AppColors.error,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.deleteAccountSubtitle,
+                    style: AppTextStyles.bodySmall,
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final password = await _showDeletePasswordDialog(
+                          context,
+                          l10n,
+                        );
+                        if (password != null && password.isNotEmpty && context.mounted) {
+                          final success = await ref
+                              .read(authProvider.notifier)
+                              .deleteAccount(password);
+                          if (context.mounted) {
+                            if (success) {
+                              context.showSnackBar(l10n.deleteAccountSuccess);
+                              context.go('/login');
+                            } else {
+                              context.showSnackBar(l10n.deleteAccountError, isError: true);
+                            }
+                          }
+                        }
+                      },
+                      icon: const Icon(LucideIcons.trash2,
+                          color: AppColors.error),
+                      label: Text(
+                        l10n.deleteAccountBtn,
+                        style: const TextStyle(color: AppColors.error),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.error),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ];
+  }
+
+  Future<String?> _showDeletePasswordDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) async {
+    final passwordController = TextEditingController();
+    bool obscure = true;
+    String? errorText;
+
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: Row(
+            children: [
+              const Icon(LucideIcons.triangleAlert,
+                  color: AppColors.error, size: 22),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.deleteAccountConfirmTitle,
+                  style: AppTextStyles.h3.copyWith(color: AppColors.error),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.deleteAccountConfirmMsg,
+                style: AppTextStyles.bodySmall,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                l10n.deleteAccountPasswordLabel,
+                style: AppTextStyles.label,
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: passwordController,
+                obscureText: obscure,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: l10n.deleteAccountPasswordHint,
+                  errorText: errorText,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscure
+                          ? LucideIcons.eye
+                          : LucideIcons.eyeOff,
+                    ),
+                    onPressed: () => setState(() => obscure = !obscure),
+                  ),
+                  border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                ),
+                onChanged: (_) {
+                  if (errorText != null) {
+                    setState(() => errorText = null);
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(null),
+              child: Text(l10n.cancel),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final pw = passwordController.text.trim();
+                if (pw.isEmpty) {
+                  setState(
+                    () => errorText = l10n.deleteAccountPasswordRequired,
+                  );
+                  return;
+                }
+                Navigator.of(ctx).pop(pw);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.error,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(l10n.deleteAccountConfirmBtn),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

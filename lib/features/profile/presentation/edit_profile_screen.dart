@@ -1,0 +1,1310 @@
+import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/buttons/primary_button.dart';
+import '../providers/profile_me_provider.dart';
+import '../providers/user_me_provider.dart';
+import '../../../shared/models/profile_me_model.dart';
+import '../../../core/utils/extensions.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+class EditProfileScreen extends ConsumerStatefulWidget {
+  final String? initialSection;
+  const EditProfileScreen({super.key, this.initialSection});
+
+  @override
+  ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
+  final _formKey = GlobalKey<FormState>();
+  
+  // ScrollController for auto-scroll
+  final _scrollController = ScrollController();
+  
+  // Section GlobalKeys for scroll targeting
+  final _keyAsosiy     = GlobalKey();
+  final _keyKorinish   = GlobalKey();
+  final _keyRezyume    = GlobalKey();
+  
+  // Controllers for Asosiy section
+  late TextEditingController _nameController;
+  late TextEditingController _cityController;
+  late TextEditingController _titleController;
+  late TextEditingController _bioController;
+  
+  // Skill controller
+  final _skillController = TextEditingController();
+  List<String> _skills = [];
+  
+  // Visibility state
+  bool _isPublic = false;
+  
+  // Account state
+  final _telegramCodeController = TextEditingController();
+  
+  // Accordion state
+  String? _activeSection;
+
+  @override
+  void initState() {
+    super.initState();
+    final profile = ref.read(profileMeProvider).asData?.value;
+    
+    _nameController = TextEditingController(text: profile?.fullName ?? '');
+    _cityController = TextEditingController(text: profile?.city ?? '');
+    _titleController = TextEditingController(text: profile?.title ?? '');
+    _bioController = TextEditingController(text: profile?.bio ?? '');
+    _skills = List.from(profile?.skills ?? []);
+    _experiences = List.from(profile?.experience ?? []);
+    _educations = List.from(profile?.education ?? []);
+    _isPublic = profile?.openToJobSeeker ?? false;
+    // Open a specific accordion if provided
+    if (widget.initialSection != null) {
+      _activeSection = widget.initialSection;
+      // Delay scroll to ensure async data has rendered
+      Future.delayed(const Duration(milliseconds: 450), () {
+        if (mounted) _scrollToSection(widget.initialSection!);
+      });
+    }
+  }
+
+  void _scrollToSection(String section) {
+    GlobalKey? key;
+    switch (section) {
+      case 'Asosiy':
+        key = _keyAsosiy;
+        break;
+      case "Ko'rinish":
+        key = _keyKorinish;
+        break;
+      case 'Rezyume':
+        key = _keyRezyume;
+        break;
+      default:
+        return;
+    }
+    final ctx = key.currentContext;
+    if (ctx != null) {
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOutCubic,
+        alignment: 0.0,
+      );
+    }
+  }
+
+  Future<String?> _selectDate(BuildContext context, String? initialValue) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initialValue != null && initialValue.isNotEmpty 
+          ? DateTime(int.parse(initialValue.split('-')[0]), int.parse(initialValue.split('-')[1])) 
+          : DateTime.now(),
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now(),
+      initialDatePickerMode: DatePickerMode.year,
+    );
+    if (picked != null) {
+      return '${picked.year}-${picked.month.toString().padLeft(2, "0")}';
+
+    }
+    return initialValue;
+  }
+
+  late List<Experience> _experiences;
+  late List<Education> _educations;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _cityController.dispose();
+    _titleController.dispose();
+    _bioController.dispose();
+    _skillController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final profileAsync = ref.watch(profileMeProvider);
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary),
+          onPressed: () => context.pop(),
+        ),
+        title: Text(
+          l10n.profileSettingsTitle,
+          style: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
+        ),
+      ),
+      body: profileAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('${l10n.errorOccurred}: $err')),
+        data: (profile) => SingleChildScrollView(
+          controller: _scrollController,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.profileSettingsSubtitle,
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 20),
+              _buildUserPreview(profile, l10n),
+              const SizedBox(height: 20),
+              Theme(
+                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                child: Column(
+                  children: [
+                    _buildAsosiySection(l10n),
+                    const SizedBox(height: 12),
+                    _buildSkillsSection(l10n),
+                    const SizedBox(height: 12),
+                    _buildTajribaSection(profile, l10n),
+                    const SizedBox(height: 12),
+                    _buildTalimSection(profile, l10n),
+                    const SizedBox(height: 12),
+                    SizedBox(key: _keyRezyume, child: _buildRezyumeSection(profile, l10n)),
+                    const SizedBox(height: 12),
+                    SizedBox(key: _keyKorinish, child: _buildKorinishSection(l10n)),
+                    const SizedBox(height: 12),
+                    _buildAkkauntSection(l10n),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserPreview(ProfileMe profile, AppLocalizations l10n) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.divider.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () async {
+              final result = await FilePicker.platform.pickFiles(
+                type: FileType.image,
+                allowMultiple: false,
+              );
+              if (result != null && result.files.isNotEmpty && result.files.first.path != null) {
+                final filePath = result.files.first.path!;
+                final extension = filePath.split('.').last.toLowerCase();
+                final allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                
+                if (!allowedExtensions.contains(extension)) {
+                  if (mounted) {
+                    context.showSnackBar(l10n.profileImageUploadError, isError: true);
+                  }
+                  return;
+                }
+
+                if (mounted) {
+                  context.showSnackBar(l10n.profileUploadingImage, isError: false);
+                  final success = await ref.read(profileMeProvider.notifier).uploadAvatar(filePath);
+                  if (mounted) {
+                    context.showSnackBar(
+                      success ? l10n.profileImageUploaded : l10n.profileImageUploadError,
+                      isError: !success,
+                    );
+                  }
+                }
+              }
+            },
+            child: Stack(
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: profile.avatar != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(40),
+                          child: Image.network(profile.avatar!.fullImageUrl, fit: BoxFit.cover),
+                        )
+                      : const Icon(LucideIcons.user, size: 40, color: Colors.white),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: const Icon(LucideIcons.camera, size: 14, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(profile.fullName, style: AppTextStyles.h3),
+          Text(profile.city ?? l10n.profileLocationNotSet, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+          Text(profile.title, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.green.withOpacity(0.2)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(LucideIcons.circleCheck, size: 14, color: Colors.green),
+                const SizedBox(width: 4),
+                Text(
+                  l10n.profileCompleteBadge,
+                  style: AppTextStyles.caption.copyWith(color: Colors.green, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAsosiySection(AppLocalizations l10n) {
+    return _buildExpansionCard(
+      title: l10n.profileMainSection,
+      icon: LucideIcons.user,
+      children: [
+        _buildTextField(label: l10n.profileFullNameReq, controller: _nameController),
+        const SizedBox(height: 16),
+        _buildTextField(label: l10n.profileCityReq, controller: _cityController),
+        const SizedBox(height: 16),
+        _buildTextField(label: l10n.profilePosition, controller: _titleController),
+        const SizedBox(height: 16),
+        _buildTextField(
+          label: l10n.profileAboutMe,
+          controller: _bioController,
+          maxLines: 4,
+          hint: 'Python/Js Software Engineer',
+        ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            '${_bioController.text.length} ${l10n.profileCharacters}',
+            style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+          ),
+        ),
+        const SizedBox(height: 20),
+        PrimaryButton(
+          text: l10n.profileSave,
+          onPressed: () async {
+            final success = await ref.read(profileMeProvider.notifier).updateProfile({
+              'fullName': _nameController.text,
+              'city': _cityController.text,
+              'title': _titleController.text,
+              'bio': _bioController.text,
+            });
+            if (context.mounted) {
+              context.showSnackBar(
+                success ? l10n.jobAppDataSaved : l10n.errorOccurred,
+                isError: !success,
+              );
+            }
+          },
+          prefixIcon: const Icon(LucideIcons.save, size: 18, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSkillsSection(AppLocalizations l10n) {
+    return _buildExpansionCard(
+      title: l10n.profileSkills,
+      icon: LucideIcons.briefcase,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: _buildTextField(
+                label: l10n.profileAddSkill,
+                controller: _skillController,
+                hint: 'React',
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              height: 56,
+              width: 56,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: IconButton(
+                icon: const Icon(LucideIcons.plus, color: Colors.white),
+                onPressed: () {
+                  if (_skillController.text.isNotEmpty) {
+                    setState(() {
+                      _skills.add(_skillController.text);
+                      _skillController.clear();
+                    });
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            '${l10n.profileYourSkills} (${_skills.length})',
+            style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _skills.map((skill) => _buildSkillChip(skill)).toList(),
+        ),
+        const SizedBox(height: 24),
+        PrimaryButton(
+          text: l10n.profileSaveSkills,
+          onPressed: () async {
+            final success = await ref.read(profileMeProvider.notifier).updateProfile({
+              'skills': _skills,
+            });
+            if (context.mounted) {
+              context.showSnackBar(
+                success ? l10n.profileSkillsSaved : l10n.errorOccurred,
+                isError: !success,
+              );
+            }
+          },
+          prefixIcon: const Icon(LucideIcons.save, size: 18, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSkillChip(String skill) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(skill, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600)),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _skills.remove(skill);
+              });
+            },
+            child: const Icon(LucideIcons.x, size: 16, color: AppColors.primary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTajribaSection(ProfileMe profile, AppLocalizations l10n) {
+    return _buildExpansionCard(
+      title: l10n.profileExperience,
+      icon: LucideIcons.briefcase,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(l10n.profileWorkExperience, style: AppTextStyles.h4),
+        ),
+        const SizedBox(height: 16),
+        PrimaryButton(
+          text: l10n.profileAddExperience,
+          onPressed: () {
+            setState(() {
+              _experiences.add(Experience(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                title: '',
+                company: '',
+                startDate: '',
+              ));
+            });
+          },
+          prefixIcon: const Icon(LucideIcons.plus, size: 18, color: Colors.white),
+        ),
+        const SizedBox(height: 24),
+        ..._experiences.asMap().entries.map((entry) {
+          final index = entry.key;
+          final exp = entry.value;
+          return _buildExperienceEditItem(exp, index, l10n);
+        }),
+        const SizedBox(height: 12),
+        PrimaryButton(
+          text: l10n.profileSaveExperience,
+          onPressed: () async {
+            final success = await ref.read(profileMeProvider.notifier).updateProfile({
+              'experience': _experiences.map((e) => e.toJson()).toList(),
+            });
+            if (context.mounted) {
+              context.showSnackBar(
+                success ? l10n.profileExperienceSaved : l10n.errorOccurred,
+                isError: !success,
+              );
+            }
+          },
+          prefixIcon: const Icon(LucideIcons.save, size: 18, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExperienceEditItem(Experience exp, int index, AppLocalizations l10n) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.divider.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTextField(
+            label: l10n.profilePositionReq,
+            initialValue: exp.title,
+            onChanged: (v) {
+              setState(() {
+                _experiences[index] = Experience(
+                  id: exp.id,
+                  title: v,
+                  company: exp.company,
+                  startDate: exp.startDate,
+                  endDate: exp.endDate,
+                  location: exp.location,
+                  description: exp.description,
+                );
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
+            label: l10n.profileCompanyReq,
+            initialValue: exp.company,
+            onChanged: (v) {
+              setState(() {
+                _experiences[index] = Experience(
+                  id: exp.id,
+                  title: exp.title,
+                  company: v,
+                  startDate: exp.startDate,
+                  endDate: exp.endDate,
+                  location: exp.location,
+                  description: exp.description,
+                );
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
+            label: l10n.profileAddress,
+            initialValue: exp.location ?? '',
+            onChanged: (v) {
+              setState(() {
+                _experiences[index] = Experience(
+                  id: exp.id,
+                  title: exp.title,
+                  company: exp.company,
+                  startDate: exp.startDate,
+                  endDate: exp.endDate,
+                  location: v,
+                  description: exp.description,
+                  current: exp.current,
+                );
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          InkWell(
+            onTap: () async {
+              final date = await _selectDate(context, exp.startDate);
+              if (date != null) {
+                setState(() {
+                  _experiences[index] = Experience(
+                    id: exp.id,
+                    title: exp.title,
+                    company: exp.company,
+                    startDate: date,
+                    endDate: exp.endDate,
+                    location: exp.location,
+                    description: exp.description,
+                    current: exp.current,
+                  );
+                });
+              }
+            },
+            child: AbsorbPointer(
+              child: _buildTextField(
+                label: l10n.profileStartDateReq,
+                initialValue: exp.startDate,
+                suffixIcon: const Icon(LucideIcons.calendar, size: 18),
+              ),
+            ),
+          ),
+          if (!exp.current) ...[
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: () async {
+                final date = await _selectDate(context, exp.endDate);
+                if (date != null) {
+                  setState(() {
+                    _experiences[index] = Experience(
+                      id: exp.id,
+                      title: exp.title,
+                      company: exp.company,
+                      startDate: exp.startDate,
+                      endDate: date,
+                      location: exp.location,
+                      description: exp.description,
+                      current: exp.current,
+                    );
+                  });
+                }
+              },
+              child: AbsorbPointer(
+                child: _buildTextField(
+                  label: l10n.profileEndDate,
+                  initialValue: exp.endDate ?? '',
+                  suffixIcon: const Icon(LucideIcons.calendar, size: 18),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Checkbox(
+                value: exp.current,
+                onChanged: (v) {
+                  setState(() {
+                    _experiences[index] = Experience(
+                      id: exp.id,
+                      title: exp.title,
+                      company: exp.company,
+                      startDate: exp.startDate,
+                      endDate: v == true ? null : exp.endDate,
+                      location: exp.location,
+                      description: exp.description,
+                      current: v ?? false,
+                    );
+                  });
+                },
+              ),
+              Text(l10n.profileCurrentlyWorkingHere),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
+            label: l10n.profileDescription,
+            initialValue: exp.description ?? '',
+            maxLines: 3,
+            onChanged: (v) {
+              setState(() {
+                _experiences[index] = Experience(
+                  id: exp.id,
+                  title: exp.title,
+                  company: exp.company,
+                  startDate: exp.startDate,
+                  endDate: exp.endDate,
+                  location: exp.location,
+                  description: v,
+                  current: exp.current,
+                );
+              });
+            },
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () {
+                setState(() {
+                  _experiences.removeAt(index);
+                });
+              },
+              icon: const Icon(LucideIcons.trash2, color: Colors.red, size: 18),
+              label: Text(l10n.profileDelete, style: const TextStyle(color: Colors.red)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTalimSection(ProfileMe profile, AppLocalizations l10n) {
+    return _buildExpansionCard(
+      title: l10n.profileEducation,
+      icon: LucideIcons.graduationCap,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(l10n.profileEducation, style: AppTextStyles.h4),
+        ),
+        const SizedBox(height: 16),
+        PrimaryButton(
+          text: l10n.profileAddEducation,
+          onPressed: () {
+            setState(() {
+              _educations.add(Education(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                school: '',
+                degree: '',
+                field: '',
+                startDate: '',
+                current: false,
+              ));
+            });
+          },
+          prefixIcon: const Icon(LucideIcons.plus, size: 18, color: Colors.white),
+        ),
+        const SizedBox(height: 24),
+        ..._educations.asMap().entries.map((entry) {
+          final index = entry.key;
+          final edu = entry.value;
+          return _buildEducationEditItem(edu, index, l10n);
+        }),
+        const SizedBox(height: 12),
+        PrimaryButton(
+          text: l10n.profileSaveEducation,
+          onPressed: () async {
+            final success = await ref.read(profileMeProvider.notifier).updateProfile({
+              l10n.profileEducation: _educations.map((e) => e.toJson()).toList(),
+            });
+            if (context.mounted) {
+              context.showSnackBar(
+                success ? l10n.profileEducationSaved : l10n.errorOccurred,
+                isError: !success,
+              );
+            }
+          },
+          prefixIcon: const Icon(LucideIcons.save, size: 18, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEducationEditItem(Education edu, int index, AppLocalizations l10n) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.divider.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTextField(
+            label: l10n.profileSchoolReq,
+            initialValue: edu.school,
+            onChanged: (v) {
+              setState(() {
+                _educations[index] = Education(
+                  id: edu.id,
+                  school: v,
+                  degree: edu.degree,
+                  field: edu.field,
+                  startDate: edu.startDate,
+                  endDate: edu.endDate,
+                  current: edu.current,
+                );
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
+            label: l10n.profileDegreeReq,
+            initialValue: edu.degree,
+            onChanged: (v) {
+              setState(() {
+                _educations[index] = Education(
+                  id: edu.id,
+                  school: edu.school,
+                  degree: v,
+                  field: edu.field,
+                  startDate: edu.startDate,
+                  endDate: edu.endDate,
+                  current: edu.current,
+                );
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
+            label: l10n.profileSpecialization,
+            initialValue: edu.field,
+            onChanged: (v) {
+              setState(() {
+                _educations[index] = Education(
+                  id: edu.id,
+                  school: edu.school,
+                  degree: edu.degree,
+                  field: v,
+                  startDate: edu.startDate,
+                  endDate: edu.endDate,
+                  current: edu.current,
+                );
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          InkWell(
+            onTap: () async {
+              final date = await _selectDate(context, edu.startDate);
+              if (date != null) {
+                setState(() {
+                  _educations[index] = Education(
+                    id: edu.id,
+                    school: edu.school,
+                    degree: edu.degree,
+                    field: edu.field,
+                    startDate: date,
+                    endDate: edu.endDate,
+                    current: edu.current,
+                  );
+                });
+              }
+            },
+            child: AbsorbPointer(
+              child: _buildTextField(
+                label: '${l10n.profileStartDate} *',
+                initialValue: edu.startDate,
+                suffixIcon: const Icon(LucideIcons.calendar, size: 18),
+              ),
+            ),
+          ),
+          if (!edu.current) ...[
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: () async {
+                final date = await _selectDate(context, edu.endDate);
+                if (date != null) {
+                  setState(() {
+                    _educations[index] = Education(
+                      id: edu.id,
+                      school: edu.school,
+                      degree: edu.degree,
+                      field: edu.field,
+                      startDate: edu.startDate,
+                      endDate: date,
+                      current: edu.current,
+                    );
+                  });
+                }
+              },
+              child: AbsorbPointer(
+                child: _buildTextField(
+                  label: l10n.profileEndDate,
+                  initialValue: edu.endDate ?? '',
+                  suffixIcon: const Icon(LucideIcons.calendar, size: 18),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Checkbox(
+                value: edu.current,
+                onChanged: (v) {
+                  setState(() {
+                    _educations[index] = Education(
+                      id: edu.id,
+                      school: edu.school,
+                      degree: edu.degree,
+                      field: edu.field,
+                      startDate: edu.startDate,
+                      endDate: v == true ? null : edu.endDate,
+                      current: v ?? false,
+                    );
+                  });
+                },
+              ),
+              Text(l10n.profileCurrentlyStudyingHere),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () {
+                setState(() {
+                  _educations.removeAt(index);
+                });
+              },
+              icon: const Icon(LucideIcons.trash2, color: Colors.red, size: 18),
+              label: Text(l10n.profileDelete, style: const TextStyle(color: Colors.red)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKorinishSection(AppLocalizations l10n) {
+    return _buildExpansionCard(
+      title: l10n.profileAppearance,
+      icon: LucideIcons.eye,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(l10n.profileVisibility, style: AppTextStyles.h4),
+        ),
+        const SizedBox(height: 16),
+        _buildVisibilityToggle(
+          l10n: l10n,
+          title: l10n.profileAppearance,
+          description: l10n.profileOpenToWorkDesc,
+          value: _isPublic,
+          onChanged: (v) async {
+            setState(() => _isPublic = v);
+            final success = await ref.read(profileMeProvider.notifier).updateProfile({
+              'openToJobSeeker': v,
+              'openToEmployer': v, // Sync both for now or as needed
+            });
+            if (context.mounted) {
+              context.showSnackBar(
+                success ? l10n.profileVisibilityUpdated : l10n.profileVisibilityError,
+                isError: !success,
+              );
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVisibilityToggle({
+    required AppLocalizations l10n,
+    required String title,
+    required String description,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 16),
+          InkWell(
+            onTap: () => onChanged(!value),
+            child: Row(
+              children: [
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: value ? AppColors.primary : AppColors.divider,
+                      width: 2,
+                    ),
+                    color: value ? AppColors.primary : Colors.transparent,
+                  ),
+                  child: value
+                      ? const Icon(LucideIcons.check, size: 18, color: Colors.white)
+                      : null,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l10n.profileShowOnThisPage,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAkkauntSection(AppLocalizations l10n) {
+    final userMeAsync = ref.watch(userMeProvider);
+
+    return _buildExpansionCard(
+      title: l10n.profileAccount,
+      icon: LucideIcons.link,
+      children: [
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text('Telegram', style: AppTextStyles.h4),
+        ),
+        const SizedBox(height: 16),
+        userMeAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, s) => Text('${l10n.errorOccurred}: $e'),
+          data: (user) {
+            final isLinked = user.telegramId != null;
+
+            if (isLinked) {
+              return Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.green.withOpacity(0.2)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.circleCheck, color: Colors.green, size: 28),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.profileTelegramConnected,
+                            style: const TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            'ID: ${user.telegramId}',
+                            style: AppTextStyles.caption.copyWith(color: Colors.green.shade700),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.divider.withOpacity(0.5)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.profileTelegramConnectDesc,
+                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: 16),
+                  InkWell(
+                    onTap: () async {
+                      final url = Uri.parse('https://t.me/ishjobs_bot?start=link');
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
+                        children: [
+                          const TextSpan(text: '1. '),
+                          TextSpan(
+                            text: l10n.profileTelegramConnectStep1,
+                            style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('2. ${l10n.profileTelegramConnectStep2}', style: AppTextStyles.bodyMedium),
+                  const SizedBox(height: 16),
+                  _buildTextField(
+                    label: '',
+                    controller: _telegramCodeController,
+                    hint: '123456',
+                  ),
+                  const SizedBox(height: 20),
+                  PrimaryButton(
+                    text: l10n.profileTelegramLink,
+                    onPressed: () async {
+                      final code = _telegramCodeController.text.trim();
+                      if (code.isEmpty) {
+                        context.showSnackBar(l10n.profileTelegramEnterCode, isError: true);
+                        return;
+                      }
+
+                      final success = await ref.read(profileMeProvider.notifier).linkTelegram(code);
+                      if (context.mounted) {
+                        context.showSnackBar(
+                          success ? l10n.profileTelegramLinkedSuccess : l10n.profileTelegramLinkError,
+                          isError: !success,
+                        );
+                        if (success) {
+                          _telegramCodeController.clear();
+                          // Refresh user data to show "Connected" status
+                          ref.refresh(userMeProvider);
+                        }
+                      }
+                    },
+                    backgroundColor: AppColors.primary.withOpacity(0.5),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRezyumeSection(ProfileMe profile, AppLocalizations l10n) {
+    return _buildExpansionCard(
+      title: l10n.profileResume,
+      icon: LucideIcons.fileText,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(l10n.profileResumeUploadTitle, style: AppTextStyles.h4),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.divider, style: BorderStyle.solid),
+          ),
+          child: Column(
+            children: [
+              const Icon(LucideIcons.cloudUpload, size: 48, color: AppColors.textTertiary),
+              const SizedBox(height: 12),
+              Text(l10n.profileResumeUploadDesc, style: AppTextStyles.bodyMedium),
+              Text(l10n.profileMaxFileSize, style: AppTextStyles.caption),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: PrimaryButton(
+                  text: l10n.profileChooseFile,
+                  onPressed: () async {
+                    FilePickerResult? result = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['pdf', 'doc', 'docx'],
+                    );
+
+                    if (result != null && result.files.single.path != null) {
+                      final success = await ref
+                          .read(profileMeProvider.notifier)
+                          .uploadFile(result.files.single.path!);
+                      
+                      if (context.mounted) {
+                        context.showSnackBar(
+                          success ? l10n.profileFileUploadSuccess : l10n.profileFileUploadError,
+                          isError: !success,
+                        );
+                      }
+                    }
+                  },
+                  prefixIcon: const Icon(LucideIcons.upload, size: 18, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        if (profile.cvFile != null)
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.green.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.green.withOpacity(0.2)),
+            ),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.fileText, color: Colors.green),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l10n.profileResumeUploadedBadge, style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                      Text(profile.cvFile!.split('/').last, style: AppTextStyles.caption.copyWith(color: Colors.green)),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(LucideIcons.trash2, color: Colors.red),
+                  onPressed: () async {
+                    final success = await ref.read(profileMeProvider.notifier).updateProfile({
+                      'cvFile': null,
+                    });
+                    if (context.mounted) {
+                      context.showSnackBar(
+                        success ? l10n.profileFileDeleted : l10n.profileVisibilityError,
+                        isError: !success,
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildExpansionCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    final bool isExpanded = _activeSection == title;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.divider.withOpacity(0.5)),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          dividerColor: Colors.transparent,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: ExpansionTile(
+            key: Key('${title}_$isExpanded'),
+            initiallyExpanded: isExpanded,
+            expansionAnimationStyle: AnimationStyle(
+              curve: Curves.easeInOutQuart,
+              duration: const Duration(milliseconds: 400),
+            ),
+            onExpansionChanged: (expanded) {
+              if (expanded) {
+                setState(() {
+                  _activeSection = title;
+                });
+              } else {
+                if (_activeSection == title) {
+                  setState(() {
+                    _activeSection = null;
+                  });
+                }
+              }
+            },
+            backgroundColor: Colors.white,
+            collapsedBackgroundColor: Colors.white,
+            leading: Icon(icon, color: AppColors.primary),
+            title: Text(title, style: AppTextStyles.h4),
+            childrenPadding: const EdgeInsets.all(20),
+            children: children,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    TextEditingController? controller,
+    String? initialValue,
+    String? hint,
+    int maxLines = 1,
+    Widget? suffixIcon,
+    ValueChanged<String>? onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: AppTextStyles.label.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          key: initialValue != null ? Key('$label-$initialValue') : null,
+          controller: controller,
+          initialValue: controller == null ? initialValue : null,
+          maxLines: maxLines,
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            hintText: hint,
+            suffixIcon: suffixIcon,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.divider),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.divider),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
