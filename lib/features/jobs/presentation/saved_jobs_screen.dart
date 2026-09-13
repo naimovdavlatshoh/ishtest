@@ -30,12 +30,6 @@ class _SavedJobsScreenState extends ConsumerState<SavedJobsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(l10n.savedJobsTitle),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-      ),
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.errorMessage != null

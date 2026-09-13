@@ -4,6 +4,7 @@ import '../../../l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/extensions.dart';
+import '../../../core/providers/ui_chrome_provider.dart';
 import '../providers/real_chat_provider.dart';
 import '../providers/global_chat_provider.dart';
 import '../../profile/providers/user_me_provider.dart';
@@ -25,11 +26,23 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
   final TextEditingController _messageController = TextEditingController();
   final _scrollController = ScrollController();
   late final int _conversationId;
+  // Captured up front: `ref` throws immediately if touched from dispose()
+  // (ConsumerStatefulElement invalidates it before calling State.dispose()),
+  // so the notifier reference must be grabbed while it's still safe to do so.
+  late final StateController<bool> _hideBottomNavController;
 
   @override
   void initState() {
     super.initState();
     _conversationId = int.tryParse(widget.chatId) ?? 0;
+    _hideBottomNavController = ref.read(hideBottomNavProvider.notifier);
+    // Riverpod forbids modifying a provider while the widget tree is still
+    // building (which initState/dispose both run during) — defer the actual
+    // mutation to after the frame finishes, via the binding directly rather
+    // than `ref`/microtask, so it's safe from both call sites.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _hideBottomNavController.state = true;
+    });
     Future.microtask(() {
       ref.read(chatRoomProvider(_conversationId).notifier).initialize();
       // Clear unread badge for this conversation globally
@@ -39,6 +52,9 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _hideBottomNavController.state = false;
+    });
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -76,7 +92,8 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF2F4F7),
       appBar: AppBar(
-        elevation: 0,
+        elevation: 0.5,
+        shadowColor: Colors.black.withOpacity(0.06),
         backgroundColor: Colors.white,
         leadingWidth: 40,
         leading: Padding(
@@ -88,15 +105,30 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
         ),
         title: Row(
           children: [
-            // Avatar
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: AppColors.primary.withOpacity(0.1),
-              backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
-              onBackgroundImageError: avatarUrl != null ? (_, __) {} : null,
-              child: avatarUrl == null
-                  ? Text(initials, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 15))
+            // Avatar with an online-glow ring
+            Container(
+              padding: EdgeInsets.all(state.isConnected ? 2 : 0),
+              decoration: state.isConnected
+                  ? const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                      ),
+                    )
                   : null,
+              child: CircleAvatar(
+                radius: 19,
+                backgroundColor: Colors.white,
+                child: CircleAvatar(
+                  radius: state.isConnected ? 17 : 19,
+                  backgroundColor: AppColors.primary.withOpacity(0.1),
+                  backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                  onBackgroundImageError: avatarUrl != null ? (_, __) {} : null,
+                  child: avatarUrl == null
+                      ? Text(initials, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 15))
+                      : null,
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -142,21 +174,21 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
               children: [
                 // Date divider
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   child: Row(
                     children: [
                       Expanded(child: Divider(color: Colors.grey[300], indent: 20)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                           decoration: BoxDecoration(
-                            color: Colors.grey[200],
+                            color: AppColors.primary.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             l10n.messagesToday,
-                            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                            style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600),
                           ),
                         ),
                       ),
@@ -176,10 +208,16 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
                           itemBuilder: (context, index) {
                             final message = state.messages[index];
                             final isMe = message.senderId == myId;
+                            final prevMsg = index > 0 ? state.messages[index - 1] : null;
+                            final nextMsg = index < state.messages.length - 1 ? state.messages[index + 1] : null;
+                            final isFirstInGroup = prevMsg == null || prevMsg.senderId != message.senderId;
+                            final isLastInGroup = nextMsg == null || nextMsg.senderId != message.senderId;
                             return MessageBubble(
                               content: message.content,
                               isMe: isMe,
                               timestamp: message.createdAt,
+                              isFirstInGroup: isFirstInGroup,
+                              isLastInGroup: isLastInGroup,
                               isRead: message.status == 'read',
                               isDelivered: message.status == 'delivered',
                             );
@@ -205,13 +243,30 @@ class _ChatRoomScreenState extends ConsumerState<ChatRoomScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 80,
-            height: 80,
+            width: 88,
+            height: 88,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.08),
+              gradient: LinearGradient(
+                colors: [AppColors.primary.withOpacity(0.14), AppColors.primary.withOpacity(0.04)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               shape: BoxShape.circle,
             ),
-            child: const Icon(LucideIcons.messageCircle, size: 38, color: AppColors.primary),
+            child: Center(
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(color: AppColors.primary.withOpacity(0.12), blurRadius: 14, offset: const Offset(0, 5)),
+                  ],
+                ),
+                child: const Icon(LucideIcons.messageCircle, size: 28, color: AppColors.primary),
+              ),
+            ),
           ),
           const SizedBox(height: 16),
           Text(l10n.messagesNoMessagesYetRoom, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),

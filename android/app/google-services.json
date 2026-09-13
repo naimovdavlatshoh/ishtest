@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "273020374425",
+    "project_id": "ishuz-aaa16",
+    "storage_bucket": "ishuz-aaa16.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:273020374425:android:ac2301f47fbdf214de5708",
+        "android_client_info": {
+          "package_name": "uz.ish.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkh9BzAV80mhA5RBYdeF65a--0Y7z50nI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

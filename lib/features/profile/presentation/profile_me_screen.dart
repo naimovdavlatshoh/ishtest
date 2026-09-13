@@ -22,17 +22,6 @@ class ProfileMeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        leading: null,
-        title: Text(
-          l10n.profileTitle,
-          style: AppTextStyles.h4.copyWith(color: AppColors.textPrimary),
-        ),
-        actions: const [],
-      ),
       body: profileAsync.when(
         loading: () => const Center(child: AppLoader()),
         error: (error, stack) => Center(child: Text('${l10n.errorOccurred}: $error')),
@@ -43,7 +32,8 @@ class ProfileMeScreen extends ConsumerWidget {
             child: Column(
               children: [
                 _buildHeader(context, ref, profile, l10n),
-                _buildSkills(ref, profile, l10n),
+                _buildAbout(profile, l10n),
+                _buildSkills(context, ref, profile, l10n),
                 _buildExperience(ref, profile, l10n),
                 _buildEducation(ref, profile, l10n),
                 _buildResume(ref, profile, l10n),
@@ -58,128 +48,109 @@ class ProfileMeScreen extends ConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context, WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
+    final initial = profile.fullName.isNotEmpty ? profile.fullName[0].toUpperCase() : '?';
+
     return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.divider.withOpacity(0.5)),
-      ),
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+      color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Background / Space
-          const SizedBox(height: 60),
-          
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                // Avatar
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.2),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: AppColors.primary.withOpacity(0.1),
+                backgroundImage: profile.avatar != null ? NetworkImage(profile.avatar!.fullImageUrl) : null,
+                child: profile.avatar == null
+                    ? Text(
+                        initial,
+                        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 30),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(profile.fullName, style: AppTextStyles.h2.copyWith(fontSize: 21)),
+                        const SizedBox(width: 6),
+                        const Icon(LucideIcons.circleCheck, color: AppColors.primary, size: 18),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      profile.title,
+                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                    ),
+                    if (profile.city != null) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const Icon(LucideIcons.mapPin, size: 15, color: AppColors.textTertiary),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              profile.city!,
+                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textTertiary),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
-                  ),
-                  child: profile.avatar != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.network(profile.avatar!.fullImageUrl, fit: BoxFit.cover),
-                        )
-                      : const Icon(LucideIcons.user, size: 50, color: Colors.white),
+                  ],
                 ),
-                const Spacer(),
-                // Edit Button
-                OutlinedButton.icon(
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
                   onPressed: () => context.push('/profile/edit'),
-                  icon: const Icon(LucideIcons.pencil, size: 18),
+                  icon: const Icon(LucideIcons.pencil, size: 17),
                   label: Text(l10n.profileEditBtn),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => context.go('/feed'),
+                  icon: const Icon(LucideIcons.eye, size: 17),
+                  label: Text(l10n.profileViewBtn),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primary,
                     side: const BorderSide(color: AppColors.primary),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
                   ),
                 ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 20),
-          
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Text(
-                      profile.fullName,
-                      style: AppTextStyles.h2,
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(
-                      LucideIcons.circleCheck,
-                      color: AppColors.primary,
-                      size: 20,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  profile.title,
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                if (profile.city != null)
-                  Row(
-                    children: [
-                      const Icon(LucideIcons.mapPin, size: 16, color: AppColors.textTertiary),
-                      const SizedBox(width: 4),
-                      Text(
-                        profile.city!,
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                      ),
-                    ],
-                  ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Divider(),
-                ),
-                if (profile.bio != null)
-                  Text(
-                    profile.bio!,
-                    style: AppTextStyles.bodyLarge,
-                  ),
-                const SizedBox(height: 20),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSkills(WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
-    if (profile.skills.isEmpty) return const SizedBox.shrink();
-    
+  Widget _buildAbout(ProfileMe profile, AppLocalizations l10n) {
+    if (profile.bio == null || profile.bio!.isEmpty) return const SizedBox.shrink();
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -194,9 +165,43 @@ class ProfileMeScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Icon(LucideIcons.code, color: AppColors.primary, size: 20),
+              const Icon(LucideIcons.user, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              Text(l10n.profileSkills, style: AppTextStyles.h3),
+              Text(l10n.profileAboutMe, style: AppTextStyles.h3),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(profile.bio!, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkills(BuildContext context, WidgetRef ref, ProfileMe profile, AppLocalizations l10n) {
+    if (profile.skills.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.divider.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(l10n.profileSkills, style: AppTextStyles.h3)),
+              GestureDetector(
+                onTap: () => context.push('/profile/edit'),
+                child: Text(
+                  l10n.profileEditBtn,
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -204,10 +209,10 @@ class ProfileMeScreen extends ConsumerWidget {
             spacing: 8,
             runSpacing: 10,
             children: profile.skills.map((skill) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
+                color: AppColors.primary.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 skill,
@@ -246,44 +251,43 @@ class ProfileMeScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 24),
-          ...profile.experience.asMap().entries.map((entry) {
-            final isLast = entry.key == profile.experience.length - 1;
-            final exp = entry.value;
-            return IntrinsicHeight(
+          ...profile.experience.map((exp) {
+            final companyInitial = exp.company.isNotEmpty ? exp.company[0].toUpperCase() : '?';
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 20),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    children: [
-                      Container(
-                        width: 12,
-                        height: 12,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        companyInitial,
+                        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 17),
                       ),
-                      if (!isLast)
-                        Expanded(
-                          child: Container(
-                            width: 2,
-                            color: AppColors.divider,
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(exp.title, style: AppTextStyles.h4),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Row(
                           children: [
-                            const Icon(LucideIcons.building2, size: 14, color: AppColors.textTertiary),
-                            const SizedBox(width: 4),
-                            Text(exp.company, style: AppTextStyles.bodyMedium),
+                            Expanded(
+                              child: Text(
+                                exp.company,
+                                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary, fontWeight: FontWeight.w600),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                             if (exp.location != null) ...[
                               const SizedBox(width: 8),
                               const Icon(LucideIcons.mapPin, size: 14, color: AppColors.textTertiary),
@@ -292,16 +296,10 @@ class ProfileMeScreen extends ConsumerWidget {
                             ],
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(LucideIcons.calendar, size: 14, color: AppColors.textTertiary),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${exp.startDate} - ${exp.endDate ?? 'present'}',
-                              style: AppTextStyles.caption,
-                            ),
-                          ],
+                        const SizedBox(height: 2),
+                        Text(
+                          '${exp.startDate} — ${exp.endDate ?? 'hozirgacha'}',
+                          style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
                         ),
                         if (exp.description != null) ...[
                           const SizedBox(height: 8),
@@ -310,14 +308,13 @@ class ProfileMeScreen extends ConsumerWidget {
                             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                           ),
                         ],
-                        const SizedBox(height: 24),
                       ],
                     ),
                   ),
                 ],
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

@@ -11,17 +11,21 @@ import '../../auth/providers/auth_provider.dart';
 import '../../profile/providers/profile_me_provider.dart';
 import '../../../core/utils/extensions.dart';
 import '../../chat/providers/global_chat_provider.dart';
-import '../../../core/widgets/app_header/app_header.dart';
+import '../../chat/providers/invitations_provider.dart';
+import '../../../core/providers/ui_chrome_provider.dart';
+import '../../notifications/providers/notifications_provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MainScreen extends ConsumerWidget {
   final Widget child;
   final int selectedIndex;
+  final bool showBottomNav;
 
   const MainScreen({
     super.key,
     required this.child,
     this.selectedIndex = 0,
+    this.showBottomNav = true,
   });
 
 
@@ -43,6 +47,11 @@ class MainScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      // The nested screen (e.g. ChatRoomScreen) has its own Scaffold and
+      // handles its own keyboard avoidance; letting this outer shell resize
+      // too causes the classic nested-Scaffold double-adjustment where a
+      // bottom-pinned input ends up hidden behind the keyboard.
+      resizeToAvoidBottomInset: false,
       drawer: Drawer(
         child: SafeArea(
           child: ListView(
@@ -119,14 +128,14 @@ class MainScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               _buildDrawerItem(
                 context,
-                LucideIcons.layoutDashboard,
+                LucideIcons.house,
                 l10n.drawerDashboard,
                 '/feed',
                 0,
               ),
               _buildDrawerItem(
                 context,
-                LucideIcons.circleUserRound,
+                LucideIcons.user,
                 l10n.drawerMyProfile,
                 '/profile/me',
                 1,
@@ -139,16 +148,25 @@ class MainScreen extends ConsumerWidget {
                 3,
                 totalUnread,
               ),
-              _buildDrawerItem(
+              _buildDrawerItemWithBadge(
                 context,
-                LucideIcons.mailCheck,
+                LucideIcons.bell,
+                l10n.drawerNotifications,
+                '/notifications',
+                11,
+                ref.watch(notificationsUnreadCountProvider),
+              ),
+              _buildDrawerItemWithBadge(
+                context,
+                LucideIcons.mail,
                 l10n.drawerInvitations,
                 '/invitations',
                 9,
+                ref.watch(pendingInvitationsCountProvider),
               ),
               _buildDrawerItem(
                 context,
-                LucideIcons.idCard,
+                LucideIcons.users,
                 l10n.drawerEmployees,
                 '/employees',
                 2,
@@ -168,20 +186,20 @@ class MainScreen extends ConsumerWidget {
               _buildDrawerItem(
                 context,
                 LucideIcons.briefcase,
-                l10n.mainNavVacancies,
+                l10n.drawerViewVacancies,
                 '/jobs',
                 4,
               ),
               _buildDrawerItem(
                 context,
-                LucideIcons.bookmark,
+                LucideIcons.bookmarkCheck,
                 l10n.drawerSaved,
                 '/jobs/saved',
                 6,
               ),
               _buildDrawerItem(
                 context,
-                LucideIcons.squarePlus,
+                LucideIcons.circlePlus,
                 l10n.drawerAddVacancy,
                 '/jobs/add',
                 8,
@@ -192,6 +210,72 @@ class MainScreen extends ConsumerWidget {
                 l10n.drawerMyVacancies,
                 '/jobs/my-jobs',
                 7,
+              ),
+
+              const SizedBox(height: 16),
+
+              // XIZMATLAR section
+              Text(
+                l10n.drawerServicesGroup,
+                style: AppTextStyles.caption.copyWith(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildDrawerItem(
+                context,
+                LucideIcons.wrench,
+                l10n.drawerViewServices,
+                '/services',
+                12,
+              ),
+              _buildDrawerItem(
+                context,
+                LucideIcons.circlePlus,
+                l10n.drawerAddService,
+                '/services/add',
+                13,
+              ),
+              _buildDrawerItem(
+                context,
+                LucideIcons.fileText,
+                l10n.drawerMyServices,
+                '/services/my-services',
+                14,
+              ),
+
+              const SizedBox(height: 16),
+
+              // POSTLAR section
+              Text(
+                l10n.drawerPostsGroup,
+                style: AppTextStyles.caption.copyWith(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildDrawerItem(
+                context,
+                LucideIcons.newspaper,
+                l10n.drawerViewPosts,
+                '/posts',
+                15,
+              ),
+              _buildDrawerItem(
+                context,
+                LucideIcons.circlePlus,
+                l10n.drawerCreatePost,
+                '/posts/add',
+                16,
+              ),
+              _buildDrawerItem(
+                context,
+                LucideIcons.fileText,
+                l10n.drawerMyPosts,
+                '/posts/my-posts',
+                17,
               ),
 
               const SizedBox(height: 16),
@@ -333,58 +417,116 @@ class MainScreen extends ConsumerWidget {
           ),
         ),
       ),
-      appBar: AppBar(
-        toolbarHeight: 96,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
-        titleSpacing: 12,
-        flexibleSpace: const AppHeaderBand(height: 96, borderRadius: 22),
-        title: AppLogoBadge(
-          size: 80,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(9),
-            child: Image.asset(
-              'assets/images/ishlogo.png',
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(7),
+      appBar: _buildHeader(context, ref, l10n),
+      body: child,
+      bottomNavigationBar: (showBottomNav && !ref.watch(hideBottomNavProvider))
+          ? _buildBottomNavBar(context, totalUnread, l10n)
+          : null,
+    );
+  }
+
+  PreferredSize _buildHeader(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
+    final double topPad = MediaQuery.of(context).padding.top;
+    const double logoSize = 48;
+    const double contentTopGap = 6;
+    const double contentBottomGap = 14;
+    final double totalHeight = topPad + contentTopGap + logoSize + contentBottomGap;
+
+    return PreferredSize(
+      preferredSize: Size.fromHeight(totalHeight),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(22),
+          bottomRight: Radius.circular(22),
+        ),
+        child: Container(
+          height: totalHeight,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.primary, AppColors.primaryDark],
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, topPad + contentTopGap, 16, contentBottomGap),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(11),
+                  child: Image.asset(
+                    'assets/images/ishlogo.png',
+                    width: logoSize,
+                    height: logoSize,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: logoSize,
+                        height: logoSize,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'ish',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  child: const Center(
-                    child: Text(
-                      'ish',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _headerTitle(selectedIndex, l10n),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                    ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'ish.uz',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.75),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              },
+                ),
+                const SizedBox(width: 8),
+                _headerTextButton(
+                  text: ref.watch(localeProvider).languageCode.toUpperCase(),
+                  onPressed: () => _showLanguageModal(context, ref),
+                ),
+                const SizedBox(width: 8),
+                Builder(
+                  builder: (context) => _headerIconButton(
+                    icon: LucideIcons.menu,
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-        actions: [
-          _headerIconButton(
-            icon: LucideIcons.globe,
-            onPressed: () => _showLanguageModal(context, ref),
-          ),
-          const SizedBox(width: 8),
-          Builder(
-            builder: (context) => _headerIconButton(
-              icon: LucideIcons.menu,
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            ),
-          ),
-          const SizedBox(width: 16),
-        ],
       ),
-      body: child,
-      bottomNavigationBar: _buildBottomNavBar(context, totalUnread, l10n),
     );
   }
 
@@ -406,34 +548,98 @@ class MainScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBottomNavBar(BuildContext context, int totalUnread, AppLocalizations l10n) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          top: BorderSide(
-            color: Colors.grey.withOpacity(0.2),
-            width: 1,
+  Widget _headerTextButton({required String text, required VoidCallback onPressed}) {
+    return Material(
+      color: Colors.white.withOpacity(0.92),
+      shape: const CircleBorder(),
+      elevation: 2,
+      shadowColor: Colors.black.withOpacity(0.2),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onPressed,
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: Center(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 12.5,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  String _headerTitle(int index, AppLocalizations l10n) {
+    switch (index) {
+      case 0:
+        return l10n.mainHeaderDashboard;
+      case 1:
+        return l10n.drawerMyProfile;
+      case 2:
+        return l10n.drawerEmployees;
+      case 3:
+        return l10n.mainNavMessages;
+      case 4:
+        return l10n.drawerViewVacancies;
+      case 5:
+        return l10n.drawerMyCompanies;
+      case 6:
+        return l10n.drawerSaved;
+      case 7:
+        return l10n.drawerMyVacancies;
+      case 8:
+        return l10n.drawerAddVacancy;
+      case 9:
+        return l10n.drawerInvitations;
+      case 10:
+        return l10n.drawerMyApplications;
+      case 11:
+        return l10n.drawerNotifications;
+      case 12:
+        return l10n.drawerViewServices;
+      case 13:
+        return l10n.drawerAddService;
+      case 14:
+        return l10n.drawerMyServices;
+      case 15:
+        return l10n.drawerViewPosts;
+      case 16:
+        return l10n.drawerCreatePost;
+      case 17:
+        return l10n.drawerMyPosts;
+      default:
+        return l10n.mainHeaderDashboard;
+    }
+  }
+
+  Widget _buildBottomNavBar(BuildContext context, int totalUnread, AppLocalizations l10n) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(16, 0, 16, MediaQuery.of(context).padding.bottom + 14),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            offset: const Offset(0, -2),
-            blurRadius: 8,
+            color: AppColors.primary.withOpacity(0.35),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      padding: EdgeInsets.only(
-        top: 8,
-        bottom: MediaQuery.of(context).padding.bottom + 8,
-      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-           _buildNavItem(context, LucideIcons.layoutDashboard, l10n.mainNavHome, 0, '/feed', 0),
+           _buildNavItem(context, LucideIcons.house, l10n.drawerDashboard, 0, '/feed', 0),
            _buildNavItem(context, LucideIcons.messageCircle, l10n.mainNavMessages, 3, '/chat', totalUnread),
            _buildNavItem(context, LucideIcons.briefcase, l10n.mainNavVacancies, 4, '/jobs', 0),
+           _buildNavItem(context, LucideIcons.newspaper, l10n.mainNavPosts, 15, '/posts', 0),
            _buildNavItem(context, LucideIcons.circleUserRound, l10n.mainNavProfile, 1, '/profile/me', 0),
         ],
       ),
@@ -442,61 +648,78 @@ class MainScreen extends ConsumerWidget {
 
   Widget _buildNavItem(BuildContext context, IconData icon, String label, int itemIndex, String route, int badgeCount) {
     final isActive = selectedIndex == itemIndex;
-    return Expanded(
+    return Material(
+      color: Colors.transparent,
       child: InkWell(
+        borderRadius: BorderRadius.circular(24),
         onTap: () => context.go(route),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Icon(
-                  icon,
-                  color: isActive ? AppColors.primary : AppColors.iconPrimary,
-                  size: 24,
-                ),
-                if (badgeCount > 0)
-                  Positioned(
-                    top: -4,
-                    right: -6,
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFEF4444),
-                        shape: BoxShape.circle,
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: Center(
-                        child: Text(
-                          badgeCount > 99 ? '99+' : '$badgeCount',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                            height: 1,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+          padding: EdgeInsets.symmetric(horizontal: isActive ? 14 : 11, vertical: 11),
+          decoration: BoxDecoration(
+            color: isActive ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(
+                    icon,
+                    color: isActive ? AppColors.primary : Colors.white,
+                    size: 22,
+                  ),
+                  if (badgeCount > 0)
+                    Positioned(
+                      top: -5,
+                      right: -7,
+                      child: Container(
+                        padding: const EdgeInsets.all(2.5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isActive ? Colors.white : AppColors.primary,
+                            width: 1.5,
+                          ),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 15,
+                          minHeight: 15,
+                        ),
+                        child: Center(
+                          child: Text(
+                            badgeCount > 99 ? '99+' : '$badgeCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                              height: 1,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                color: isActive ? AppColors.primary : AppColors.iconPrimary,
+                ],
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ],
+              if (isActive) ...[
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

@@ -18,7 +18,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get mainNavVacancies => 'Вакансии';
 
   @override
+  String get mainNavPosts => 'Посты';
+
+  @override
   String get mainNavProfile => 'Профиль';
+
+  @override
+  String get mainHeaderDashboard => 'Панель управления';
 
   @override
   String get defaultUser => 'Пользователь';
@@ -42,7 +48,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get drawerEmployees => 'Сотрудники';
 
   @override
+  String get drawerNotifications => 'Уведомления';
+
+  @override
   String get drawerVacanciesGroup => 'ВАКАНСИИ';
+
+  @override
+  String get drawerViewVacancies => 'Просмотр вакансий';
 
   @override
   String get drawerSaved => 'Сохраненные';
@@ -52,6 +64,30 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get drawerMyVacancies => 'Мои вакансии';
+
+  @override
+  String get drawerServicesGroup => 'УСЛУГИ';
+
+  @override
+  String get drawerViewServices => 'Смотреть услуги';
+
+  @override
+  String get drawerAddService => 'Добавить услугу';
+
+  @override
+  String get drawerMyServices => 'Мои услуги';
+
+  @override
+  String get drawerPostsGroup => 'ПОСТЫ';
+
+  @override
+  String get drawerViewPosts => 'Смотреть посты';
+
+  @override
+  String get drawerCreatePost => 'Создать пост';
+
+  @override
+  String get drawerMyPosts => 'Мои посты';
 
   @override
   String get drawerMyApplicationsGroup => 'МОИ ЗАЯВКИ';
@@ -714,22 +750,23 @@ class AppLocalizationsRu extends AppLocalizations {
   String get statsViews => 'Просмотры';
 
   @override
-  String get jobFormTitleNew => 'Новая вакансия';
+  String get jobFormTitleNew => 'Опубликовать вакансию';
 
   @override
   String get jobFormTitleEdit => 'Редактирование вакансии';
 
   @override
-  String get jobFormSubtitle => 'Заполните все данные';
+  String get jobFormSubtitle =>
+      'Создайте новую вакансию, чтобы найти идеального кандидата';
 
   @override
   String get jobFormSectionBasic => 'Основная информация';
 
   @override
-  String get jobFormLabelCompany => 'Компания';
+  String get jobFormLabelCompany => 'Компания (необязательно)';
 
   @override
-  String get jobFormCompanyPersonal => 'Личная (без компании)';
+  String get jobFormCompanyPersonal => 'Личная / Без компании';
 
   @override
   String get jobFormHintCompany => 'Выберите компанию';
@@ -738,10 +775,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get jobFormErrorLoadingCompanies => 'Ошибка при загрузке компаний';
 
   @override
+  String get jobFormCompanyNoneHelper =>
+      'У вас пока нет компаний. Вакансия будет опубликована от физического лица.';
+
+  @override
+  String get jobFormLabelLogo => 'Логотип компании (необязательно)';
+
+  @override
+  String get jobFormChooseLogo => 'Выбрать логотип';
+
+  @override
+  String get jobFormLogoHint =>
+      'Загрузите квадратное изображение (JPG, PNG, WEBP). Макс. 5МБ.';
+
+  @override
   String get jobFormLabelTitle => 'Название должности';
 
   @override
-  String get jobFormHintTitle => 'Напр: Flutter Developer';
+  String get jobFormHintTitle => 'например, Senior Software Engineer';
 
   @override
   String get jobFormErrorRequired => 'Обязательное поле';
@@ -750,43 +801,47 @@ class AppLocalizationsRu extends AppLocalizations {
   String get jobFormLabelType => 'Тип работы';
 
   @override
-  String get jobFormLabelLocation => 'Местоположение';
+  String get jobFormLabelLocation => 'Адрес';
 
   @override
-  String get jobFormHintLocation => 'Напр: Ташкент';
+  String get jobFormHintLocation => 'например, Ташкент, Узбекистан';
 
   @override
   String get jobFormLabelRemote => 'Удаленная работа';
 
   @override
-  String get jobFormSubtitleRemote => 'Сотрудник может работать из дома';
+  String get jobFormSectionSalary => 'Зарплата (необязательно)';
 
   @override
-  String get jobFormSectionSalary => 'Зарплата и валюта';
+  String get jobFormLabelMinSalary => 'Минимум';
 
   @override
-  String get jobFormLabelMinSalary => 'Мин. зарплата';
+  String get jobFormLabelMaxSalary => 'Максимум';
 
   @override
-  String get jobFormLabelMaxSalary => 'Макс. зарплата';
+  String get jobFormHintMinSalary => 'например, 2 500 000';
+
+  @override
+  String get jobFormHintMaxSalary => 'например, 5 000 000';
 
   @override
   String get jobFormLabelCurrency => 'Валюта';
 
   @override
-  String get jobFormSectionDetails => 'Детали';
+  String get jobFormSectionDetails => 'Требования (необязательно)';
 
   @override
   String get jobFormLabelDescription => 'Описание';
 
   @override
-  String get jobFormHintDescription => 'Подробно о вакансии...';
+  String get jobFormHintDescription =>
+      'Опишите роль, обязанности и кого вы ищете...';
 
   @override
-  String get jobFormLabelRequirements => 'Требования';
+  String get jobFormLabelRequirements => 'Добавить требование';
 
   @override
-  String get jobFormHintRequirements => 'По одному требованию на строку...';
+  String get jobFormHintRequirements => 'например, 3+ года опыта с React';
 
   @override
   String get jobFormBtnCreate => 'Опубликовать';

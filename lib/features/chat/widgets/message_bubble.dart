@@ -8,6 +8,13 @@ class MessageBubble extends StatelessWidget {
   final DateTime timestamp;
   final bool isRead;
   final bool isDelivered;
+  /// Whether this is the first bubble in a run of consecutive messages from
+  /// the same sender — controls the rounded corner on the "start" side.
+  final bool isFirstInGroup;
+  /// Whether this is the last bubble in a run of consecutive messages from
+  /// the same sender — controls the tail corner and whether the
+  /// timestamp/read-receipt row is shown.
+  final bool isLastInGroup;
 
   const MessageBubble({
     super.key,
@@ -16,16 +23,21 @@ class MessageBubble extends StatelessWidget {
     required this.timestamp,
     this.isRead = false,
     this.isDelivered = false,
+    this.isFirstInGroup = true,
+    this.isLastInGroup = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    const double roundCorner = 20;
+    const double tightCorner = 6;
+
     return Padding(
       padding: EdgeInsets.only(
         left: isMe ? 64 : 16,
         right: isMe ? 16 : 64,
-        top: 3,
-        bottom: 3,
+        top: isFirstInGroup ? 8 : 2,
+        bottom: isLastInGroup ? 2 : 2,
       ),
       child: Align(
         alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -33,7 +45,7 @@ class MessageBubble extends StatelessWidget {
           crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
               decoration: BoxDecoration(
                 gradient: isMe
                     ? const LinearGradient(
@@ -44,16 +56,16 @@ class MessageBubble extends StatelessWidget {
                     : null,
                 color: isMe ? null : Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(18),
-                  topRight: const Radius.circular(18),
-                  bottomLeft: Radius.circular(isMe ? 18 : 4),
-                  bottomRight: Radius.circular(isMe ? 4 : 18),
+                  topLeft: Radius.circular(!isMe && !isFirstInGroup ? tightCorner : roundCorner),
+                  topRight: Radius.circular(isMe && !isFirstInGroup ? tightCorner : roundCorner),
+                  bottomLeft: Radius.circular(!isMe && !isLastInGroup ? tightCorner : (isMe ? roundCorner : tightCorner + 2)),
+                  bottomRight: Radius.circular(isMe && !isLastInGroup ? tightCorner : (isMe ? tightCorner + 2 : roundCorner)),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
+                    color: (isMe ? AppColors.primary : Colors.black).withOpacity(0.08),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -66,30 +78,35 @@ class MessageBubble extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}',
-                  style: TextStyle(fontSize: 11, color: Colors.grey[400]),
-                ),
-                if (isMe) ...[
-                  const SizedBox(width: 4),
-                  Icon(
-                    isRead
-                        ? LucideIcons.checkCheck
-                        : isDelivered
+            if (isLastInGroup) ...[
+              const SizedBox(height: 4),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}',
+                      style: TextStyle(fontSize: 11, color: Colors.grey[400]),
+                    ),
+                    if (isMe) ...[
+                      const SizedBox(width: 4),
+                      Icon(
+                        isRead
                             ? LucideIcons.checkCheck
-                            : LucideIcons.check,
-                    size: 14,
-                    color: isRead
-                        ? AppColors.primary
-                        : Colors.grey[400],
-                  ),
-                ],
-              ],
-            ),
+                            : isDelivered
+                                ? LucideIcons.checkCheck
+                                : LucideIcons.check,
+                        size: 14,
+                        color: isRead
+                            ? AppColors.primary
+                            : Colors.grey[400],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),

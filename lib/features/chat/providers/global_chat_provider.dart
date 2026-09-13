@@ -105,6 +105,10 @@ class GlobalChatNotifier extends StateNotifier<GlobalChatState> {
       _channel = WebSocketChannel.connect(Uri.parse(wsUrl));
       if (!_disposed) state = state.copyWith(isConnected: true);
 
+      // The server expects this as the very first message on the socket;
+      // it closes the connection otherwise (see websocket.py's `first` check).
+      _sendWS({'type': 'auth', 'token': token});
+
       _channel!.stream.listen(
         _onMessage,
         onError: (_) => _onDisconnect(),

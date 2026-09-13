@@ -3,12 +3,10 @@ import '../../../l10n/app_localizations.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 import 'package:linkedin_clone/core/network/api_client.dart';
 import '../../../core/config/env.dart';
 import '../../../core/services/token_storage.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
 import '../providers/my_applications_provider.dart';
 import '../../../shared/models/application_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -29,9 +27,6 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    
-    
     final state = ref.watch(myApplicationsProvider);
 
     return Scaffold(
@@ -45,39 +40,6 @@ class _MyApplicationsScreenState extends ConsumerState<MyApplicationsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 42,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF1D4ED8), Color(0xFF3B82F6)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(LucideIcons.fileText, color: Colors.white, size: 22),
-                      ),
-                      const SizedBox(width: 14),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.myAppsTitle,
-                            style: AppTextStyles.h2.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            l10n.myAppsSubtitle,
-                            style: TextStyle(fontSize: 13, color: Colors.grey[500]),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
                   if (!state.isLoading && state.applications.isNotEmpty)
                     _buildStatsRow(state.applications),
                 ],

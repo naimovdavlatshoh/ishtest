@@ -17,6 +17,7 @@ class JobModel {
   final int viewsCount;
   final String createdAt;
   final String updatedAt;
+  final String? image;
   final CompanyModel? company;
   final JobAuthor? author;
 
@@ -37,6 +38,7 @@ class JobModel {
     required this.viewsCount,
     required this.createdAt,
     required this.updatedAt,
+    this.image,
     this.company,
     this.author,
   });
@@ -59,6 +61,7 @@ class JobModel {
       viewsCount: json['views_count'] as int? ?? 0,
       createdAt: json['created_at'] as String? ?? '',
       updatedAt: json['updated_at'] as String? ?? '',
+      image: json['image'] as String?,
       company: json['company'] != null ? CompanyModel.fromJson(json['company'] as Map<String, dynamic>) : null,
       author: json['author'] != null ? JobAuthor.fromJson(json['author'] as Map<String, dynamic>) : null,
     );
@@ -81,6 +84,7 @@ class JobModel {
     int? viewsCount,
     String? createdAt,
     String? updatedAt,
+    String? image,
     CompanyModel? company,
     JobAuthor? author,
   }) {
@@ -101,6 +105,7 @@ class JobModel {
       viewsCount: viewsCount ?? this.viewsCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      image: image ?? this.image,
       company: company ?? this.company,
       author: author ?? this.author,
     );

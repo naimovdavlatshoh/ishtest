@@ -25,12 +25,6 @@ class MyCompaniesPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(l10n.myCompaniesTitle),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
-      ),
       body: companiesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(

@@ -39,23 +39,6 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  const Icon(LucideIcons.briefcase, color: AppColors.primary, size: 36),
-                  const SizedBox(width: 12),
-                  Text(
-                    l10n.employeesTitle,
-                    style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                l10n.employeesSubtitle,
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 24),
-              
               // Filter Card
               Container(
                 padding: const EdgeInsets.all(20),

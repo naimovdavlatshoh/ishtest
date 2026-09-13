@@ -4,7 +4,6 @@ import '../../../l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/extensions.dart';
 import '../providers/real_chat_provider.dart';
 import '../providers/global_chat_provider.dart';
@@ -49,15 +48,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Text(
-                l10n.messagesTitle,
-                style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-            ),
-
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
 
             Expanded(
               child: state.isLoading && state.conversations.isEmpty
@@ -66,27 +57,48 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
                       ? _buildEmpty(l10n)
                       : RefreshIndicator(
                           onRefresh: () => ref.read(conversationListProvider.notifier).load(),
-                          child: ListView.builder(
-                            itemCount: state.conversations.length,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            itemBuilder: (context, index) {
-                              final conv = state.conversations[index];
-                              final other = conv.otherParticipant(myId);
-                              // Merge live unread count from global WS state
-                              final liveUnread = globalState.unreadByConversation[conv.id] ?? conv.unreadCount;
-                              return _ConvCard(
-                                conversation: conv,
-                                other: other,
-                                myId: myId,
-                                liveUnread: liveUnread,
-                                l10n: l10n,
-                                onTap: () {
-                                  // Clear badge immediately on tap
-                                  ref.read(globalChatProvider.notifier).markConversationRead(conv.id);
-                                  context.push('/chat/${conv.id}');
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                            child: Container(
+                              clipBehavior: Clip.antiAlias,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 14,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ListView.separated(
+                                itemCount: state.conversations.length,
+                                separatorBuilder: (context, index) => Divider(
+                                  height: 1,
+                                  thickness: 1,
+                                  color: Colors.grey[100],
+                                ),
+                                itemBuilder: (context, index) {
+                                  final conv = state.conversations[index];
+                                  final other = conv.otherParticipant(myId);
+                                  // Merge live unread count from global WS state
+                                  final liveUnread = globalState.unreadByConversation[conv.id] ?? conv.unreadCount;
+                                  return _ConvCard(
+                                    conversation: conv,
+                                    other: other,
+                                    myId: myId,
+                                    liveUnread: liveUnread,
+                                    l10n: l10n,
+                                    onTap: () {
+                                      // Clear badge immediately on tap
+                                      ref.read(globalChatProvider.notifier).markConversationRead(conv.id);
+                                      context.push('/chat/${conv.id}');
+                                    },
+                                  );
                                 },
-                              );
-                            },
+                              ),
+                            ),
                           ),
                         ),
             ),
@@ -102,16 +114,33 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 96,
-            height: 96,
+            width: 104,
+            height: 104,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.08),
+              gradient: LinearGradient(
+                colors: [AppColors.primary.withOpacity(0.14), AppColors.primary.withOpacity(0.04)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               shape: BoxShape.circle,
             ),
-            child: const Icon(LucideIcons.messageCircle, size: 44, color: AppColors.primary),
+            child: Center(
+              child: Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(color: AppColors.primary.withOpacity(0.12), blurRadius: 16, offset: const Offset(0, 6)),
+                  ],
+                ),
+                child: const Icon(LucideIcons.messageCircle, size: 32, color: AppColors.primary),
+              ),
+            ),
           ),
-          const SizedBox(height: 20),
-          Text(l10n.messagesNoMessagesYet, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 22),
+          Text(l10n.messagesNoMessagesYet, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF101828))),
           const SizedBox(height: 8),
           Text(
             l10n.messagesStartChat,
@@ -191,140 +220,113 @@ class _ConvCardState extends ConsumerState<_ConvCard>
 
     return ScaleTransition(
       scale: _pulseAnim,
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isUnread ? const Color(0xFFF0F5FF) : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: isUnread
-                ? Border.all(color: AppColors.primary.withOpacity(0.25), width: 1.5)
-                : Border.all(color: Colors.transparent),
-            boxShadow: [
-              BoxShadow(
-                color: isUnread
-                    ? AppColors.primary.withOpacity(0.08)
-                    : Colors.black.withOpacity(0.04),
-                blurRadius: isUnread ? 12 : 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              // Avatar with notification dot
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
-                    backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
-                    child: avatarUrl == null
-                        ? Text(
-                            initials,
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          )
-                        : null,
-                  ),
-                  if (isUnread)
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                // Avatar with status dot
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    CircleAvatar(
+                      radius: 26,
+                      backgroundColor: AppColors.primary.withOpacity(0.12),
+                      backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                      child: avatarUrl == null
+                          ? Text(
+                              initials,
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            )
+                          : null,
+                    ),
                     Positioned(
                       bottom: 0,
                       right: 0,
                       child: Container(
-                        width: 14,
-                        height: 14,
+                        width: 13,
+                        height: 13,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981),
+                          color: isUnread ? const Color(0xFF10B981) : Colors.grey[400],
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2),
                         ),
                       ),
                     ),
-                ],
-              ),
-              const SizedBox(width: 14),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            name,
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (lastMsg != null)
-                          Text(
-                            _formatTime(lastMsg.createdAt, widget.l10n),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isUnread ? AppColors.primary : Colors.grey[400],
-                              fontWeight: isUnread ? FontWeight.w600 : FontWeight.normal,
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            lastMsg?.content ?? widget.l10n.messagesConversationStarted,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isUnread ? const Color(0xFF101828) : Colors.grey[500],
-                              fontWeight: isUnread ? FontWeight.w600 : FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                        if (isUnread) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            constraints: const BoxConstraints(minWidth: 22),
-                            height: 22,
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF1D4ED8), Color(0xFF3B82F6)],
-                              ),
-                              borderRadius: BorderRadius.circular(11),
-                            ),
-                            child: Center(
-                              child: Text(
-                                widget.liveUnread > 99 ? '99+' : '${widget.liveUnread}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(width: 14),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15.5,
+                          color: Color(0xFF101828),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        lastMsg?.content ?? widget.l10n.messagesConversationStarted,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          color: isUnread ? AppColors.textSecondary : Colors.grey[500],
+                          fontWeight: isUnread ? FontWeight.w500 : FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (lastMsg != null)
+                      Text(
+                        _formatTime(lastMsg.createdAt, widget.l10n),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                      ),
+                    if (isUnread) ...[
+                      const SizedBox(height: 6),
+                      Container(
+                        constraints: const BoxConstraints(minWidth: 22),
+                        height: 22,
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFEF4444),
+                          borderRadius: BorderRadius.all(Radius.circular(11)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            widget.liveUnread > 99 ? '99+' : '${widget.liveUnread}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

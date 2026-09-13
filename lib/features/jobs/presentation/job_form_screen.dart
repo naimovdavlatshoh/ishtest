@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -22,15 +25,23 @@ class JobFormScreen extends ConsumerStatefulWidget {
 }
 
 class _JobFormScreenState extends ConsumerState<JobFormScreen> {
+  static const Color _cardBlue = Color(0xFF3B82F6);
+  static const Color _cardGreen = Color(0xFF22C55E);
+  static const Color _cardPurple = Color(0xFF8B5CF6);
+  static const Color _remoteTeal = Color(0xFF14B8A6);
+
   final _formKey = GlobalKey<FormState>();
-  
+
   late final TextEditingController _titleController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _locationController;
   late final TextEditingController _salaryMinController;
   late final TextEditingController _salaryMaxController;
-  late final TextEditingController _requirementsController;
-  
+  late final TextEditingController _requirementInputController;
+
+  List<String> _requirements = [];
+  String? _pickedLogoPath;
+
   int? _selectedCompanyId = -1; // Default to 'Shaxsiy'
   String _selectedJobType = 'full-time';
   String _selectedCurrency = 'UZS';
@@ -45,8 +56,9 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     _locationController = TextEditingController(text: widget.job?.location);
     _salaryMinController = TextEditingController(text: widget.job?.salaryMin?.toString());
     _salaryMaxController = TextEditingController(text: widget.job?.salaryMax?.toString());
-    _requirementsController = TextEditingController(text: widget.job?.requirements.join('\n'));
-    
+    _requirementInputController = TextEditingController();
+    _requirements = widget.job != null ? List<String>.from(widget.job!.requirements) : [];
+
     if (widget.job != null) {
       _selectedCompanyId = widget.job?.companyId ?? -1;
       _selectedJobType = widget.job?.jobType ?? 'full-time';
@@ -57,19 +69,12 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     }
   }
 
-  late final List<Map<String, String>> _jobTypes;
-
-  @override
-  void didChangeDependencies() {
-    final l10n = AppLocalizations.of(context)!;
-    super.didChangeDependencies();
-    _jobTypes = [
-      {'value': 'full-time', 'label': l10n.vacanciesFullTime},
-      {'value': 'part-time', 'label': l10n.vacanciesPartTime},
-      {'value': 'internship', 'label': l10n.vacanciesInternship},
-      {'value': 'contract', 'label': l10n.vacanciesContract},
-    ];
-  }
+  List<Map<String, String>> _jobTypesOf(AppLocalizations l10n) => [
+        {'value': 'full-time', 'label': l10n.vacanciesFullTime},
+        {'value': 'part-time', 'label': l10n.vacanciesPartTime},
+        {'value': 'internship', 'label': l10n.vacanciesInternship},
+        {'value': 'contract', 'label': l10n.vacanciesContract},
+      ];
 
   final List<String> _currencies = ['UZS', 'USD', 'EUR', 'RUB'];
 
@@ -80,8 +85,27 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     _locationController.dispose();
     _salaryMinController.dispose();
     _salaryMaxController.dispose();
-    _requirementsController.dispose();
+    _requirementInputController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickLogo() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: false,
+    );
+    if (result != null && result.files.isNotEmpty && result.files.first.path != null) {
+      setState(() => _pickedLogoPath = result.files.first.path);
+    }
+  }
+
+  void _addRequirement() {
+    final text = _requirementInputController.text.trim();
+    if (text.isEmpty) return;
+    setState(() {
+      _requirements.add(text);
+      _requirementInputController.clear();
+    });
   }
 
   Future<void> _submit() async {
@@ -89,11 +113,6 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-
-    final requirements = _requirementsController.text
-        .split('\n')
-        .where((e) => e.trim().isNotEmpty)
-        .toList();
 
     final data = {
       'title': _titleController.text.trim(),
@@ -105,14 +124,21 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
       'salary_min': int.tryParse(_salaryMinController.text),
       'salary_max': int.tryParse(_salaryMaxController.text),
       'is_remote': _isRemote,
-      'requirements': requirements,
+      'requirements': _requirements,
     };
 
-    final bool success;
+    bool success;
     if (widget.job != null) {
       success = await ref.read(myJobsProvider.notifier).updateJob(widget.job!.id, data);
+      if (success && _pickedLogoPath != null) {
+        await ref.read(myJobsProvider.notifier).uploadJobImage(widget.job!.id, _pickedLogoPath!);
+      }
     } else {
-      success = await ref.read(myJobsProvider.notifier).createJob(data);
+      final int? newJobId = await ref.read(myJobsProvider.notifier).createJob(data);
+      success = newJobId != null;
+      if (success && _pickedLogoPath != null) {
+        await ref.read(myJobsProvider.notifier).uploadJobImage(newJobId, _pickedLogoPath!);
+      }
     }
     if (mounted) {
       setState(() => _isLoading = false);
@@ -136,154 +162,244 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
 
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final jobTypes = _jobTypesOf(l10n);
     final companiesAsync = ref.watch(myCompaniesProvider);
 
     final content = SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       child: Form(
         key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (widget.job == null) ...[
-              Text(
-                l10n.jobFormTitleNew,
-                style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
+              Row(
+                children: [
+                  const Icon(LucideIcons.briefcase, color: AppColors.primary, size: 26),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      l10n.jobFormTitleNew,
+                      style: AppTextStyles.h2.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 l10n.jobFormSubtitle,
                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
             ],
-            _buildSectionTitle(l10n.jobFormSectionBasic),
-            const SizedBox(height: 16),
-            
-            // Company Select
-            companiesAsync.when(
-              data: (companies) => _buildDropdownField<int>(
-                label: l10n.jobFormLabelCompany,
-                value: _selectedCompanyId,
-                items: [
-                  DropdownMenuItem(
-                    value: -1,
-                    child: Text(l10n.jobFormCompanyPersonal),
-                  ),
-                  ...companies.map((c) => DropdownMenuItem(
-                    value: c.id,
-                    child: Text(c.name),
-                  )).toList(),
-                ],
-                onChanged: (val) => setState(() => _selectedCompanyId = val),
-                hint: l10n.jobFormHintCompany,
-              ),
-              loading: () => const LinearProgressIndicator(),
-              error: (_, __) => Text(l10n.jobFormErrorLoadingCompanies),
-            ),
-            const SizedBox(height: 20),
 
-            _buildTextField(
-              label: l10n.jobFormLabelTitle,
-              controller: _titleController,
-              hint: l10n.jobFormHintTitle,
-              validator: (val) => val == null || val.isEmpty ? l10n.jobFormErrorRequired : null,
-            ),
-            const SizedBox(height: 20),
-
-            _buildDropdownField<String>(
-              label: l10n.jobFormLabelType,
-              value: _selectedJobType,
-              items: _jobTypes.map((t) => DropdownMenuItem(
-                value: t['value'],
-                child: Text(t['label']!),
-              )).toList(),
-              onChanged: (val) => setState(() => _selectedJobType = val!),
-            ),
-            const SizedBox(height: 20),
-
-            _buildTextField(
-              label: l10n.jobFormLabelLocation,
-              controller: _locationController,
-              hint: l10n.jobFormHintLocation,
-              validator: (val) => val == null || val.isEmpty ? l10n.jobFormErrorRequired : null,
-            ),
-            const SizedBox(height: 12),
-
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: SwitchListTile(
-                value: _isRemote,
-                onChanged: (val) => setState(() => _isRemote = val),
-                title: Text(l10n.jobFormLabelRemote, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
-                subtitle: Text(l10n.jobFormSubtitleRemote, style: const TextStyle(fontSize: 12)),
-                activeColor: AppColors.primary,
-                dense: true,
-              ),
-            ),
-
-            const SizedBox(height: 32),
-            _buildSectionTitle(l10n.jobFormSectionSalary),
-            const SizedBox(height: 16),
-
-            Row(
+            // Card 1: Asosiy ma'lumot
+            _buildCard(
+              icon: LucideIcons.fileText,
+              iconColor: _cardBlue,
+              title: l10n.jobFormSectionBasic,
               children: [
-                Expanded(
-                  child: _buildTextField(
-                    label: l10n.jobFormLabelMinSalary,
-                    controller: _salaryMinController,
-                    keyboardType: TextInputType.number,
-                    hint: '0',
-                  ),
+                _buildTextField(
+                  label: l10n.jobFormLabelTitle,
+                  controller: _titleController,
+                  hint: l10n.jobFormHintTitle,
+                  required: true,
+                  validator: (val) => val == null || val.isEmpty ? l10n.jobFormErrorRequired : null,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildTextField(
-                    label: l10n.jobFormLabelMaxSalary,
-                    controller: _salaryMaxController,
-                    keyboardType: TextInputType.number,
-                    hint: '0',
+                const SizedBox(height: 20),
+
+                companiesAsync.when(
+                  data: (companies) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDropdownField<int>(
+                        label: l10n.jobFormLabelCompany,
+                        value: _selectedCompanyId,
+                        items: [
+                          DropdownMenuItem(
+                            value: -1,
+                            child: Text(l10n.jobFormCompanyPersonal),
+                          ),
+                          ...companies.map((c) => DropdownMenuItem(
+                                value: c.id,
+                                child: Text(c.name),
+                              )),
+                        ],
+                        onChanged: (val) => setState(() => _selectedCompanyId = val),
+                        hint: l10n.jobFormHintCompany,
+                        prefixIcon: LucideIcons.building2,
+                      ),
+                      if (companies.isEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.jobFormCompanyNoneHelper,
+                          style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+                        ),
+                      ],
+                    ],
                   ),
+                  loading: () => const LinearProgressIndicator(),
+                  error: (_, __) => Text(l10n.jobFormErrorLoadingCompanies),
+                ),
+                const SizedBox(height: 20),
+
+                _buildLogoPicker(l10n),
+                const SizedBox(height: 20),
+
+                _buildTextField(
+                  label: l10n.jobFormLabelDescription,
+                  controller: _descriptionController,
+                  maxLines: 5,
+                  hint: l10n.jobFormHintDescription,
+                  required: true,
+                  validator: (val) => val == null || val.isEmpty ? l10n.jobFormErrorRequired : null,
+                ),
+                const SizedBox(height: 20),
+
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _buildDropdownField<String>(
+                        label: l10n.jobFormLabelType,
+                        value: _selectedJobType,
+                        items: jobTypes.map((t) => DropdownMenuItem(
+                              value: t['value'],
+                              child: Text(t['label']!),
+                            )).toList(),
+                        onChanged: (val) => setState(() => _selectedJobType = val!),
+                        required: true,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildTextField(
+                        label: l10n.jobFormLabelLocation,
+                        controller: _locationController,
+                        hint: l10n.jobFormHintLocation,
+                        prefixIcon: LucideIcons.mapPin,
+                        required: true,
+                        validator: (val) => val == null || val.isEmpty ? l10n.jobFormErrorRequired : null,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: Checkbox(
+                        value: _isRemote,
+                        onChanged: (val) => setState(() => _isRemote = val ?? false),
+                        activeColor: AppColors.primary,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Icon(LucideIcons.globe, size: 18, color: _remoteTeal),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.jobFormLabelRemote,
+                      style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500),
+                    ),
+                  ],
                 ),
               ],
             ),
             const SizedBox(height: 20),
 
-            _buildDropdownField<String>(
-              label: l10n.jobFormLabelCurrency,
-              value: _selectedCurrency,
-              items: _currencies.map((c) => DropdownMenuItem(
-                value: c,
-                child: Text(c),
-              )).toList(),
-              onChanged: (val) => setState(() => _selectedCurrency = val!),
-            ),
-
-            const SizedBox(height: 32),
-            _buildSectionTitle(l10n.jobFormSectionDetails),
-            const SizedBox(height: 16),
-
-            _buildTextField(
-              label: l10n.jobFormLabelDescription,
-              controller: _descriptionController,
-              maxLines: 5,
-              hint: l10n.jobFormHintDescription,
-              validator: (val) => val == null || val.isEmpty ? l10n.jobFormErrorRequired : null,
+            // Card 2: Maosh
+            _buildCard(
+              icon: LucideIcons.dollarSign,
+              iconColor: _cardGreen,
+              title: l10n.jobFormSectionSalary,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        label: l10n.jobFormLabelMinSalary,
+                        controller: _salaryMinController,
+                        keyboardType: TextInputType.number,
+                        hint: l10n.jobFormHintMinSalary,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildTextField(
+                        label: l10n.jobFormLabelMaxSalary,
+                        controller: _salaryMaxController,
+                        keyboardType: TextInputType.number,
+                        hint: l10n.jobFormHintMaxSalary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _buildDropdownField<String>(
+                  label: l10n.jobFormLabelCurrency,
+                  value: _selectedCurrency,
+                  items: _currencies.map((c) => DropdownMenuItem(
+                        value: c,
+                        child: Text(c),
+                      )).toList(),
+                  onChanged: (val) => setState(() => _selectedCurrency = val!),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
 
-            _buildTextField(
-              label: l10n.jobFormLabelRequirements,
-              controller: _requirementsController,
-              maxLines: 5,
-              hint: l10n.jobFormHintRequirements,
+            // Card 3: Talablar
+            _buildCard(
+              icon: LucideIcons.building2,
+              iconColor: _cardPurple,
+              title: l10n.jobFormSectionDetails,
+              children: [
+                _buildLabel(l10n.jobFormLabelRequirements, false),
+                const SizedBox(height: 8),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _requirementInputController,
+                        decoration: _fieldDecoration(hint: l10n.jobFormHintRequirements),
+                        onFieldSubmitted: (_) => _addRequirement(),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Material(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(12),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: _addRequirement,
+                        child: const SizedBox(
+                          width: 52,
+                          height: 52,
+                          child: Icon(LucideIcons.plus, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (_requirements.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _requirements.map(_buildRequirementChip).toList(),
+                  ),
+                ],
+              ],
             ),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 32),
             PrimaryButton(
               text: widget.job != null ? l10n.vacanciesSave : l10n.jobFormBtnCreate,
               isLoading: _isLoading,
@@ -297,13 +413,13 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
 
     if (widget.job == null) {
       return Container(
-        color: Colors.white,
+        color: AppColors.background,
         child: content,
       );
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(l10n.jobFormTitleEdit),
         elevation: 0,
@@ -314,10 +430,162 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: AppTextStyles.h3.copyWith(color: AppColors.primary),
+  Widget _buildCard({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: iconColor, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: AppTextStyles.h3.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogoPicker(AppLocalizations l10n) {
+    final String? existingImage = widget.job?.image;
+    final bool hasImage = _pickedLogoPath != null || (existingImage != null && existingImage.isNotEmpty);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLabel(l10n.jobFormLabelLogo, false),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+                image: _pickedLogoPath != null
+                    ? DecorationImage(image: FileImage(File(_pickedLogoPath!)), fit: BoxFit.cover)
+                    : (existingImage != null && existingImage.isNotEmpty
+                        ? DecorationImage(image: NetworkImage(existingImage.fullImageUrl), fit: BoxFit.cover)
+                        : null),
+              ),
+              child: !hasImage
+                  ? const Icon(LucideIcons.briefcase, color: AppColors.textTertiary)
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _pickLogo,
+                icon: const Icon(LucideIcons.imagePlus, size: 16),
+                label: Text(l10n.jobFormChooseLogo),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: BorderSide(color: AppColors.primary.withOpacity(0.4)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          l10n.jobFormLogoHint,
+          style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRequirementChip(String req) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 220),
+            child: Text(
+              req,
+              style: AppTextStyles.bodyMedium.copyWith(fontSize: 13),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: 6),
+          InkWell(
+            onTap: () => setState(() => _requirements.remove(req)),
+            child: const Icon(LucideIcons.x, size: 14, color: AppColors.textTertiary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLabel(String label, bool required) {
+    return RichText(
+      text: TextSpan(
+        style: AppTextStyles.label.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+        children: [
+          TextSpan(text: label),
+          if (required) const TextSpan(text: ' *', style: TextStyle(color: Colors.red)),
+        ],
+      ),
+    );
+  }
+
+  InputDecoration _fieldDecoration({String? hint, IconData? prefixIcon}) {
+    return InputDecoration(
+      hintText: hint,
+      prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 18, color: AppColors.textTertiary) : null,
+      filled: true,
+      fillColor: Colors.grey[50],
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey[200]!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+      ),
     );
   }
 
@@ -328,30 +596,20 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     int maxLines = 1,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    IconData? prefixIcon,
+    bool required = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.label.copyWith(fontWeight: FontWeight.bold)),
+        _buildLabel(label, required),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           maxLines: maxLines,
           keyboardType: keyboardType,
           validator: validator,
-          decoration: InputDecoration(
-            hintText: hint,
-            filled: true,
-            fillColor: Colors.grey[50],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[200]!),
-            ),
-          ),
+          decoration: _fieldDecoration(hint: hint, prefixIcon: prefixIcon),
         ),
       ],
     );
@@ -363,11 +621,13 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
     required List<DropdownMenuItem<T>> items,
     required ValueChanged<T?> onChanged,
     String? hint,
+    IconData? prefixIcon,
+    bool required = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.label.copyWith(fontWeight: FontWeight.bold)),
+        _buildLabel(label, required),
         const SizedBox(height: 8),
         DropdownButtonFormField<T>(
           value: value,
@@ -377,24 +637,7 @@ class _JobFormScreenState extends ConsumerState<JobFormScreen> {
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(16),
           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
-          decoration: InputDecoration(
-            hintText: hint,
-            filled: true,
-            fillColor: Colors.grey[50],
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[200]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-            ),
-          ),
+          decoration: _fieldDecoration(hint: hint, prefixIcon: prefixIcon),
         ),
       ],
     );
