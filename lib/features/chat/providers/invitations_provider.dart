@@ -113,7 +113,9 @@ class InvitationsState {
 // ─── Notifier ─────────────────────────────────────────────────────────────────
 
 class InvitationsNotifier extends StateNotifier<InvitationsState> {
-  InvitationsNotifier() : super(InvitationsState());
+  InvitationsNotifier() : super(InvitationsState()) {
+    loadReceived();
+  }
 
   Future<Map<String, String>> _headers() async {
     const s = TokenStorage();
@@ -194,4 +196,13 @@ class InvitationsNotifier extends StateNotifier<InvitationsState> {
 final invitationsProvider =
     StateNotifierProvider<InvitationsNotifier, InvitationsState>((ref) {
   return InvitationsNotifier();
+});
+
+/// Convenience provider for badge UI (e.g. the drawer): count of received
+/// invitations still awaiting a response. The backend doesn't expose a
+/// dedicated count endpoint, so this is derived client-side from the
+/// already-fetched received list — the same pattern used for chat's
+/// totalUnreadProvider.
+final pendingInvitationsCountProvider = Provider<int>((ref) {
+  return ref.watch(invitationsProvider).received.where((i) => i.status == 'pending').length;
 });

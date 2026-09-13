@@ -18,7 +18,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mainNavVacancies => 'Vacancies';
 
   @override
+  String get mainNavPosts => 'Posts';
+
+  @override
   String get mainNavProfile => 'Profile';
+
+  @override
+  String get mainHeaderDashboard => 'Dashboard';
 
   @override
   String get defaultUser => 'User';
@@ -42,7 +48,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerEmployees => 'Employees';
 
   @override
+  String get drawerNotifications => 'Notifications';
+
+  @override
   String get drawerVacanciesGroup => 'VACANCIES';
+
+  @override
+  String get drawerViewVacancies => 'View Vacancies';
 
   @override
   String get drawerSaved => 'Saved';
@@ -52,6 +64,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get drawerMyVacancies => 'My Vacancies';
+
+  @override
+  String get drawerServicesGroup => 'SERVICES';
+
+  @override
+  String get drawerViewServices => 'View Services';
+
+  @override
+  String get drawerAddService => 'Add Service';
+
+  @override
+  String get drawerMyServices => 'My Services';
+
+  @override
+  String get drawerPostsGroup => 'POSTS';
+
+  @override
+  String get drawerViewPosts => 'View Posts';
+
+  @override
+  String get drawerCreatePost => 'Create Post';
+
+  @override
+  String get drawerMyPosts => 'My Posts';
 
   @override
   String get drawerMyApplicationsGroup => 'MY APPLICATIONS';
@@ -715,22 +751,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsViews => 'Views';
 
   @override
-  String get jobFormTitleNew => 'New Vacancy';
+  String get jobFormTitleNew => 'Post a Job';
 
   @override
   String get jobFormTitleEdit => 'Edit Vacancy';
 
   @override
-  String get jobFormSubtitle => 'Fill in all the details';
+  String get jobFormSubtitle =>
+      'Create a new job posting to find the ideal candidate';
 
   @override
   String get jobFormSectionBasic => 'Basic Information';
 
   @override
-  String get jobFormLabelCompany => 'Company';
+  String get jobFormLabelCompany => 'Company (optional)';
 
   @override
-  String get jobFormCompanyPersonal => 'Personal (no company)';
+  String get jobFormCompanyPersonal => 'Personal / No company';
 
   @override
   String get jobFormHintCompany => 'Select company';
@@ -739,10 +776,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jobFormErrorLoadingCompanies => 'Error loading companies';
 
   @override
+  String get jobFormCompanyNoneHelper =>
+      'You don\'t have any companies yet. The job will be posted as an individual.';
+
+  @override
+  String get jobFormLabelLogo => 'Company logo (optional)';
+
+  @override
+  String get jobFormChooseLogo => 'Choose logo';
+
+  @override
+  String get jobFormLogoHint =>
+      'Upload a square image (JPG, PNG, WEBP). Max 5MB.';
+
+  @override
   String get jobFormLabelTitle => 'Job Title';
 
   @override
-  String get jobFormHintTitle => 'E.g. Flutter Developer';
+  String get jobFormHintTitle => 'e.g. Senior Software Engineer';
 
   @override
   String get jobFormErrorRequired => 'Required field';
@@ -754,40 +805,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jobFormLabelLocation => 'Location';
 
   @override
-  String get jobFormHintLocation => 'E.g. Tashkent';
+  String get jobFormHintLocation => 'e.g. Tashkent, Uzbekistan';
 
   @override
   String get jobFormLabelRemote => 'Remote Work';
 
   @override
-  String get jobFormSubtitleRemote => 'Employee can work from home';
+  String get jobFormSectionSalary => 'Salary (optional)';
 
   @override
-  String get jobFormSectionSalary => 'Salary & Currency';
+  String get jobFormLabelMinSalary => 'Minimum';
 
   @override
-  String get jobFormLabelMinSalary => 'Min Salary';
+  String get jobFormLabelMaxSalary => 'Maximum';
 
   @override
-  String get jobFormLabelMaxSalary => 'Max Salary';
+  String get jobFormHintMinSalary => 'e.g. 2,500,000';
+
+  @override
+  String get jobFormHintMaxSalary => 'e.g. 5,000,000';
 
   @override
   String get jobFormLabelCurrency => 'Currency';
 
   @override
-  String get jobFormSectionDetails => 'Details';
+  String get jobFormSectionDetails => 'Requirements (optional)';
 
   @override
   String get jobFormLabelDescription => 'Description';
 
   @override
-  String get jobFormHintDescription => 'Detailed job description...';
+  String get jobFormHintDescription =>
+      'Describe the role, responsibilities, and who you\'re looking for...';
 
   @override
-  String get jobFormLabelRequirements => 'Requirements';
+  String get jobFormLabelRequirements => 'Add requirement';
 
   @override
-  String get jobFormHintRequirements => 'One requirement per line...';
+  String get jobFormHintRequirements =>
+      'e.g. 3+ years of experience with React';
 
   @override
   String get jobFormBtnCreate => 'Create Vacancy';

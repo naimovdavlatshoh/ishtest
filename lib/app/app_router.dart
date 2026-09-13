@@ -20,6 +20,15 @@ import '../features/jobs/presentation/my_jobs_screen.dart';
 import '../features/jobs/presentation/job_applications_screen.dart';
 import '../features/jobs/presentation/job_form_screen.dart';
 import '../features/jobs/presentation/my_applications_screen.dart';
+import '../features/services/presentation/services_screen.dart';
+import '../features/services/presentation/service_form_screen.dart';
+import '../features/services/presentation/my_services_screen.dart';
+import '../features/services/presentation/service_detail_screen.dart';
+import '../features/posts/presentation/posts_screen.dart';
+import '../features/posts/presentation/post_form_screen.dart';
+import '../features/posts/presentation/my_posts_screen.dart';
+import '../features/posts/presentation/post_detail_screen.dart';
+import '../features/notifications/presentation/notifications_screen.dart';
 import '../features/employees/presentation/employees_screen.dart';
 import '../features/main/presentation/main_screen.dart';
 import '../features/auth/providers/auth_provider.dart';
@@ -27,6 +36,8 @@ import '../features/companies/presentation/pages/my_companies_page.dart';
 import '../features/companies/presentation/pages/company_form_page.dart';
 import '../shared/models/company_model.dart';
 import '../shared/models/job_model.dart';
+import '../shared/models/service_model.dart';
+import '../shared/models/company_post_model.dart';
 import '../core/utils/app_messenger.dart';
 import '../features/splash/presentation/splash_screen.dart';
 
@@ -154,14 +165,32 @@ final routerProvider = Provider<GoRouter>((ref) {
             selectedIndex = 6;
           } else if (path.startsWith('/jobs')) {
             selectedIndex = 4;
+          } else if (path.startsWith('/notifications')) {
+            selectedIndex = 11;
+          } else if (path.startsWith('/services/add')) {
+            selectedIndex = 13;
+          } else if (path.startsWith('/services/my-services')) {
+            selectedIndex = 14;
+          } else if (path.startsWith('/services')) {
+            selectedIndex = 12;
+          } else if (path.startsWith('/posts/add')) {
+            selectedIndex = 16;
+          } else if (path.startsWith('/posts/my-posts')) {
+            selectedIndex = 17;
+          } else if (path.startsWith('/posts')) {
+            selectedIndex = 15;
           }
-          
+
+          // Hide the bottom nav bar inside an individual chat room so the
+          // conversation gets the full screen (matches messaging-app norms).
+          final bool hideBottomNav = path.startsWith('/chat/');
 
           return buildPageWithCustomTransition(
             context: context,
             state: state,
             child: MainScreen(
               selectedIndex: selectedIndex,
+              showBottomNav: !hideBottomNav,
               child: child,
             ),
           );
@@ -206,6 +235,90 @@ final routerProvider = Provider<GoRouter>((ref) {
               state: state,
               child: const MyApplicationsScreen(),
             ),
+          ),
+          GoRoute(
+            path: '/notifications',
+            pageBuilder: (context, state) => buildPageWithCustomTransition(
+              context: context,
+              state: state,
+              child: const NotificationsScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/services',
+            pageBuilder: (context, state) => buildPageWithCustomTransition(
+              context: context,
+              state: state,
+              child: const ServicesScreen(),
+            ),
+            routes: [
+              GoRoute(
+                path: 'add',
+                pageBuilder: (context, state) => buildPageWithCustomTransition(
+                  context: context,
+                  state: state,
+                  child: const ServiceFormScreen(),
+                ),
+              ),
+              GoRoute(
+                path: 'my-services',
+                pageBuilder: (context, state) => buildPageWithCustomTransition(
+                  context: context,
+                  state: state,
+                  child: const MyServicesScreen(),
+                ),
+              ),
+              GoRoute(
+                path: ':id',
+                pageBuilder: (context, state) {
+                  final int id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+                  final ServiceModel? service = state.extra as ServiceModel?;
+                  return buildPageWithCustomTransition(
+                    context: context,
+                    state: state,
+                    child: ServiceDetailScreen(service: service, serviceId: id),
+                  );
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/posts',
+            pageBuilder: (context, state) => buildPageWithCustomTransition(
+              context: context,
+              state: state,
+              child: const PostsScreen(),
+            ),
+            routes: [
+              GoRoute(
+                path: 'add',
+                pageBuilder: (context, state) => buildPageWithCustomTransition(
+                  context: context,
+                  state: state,
+                  child: const PostFormScreen(),
+                ),
+              ),
+              GoRoute(
+                path: 'my-posts',
+                pageBuilder: (context, state) => buildPageWithCustomTransition(
+                  context: context,
+                  state: state,
+                  child: const MyPostsScreen(),
+                ),
+              ),
+              GoRoute(
+                path: ':id',
+                pageBuilder: (context, state) {
+                  final int id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+                  final CompanyPostModel? post = state.extra as CompanyPostModel?;
+                  return buildPageWithCustomTransition(
+                    context: context,
+                    state: state,
+                    child: PostDetailScreen(post: post, postId: id),
+                  );
+                },
+              ),
+            ],
           ),
           GoRoute(
             path: '/jobs',

@@ -118,11 +118,23 @@ abstract class AppLocalizations {
   /// **'Vakansiyalar'**
   String get mainNavVacancies;
 
+  /// No description provided for @mainNavPosts.
+  ///
+  /// In uz, this message translates to:
+  /// **'Postlar'**
+  String get mainNavPosts;
+
   /// No description provided for @mainNavProfile.
   ///
   /// In uz, this message translates to:
   /// **'Profil'**
   String get mainNavProfile;
+
+  /// No description provided for @mainHeaderDashboard.
+  ///
+  /// In uz, this message translates to:
+  /// **'Boshqaruv paneli'**
+  String get mainHeaderDashboard;
 
   /// No description provided for @defaultUser.
   ///
@@ -139,13 +151,13 @@ abstract class AppLocalizations {
   /// No description provided for @drawerNews.
   ///
   /// In uz, this message translates to:
-  /// **'YANGILIKLAR'**
+  /// **'ASOSIY'**
   String get drawerNews;
 
   /// No description provided for @drawerDashboard.
   ///
   /// In uz, this message translates to:
-  /// **'Boshqaruv paneli'**
+  /// **'Dashboard'**
   String get drawerDashboard;
 
   /// No description provided for @drawerMyProfile.
@@ -157,7 +169,7 @@ abstract class AppLocalizations {
   /// No description provided for @drawerInvitations.
   ///
   /// In uz, this message translates to:
-  /// **'Taklifnomalar'**
+  /// **'Takliflar'**
   String get drawerInvitations;
 
   /// No description provided for @drawerEmployees.
@@ -166,11 +178,23 @@ abstract class AppLocalizations {
   /// **'Xodimlar'**
   String get drawerEmployees;
 
+  /// No description provided for @drawerNotifications.
+  ///
+  /// In uz, this message translates to:
+  /// **'Bildirishnomalar'**
+  String get drawerNotifications;
+
   /// No description provided for @drawerVacanciesGroup.
   ///
   /// In uz, this message translates to:
-  /// **'VAKANSIYALAR'**
+  /// **'ISHLAR'**
   String get drawerVacanciesGroup;
+
+  /// No description provided for @drawerViewVacancies.
+  ///
+  /// In uz, this message translates to:
+  /// **'Ishlarni ko\'rish'**
+  String get drawerViewVacancies;
 
   /// No description provided for @drawerSaved.
   ///
@@ -181,19 +205,67 @@ abstract class AppLocalizations {
   /// No description provided for @drawerAddVacancy.
   ///
   /// In uz, this message translates to:
-  /// **'Vakansiya qo\'shish'**
+  /// **'Ish e\'lon qilish'**
   String get drawerAddVacancy;
 
   /// No description provided for @drawerMyVacancies.
   ///
   /// In uz, this message translates to:
-  /// **'Mening vakansiyalarim'**
+  /// **'Mening ishlarim'**
   String get drawerMyVacancies;
+
+  /// No description provided for @drawerServicesGroup.
+  ///
+  /// In uz, this message translates to:
+  /// **'XIZMATLAR'**
+  String get drawerServicesGroup;
+
+  /// No description provided for @drawerViewServices.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xizmatlarni ko\'rish'**
+  String get drawerViewServices;
+
+  /// No description provided for @drawerAddService.
+  ///
+  /// In uz, this message translates to:
+  /// **'Xizmat e\'lon qilish'**
+  String get drawerAddService;
+
+  /// No description provided for @drawerMyServices.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mening xizmatlarim'**
+  String get drawerMyServices;
+
+  /// No description provided for @drawerPostsGroup.
+  ///
+  /// In uz, this message translates to:
+  /// **'POSTLAR'**
+  String get drawerPostsGroup;
+
+  /// No description provided for @drawerViewPosts.
+  ///
+  /// In uz, this message translates to:
+  /// **'Postlarni ko\'rish'**
+  String get drawerViewPosts;
+
+  /// No description provided for @drawerCreatePost.
+  ///
+  /// In uz, this message translates to:
+  /// **'Post yaratish'**
+  String get drawerCreatePost;
+
+  /// No description provided for @drawerMyPosts.
+  ///
+  /// In uz, this message translates to:
+  /// **'Mening postlarim'**
+  String get drawerMyPosts;
 
   /// No description provided for @drawerMyApplicationsGroup.
   ///
   /// In uz, this message translates to:
-  /// **'MENING ARIZALARIM'**
+  /// **'ARIZALAR'**
   String get drawerMyApplicationsGroup;
 
   /// No description provided for @drawerMyApplications.
@@ -1471,7 +1543,7 @@ abstract class AppLocalizations {
   /// No description provided for @jobFormTitleNew.
   ///
   /// In uz, this message translates to:
-  /// **'Yangi vakansiya'**
+  /// **'Ish e\'lon qilish'**
   String get jobFormTitleNew;
 
   /// No description provided for @jobFormTitleEdit.
@@ -1483,25 +1555,25 @@ abstract class AppLocalizations {
   /// No description provided for @jobFormSubtitle.
   ///
   /// In uz, this message translates to:
-  /// **'Barcha ma\'lumotlarni to\'ldiring'**
+  /// **'Ideal nomzodni topish uchun yangi ish e\'lonini yarating'**
   String get jobFormSubtitle;
 
   /// No description provided for @jobFormSectionBasic.
   ///
   /// In uz, this message translates to:
-  /// **'Asosiy ma\'lumotlar'**
+  /// **'Asosiy ma\'lumot'**
   String get jobFormSectionBasic;
 
   /// No description provided for @jobFormLabelCompany.
   ///
   /// In uz, this message translates to:
-  /// **'Kompaniya'**
+  /// **'Kompaniya (ixtiyoriy)'**
   String get jobFormLabelCompany;
 
   /// No description provided for @jobFormCompanyPersonal.
   ///
   /// In uz, this message translates to:
-  /// **'Shaxsiy (kompaniyasiz)'**
+  /// **'Shaxsiy / Kompaniyasiz'**
   String get jobFormCompanyPersonal;
 
   /// No description provided for @jobFormHintCompany.
@@ -1516,16 +1588,40 @@ abstract class AppLocalizations {
   /// **'Kompaniyalarni yuklashda xatolik'**
   String get jobFormErrorLoadingCompanies;
 
+  /// No description provided for @jobFormCompanyNoneHelper.
+  ///
+  /// In uz, this message translates to:
+  /// **'Sizda hali kompaniyalar yo\'q. Ish shaxs sifatida e\'lon qilinadi.'**
+  String get jobFormCompanyNoneHelper;
+
+  /// No description provided for @jobFormLabelLogo.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kompaniya logotipi (ixtiyoriy)'**
+  String get jobFormLabelLogo;
+
+  /// No description provided for @jobFormChooseLogo.
+  ///
+  /// In uz, this message translates to:
+  /// **'Logotip tanlash'**
+  String get jobFormChooseLogo;
+
+  /// No description provided for @jobFormLogoHint.
+  ///
+  /// In uz, this message translates to:
+  /// **'Kvadrat rasm yuklang (JPG, PNG, WEBP). Maks. 5MB.'**
+  String get jobFormLogoHint;
+
   /// No description provided for @jobFormLabelTitle.
   ///
   /// In uz, this message translates to:
-  /// **'Lavozim nomi'**
+  /// **'Ish nomi'**
   String get jobFormLabelTitle;
 
   /// No description provided for @jobFormHintTitle.
   ///
   /// In uz, this message translates to:
-  /// **'Masalan: Flutter Developer'**
+  /// **'masalan, Senior Software Engineer'**
   String get jobFormHintTitle;
 
   /// No description provided for @jobFormErrorRequired.
@@ -1543,13 +1639,13 @@ abstract class AppLocalizations {
   /// No description provided for @jobFormLabelLocation.
   ///
   /// In uz, this message translates to:
-  /// **'Joylashuv'**
+  /// **'Manzil'**
   String get jobFormLabelLocation;
 
   /// No description provided for @jobFormHintLocation.
   ///
   /// In uz, this message translates to:
-  /// **'Masalan: Toshkent'**
+  /// **'masalan, Toshkent, O\'zbekiston'**
   String get jobFormHintLocation;
 
   /// No description provided for @jobFormLabelRemote.
@@ -1558,29 +1654,35 @@ abstract class AppLocalizations {
   /// **'Masofaviy ish'**
   String get jobFormLabelRemote;
 
-  /// No description provided for @jobFormSubtitleRemote.
-  ///
-  /// In uz, this message translates to:
-  /// **'Xodim uydan ishlashi mumkin'**
-  String get jobFormSubtitleRemote;
-
   /// No description provided for @jobFormSectionSalary.
   ///
   /// In uz, this message translates to:
-  /// **'Maosh va valyuta'**
+  /// **'Maosh (ixtiyoriy)'**
   String get jobFormSectionSalary;
 
   /// No description provided for @jobFormLabelMinSalary.
   ///
   /// In uz, this message translates to:
-  /// **'Minimum maosh'**
+  /// **'Minimal'**
   String get jobFormLabelMinSalary;
 
   /// No description provided for @jobFormLabelMaxSalary.
   ///
   /// In uz, this message translates to:
-  /// **'Maksimum maosh'**
+  /// **'Maksimal'**
   String get jobFormLabelMaxSalary;
+
+  /// No description provided for @jobFormHintMinSalary.
+  ///
+  /// In uz, this message translates to:
+  /// **'masalan, 2.500.000'**
+  String get jobFormHintMinSalary;
+
+  /// No description provided for @jobFormHintMaxSalary.
+  ///
+  /// In uz, this message translates to:
+  /// **'masalan, 5.000.000'**
+  String get jobFormHintMaxSalary;
 
   /// No description provided for @jobFormLabelCurrency.
   ///
@@ -1591,31 +1693,31 @@ abstract class AppLocalizations {
   /// No description provided for @jobFormSectionDetails.
   ///
   /// In uz, this message translates to:
-  /// **'Tafsilotlar'**
+  /// **'Talablar (ixtiyoriy)'**
   String get jobFormSectionDetails;
 
   /// No description provided for @jobFormLabelDescription.
   ///
   /// In uz, this message translates to:
-  /// **'Tavsif'**
+  /// **'Ta\'rif'**
   String get jobFormLabelDescription;
 
   /// No description provided for @jobFormHintDescription.
   ///
   /// In uz, this message translates to:
-  /// **'Vakansiya haqida batafsil...'**
+  /// **'Rol, majburiyatlar va qidirayotganingizni tavsiflang...'**
   String get jobFormHintDescription;
 
   /// No description provided for @jobFormLabelRequirements.
   ///
   /// In uz, this message translates to:
-  /// **'Talablar'**
+  /// **'Talab qo\'shish'**
   String get jobFormLabelRequirements;
 
   /// No description provided for @jobFormHintRequirements.
   ///
   /// In uz, this message translates to:
-  /// **'Har qatorga bitta talab...'**
+  /// **'masalan, React bilan 3+ yillik tajriba'**
   String get jobFormHintRequirements;
 
   /// No description provided for @jobFormBtnCreate.

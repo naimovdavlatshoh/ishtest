@@ -18,7 +18,13 @@ class AppLocalizationsUz extends AppLocalizations {
   String get mainNavVacancies => 'Vakansiyalar';
 
   @override
+  String get mainNavPosts => 'Postlar';
+
+  @override
   String get mainNavProfile => 'Profil';
+
+  @override
+  String get mainHeaderDashboard => 'Boshqaruv paneli';
 
   @override
   String get defaultUser => 'Foydalanuvchi';
@@ -27,34 +33,64 @@ class AppLocalizationsUz extends AppLocalizations {
   String get defaultExpert => 'Mutaxassis';
 
   @override
-  String get drawerNews => 'YANGILIKLAR';
+  String get drawerNews => 'ASOSIY';
 
   @override
-  String get drawerDashboard => 'Boshqaruv paneli';
+  String get drawerDashboard => 'Dashboard';
 
   @override
   String get drawerMyProfile => 'Mening profilim';
 
   @override
-  String get drawerInvitations => 'Taklifnomalar';
+  String get drawerInvitations => 'Takliflar';
 
   @override
   String get drawerEmployees => 'Xodimlar';
 
   @override
-  String get drawerVacanciesGroup => 'VAKANSIYALAR';
+  String get drawerNotifications => 'Bildirishnomalar';
+
+  @override
+  String get drawerVacanciesGroup => 'ISHLAR';
+
+  @override
+  String get drawerViewVacancies => 'Ishlarni ko\'rish';
 
   @override
   String get drawerSaved => 'Saqlanganlar';
 
   @override
-  String get drawerAddVacancy => 'Vakansiya qo\'shish';
+  String get drawerAddVacancy => 'Ish e\'lon qilish';
 
   @override
-  String get drawerMyVacancies => 'Mening vakansiyalarim';
+  String get drawerMyVacancies => 'Mening ishlarim';
 
   @override
-  String get drawerMyApplicationsGroup => 'MENING ARIZALARIM';
+  String get drawerServicesGroup => 'XIZMATLAR';
+
+  @override
+  String get drawerViewServices => 'Xizmatlarni ko\'rish';
+
+  @override
+  String get drawerAddService => 'Xizmat e\'lon qilish';
+
+  @override
+  String get drawerMyServices => 'Mening xizmatlarim';
+
+  @override
+  String get drawerPostsGroup => 'POSTLAR';
+
+  @override
+  String get drawerViewPosts => 'Postlarni ko\'rish';
+
+  @override
+  String get drawerCreatePost => 'Post yaratish';
+
+  @override
+  String get drawerMyPosts => 'Mening postlarim';
+
+  @override
+  String get drawerMyApplicationsGroup => 'ARIZALAR';
 
   @override
   String get drawerMyApplications => 'Mening arizalarim';
@@ -718,22 +754,23 @@ class AppLocalizationsUz extends AppLocalizations {
   String get statsViews => 'Ko\'rishlar';
 
   @override
-  String get jobFormTitleNew => 'Yangi vakansiya';
+  String get jobFormTitleNew => 'Ish e\'lon qilish';
 
   @override
   String get jobFormTitleEdit => 'Vakansiyani tahrirlash';
 
   @override
-  String get jobFormSubtitle => 'Barcha ma\'lumotlarni to\'ldiring';
+  String get jobFormSubtitle =>
+      'Ideal nomzodni topish uchun yangi ish e\'lonini yarating';
 
   @override
-  String get jobFormSectionBasic => 'Asosiy ma\'lumotlar';
+  String get jobFormSectionBasic => 'Asosiy ma\'lumot';
 
   @override
-  String get jobFormLabelCompany => 'Kompaniya';
+  String get jobFormLabelCompany => 'Kompaniya (ixtiyoriy)';
 
   @override
-  String get jobFormCompanyPersonal => 'Shaxsiy (kompaniyasiz)';
+  String get jobFormCompanyPersonal => 'Shaxsiy / Kompaniyasiz';
 
   @override
   String get jobFormHintCompany => 'Kompaniyani tanlang';
@@ -742,10 +779,24 @@ class AppLocalizationsUz extends AppLocalizations {
   String get jobFormErrorLoadingCompanies => 'Kompaniyalarni yuklashda xatolik';
 
   @override
-  String get jobFormLabelTitle => 'Lavozim nomi';
+  String get jobFormCompanyNoneHelper =>
+      'Sizda hali kompaniyalar yo\'q. Ish shaxs sifatida e\'lon qilinadi.';
 
   @override
-  String get jobFormHintTitle => 'Masalan: Flutter Developer';
+  String get jobFormLabelLogo => 'Kompaniya logotipi (ixtiyoriy)';
+
+  @override
+  String get jobFormChooseLogo => 'Logotip tanlash';
+
+  @override
+  String get jobFormLogoHint =>
+      'Kvadrat rasm yuklang (JPG, PNG, WEBP). Maks. 5MB.';
+
+  @override
+  String get jobFormLabelTitle => 'Ish nomi';
+
+  @override
+  String get jobFormHintTitle => 'masalan, Senior Software Engineer';
 
   @override
   String get jobFormErrorRequired => 'Majburiy maydon';
@@ -754,43 +805,48 @@ class AppLocalizationsUz extends AppLocalizations {
   String get jobFormLabelType => 'Ish turi';
 
   @override
-  String get jobFormLabelLocation => 'Joylashuv';
+  String get jobFormLabelLocation => 'Manzil';
 
   @override
-  String get jobFormHintLocation => 'Masalan: Toshkent';
+  String get jobFormHintLocation => 'masalan, Toshkent, O\'zbekiston';
 
   @override
   String get jobFormLabelRemote => 'Masofaviy ish';
 
   @override
-  String get jobFormSubtitleRemote => 'Xodim uydan ishlashi mumkin';
+  String get jobFormSectionSalary => 'Maosh (ixtiyoriy)';
 
   @override
-  String get jobFormSectionSalary => 'Maosh va valyuta';
+  String get jobFormLabelMinSalary => 'Minimal';
 
   @override
-  String get jobFormLabelMinSalary => 'Minimum maosh';
+  String get jobFormLabelMaxSalary => 'Maksimal';
 
   @override
-  String get jobFormLabelMaxSalary => 'Maksimum maosh';
+  String get jobFormHintMinSalary => 'masalan, 2.500.000';
+
+  @override
+  String get jobFormHintMaxSalary => 'masalan, 5.000.000';
 
   @override
   String get jobFormLabelCurrency => 'Valyuta';
 
   @override
-  String get jobFormSectionDetails => 'Tafsilotlar';
+  String get jobFormSectionDetails => 'Talablar (ixtiyoriy)';
 
   @override
-  String get jobFormLabelDescription => 'Tavsif';
+  String get jobFormLabelDescription => 'Ta\'rif';
 
   @override
-  String get jobFormHintDescription => 'Vakansiya haqida batafsil...';
+  String get jobFormHintDescription =>
+      'Rol, majburiyatlar va qidirayotganingizni tavsiflang...';
 
   @override
-  String get jobFormLabelRequirements => 'Talablar';
+  String get jobFormLabelRequirements => 'Talab qo\'shish';
 
   @override
-  String get jobFormHintRequirements => 'Har qatorga bitta talab...';
+  String get jobFormHintRequirements =>
+      'masalan, React bilan 3+ yillik tajriba';
 
   @override
   String get jobFormBtnCreate => 'E\'lon yaratish';

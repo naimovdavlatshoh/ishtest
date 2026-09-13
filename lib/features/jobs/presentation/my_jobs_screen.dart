@@ -52,25 +52,6 @@ class _MyJobsScreenState extends ConsumerState<MyJobsScreen> {
                     child: ListView(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                       children: [
-                        Row(
-                          children: [
-                            const Icon(LucideIcons.briefcase, color: AppColors.primary, size: 36),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                l10n.myJobsTitle,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTextStyles.h2.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          l10n.myJobsAddSubtitle,
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(height: 24),
                         SizedBox(
                           width: double.infinity,
                           height: 52,

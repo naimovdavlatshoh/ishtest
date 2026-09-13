@@ -4,7 +4,6 @@ import '../../../l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
 import '../../../core/utils/extensions.dart';
 import '../providers/invitations_provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -51,39 +50,6 @@ class _InvitationsScreenState extends ConsumerState<InvitationsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 42,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF1D4ED8), Color(0xFF3B82F6)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(LucideIcons.messageCircle, color: Colors.white, size: 22),
-                      ),
-                      const SizedBox(width: 14),
-                      Text(
-                        l10n.invitationsTitle,
-                        style: AppTextStyles.h2.copyWith(fontSize: 26, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    l10n.invitationsSubtitle,
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      color: Colors.grey[500],
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
                   // ─── Custom Tab Bar ───────────────────────────────────
                   Container(
                     decoration: BoxDecoration(

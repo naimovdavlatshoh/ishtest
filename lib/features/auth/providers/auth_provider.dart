@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +6,8 @@ import 'package:http/http.dart' as http;
 
 import '../../../shared/models/user_model.dart';
 import '../../../core/config/env.dart';
+import '../../../core/services/device_registration_service.dart';
+import '../../../core/services/push_notification_service.dart';
 import '../../../core/services/token_storage.dart';
 
 class AuthState {
@@ -135,6 +138,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
           isLoading: false,
           errorMessage: null,
         );
+
+        // The FCM token is usually already available by the time the user
+        // logs in (fetched at app start in main.dart), but registration
+        // requires a signed-in user, so it couldn't be sent to the backend
+        // until now.
+        final String? fcmToken = PushNotificationService.instance.currentToken;
+        if (fcmToken != null) {
+          unawaited(DeviceRegistrationService.instance.register(fcmToken));
+        }
       } else {
         String errorMessage = 'Login failed. Please try again.';
         try {
@@ -259,6 +271,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
+    // Must run before clearing the access token: unregistering is an
+    // authenticated call, so the backend needs it to know which device
+    // to stop pushing to.
+    final String? fcmToken = PushNotificationService.instance.currentToken;
+    if (fcmToken != null) {
+      await DeviceRegistrationService.instance.unregister(fcmToken);
+    }
     await _tokenStorage.clear();
     state = AuthState(isInitializing: false);
   }

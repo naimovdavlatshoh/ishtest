@@ -85,11 +85,12 @@ class MyJobsNotifier extends StateNotifier<JobsState> {
     }
   }
 
-  Future<bool> createJob(Map<String, dynamic> data) async {
+  /// Creates a job and returns its id, or null on failure.
+  Future<int?> createJob(Map<String, dynamic> data) async {
     try {
       final Map<String, String> headers = await _getAuthHeaders();
       final Uri uri = Uri.parse('${Environment.apiBaseUrl}/api/${Environment.apiVersion}/jobs');
-      
+
       final http.Response response = await ApiClient.post(
         uri,
         headers: headers,
@@ -97,12 +98,50 @@ class MyJobsNotifier extends StateNotifier<JobsState> {
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
+        final dynamic created = jsonDecode(response.body);
         await loadMyJobs();
-        return true;
+        return created['id'] as int?;
       }
-      return false;
+      return null;
     } catch (e) {
-      return false;
+      return null;
+    }
+  }
+
+  /// Uploads a logo/image for an existing job. Returns the hosted image URL, or null on failure.
+  Future<String?> uploadJobImage(int jobId, String filePath) async {
+    try {
+      const tokenStorage = TokenStorage();
+      final String? token = await tokenStorage.getAccessToken();
+      final Uri uri = Uri.parse(
+        '${Environment.apiBaseUrl}/api/${Environment.apiVersion}/jobs/$jobId/image',
+      );
+
+      final request = http.MultipartRequest('POST', uri);
+      if (token != null) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
+      request.files.add(await http.MultipartFile.fromPath('file', filePath));
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final dynamic updated = jsonDecode(response.body);
+        final String? imageUrl = updated['image'] as String?;
+        state = state.copyWith(
+          jobs: state.jobs.map((j) {
+            if (j.id == jobId) {
+              return j.copyWith(image: imageUrl);
+            }
+            return j;
+          }).toList(),
+        );
+        return imageUrl;
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
   }
 
