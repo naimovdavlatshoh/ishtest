@@ -34,6 +34,8 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Ilova galereyadan rasm yuklash uchun ruxsat so'raydi.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Ilova profil rasmi yoki hujjat suratini olish uchun kamerangizdan foydalanishi mumkin.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Ilova sizga yaqin ish va xizmatlarni ko'rsatish uchun joylashuvingizdan foydalanishi mumkin.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
