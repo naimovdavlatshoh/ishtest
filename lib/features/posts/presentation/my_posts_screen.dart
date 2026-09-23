@@ -76,52 +76,84 @@ class _MyPostsScreenState extends ConsumerState<MyPostsScreen> {
   }
 
   Widget _buildPostCard(CompanyPostModel post) {
+    final bool hasImage = post.image != null && post.image!.isNotEmpty;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.divider.withOpacity(0.5)),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    post.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.h3.copyWith(fontSize: 18, color: AppColors.textPrimary),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => context.push('/posts/${post.id}', extra: post),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (hasImage)
+                AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Image.network(
+                    post.image!.fullImageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: AppColors.surfaceVariant,
+                      child: const Icon(LucideIcons.image, color: AppColors.textTertiary, size: 32),
+                    ),
                   ),
                 ),
-                GestureDetector(
-                  onTap: () => _showDeleteConfirmation(post.id),
-                  child: const Icon(LucideIcons.trash2, color: Colors.red, size: 20),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            post.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.h3.copyWith(fontSize: 18, color: AppColors.textPrimary),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.push('/posts/add', extra: post),
+                          child: const Icon(LucideIcons.pencil, color: AppColors.primary, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: () => _showDeleteConfirmation(post.id),
+                          child: const Icon(LucideIcons.trash2, color: Colors.red, size: 20),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      post.content,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const Icon(LucideIcons.heart, size: 16, color: AppColors.textTertiary),
+                        const SizedBox(width: 4),
+                        Text('${post.likesCount}', style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary)),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              post.content,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Icon(LucideIcons.heart, size: 16, color: AppColors.textTertiary),
-                const SizedBox(width: 4),
-                Text('${post.likesCount}', style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary)),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

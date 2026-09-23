@@ -105,6 +105,24 @@ class MyPostsNotifier extends StateNotifier<PostsState> {
     }
   }
 
+  Future<bool> updatePost(int postId, Map<String, dynamic> data) async {
+    try {
+      final Map<String, String> headers = await _getAuthHeaders();
+      final Uri uri = Uri.parse('${Environment.apiBaseUrl}/api/${Environment.apiVersion}/posts/$postId');
+      final http.Response response = await ApiClient.put(uri, headers: headers, body: jsonEncode(data));
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        await loadMyPosts();
+        return true;
+      }
+      debugPrint('Post update failed: ${response.statusCode} ${response.body}');
+      return false;
+    } catch (e) {
+      debugPrint('Post update error: $e');
+      return false;
+    }
+  }
+
   Future<bool> deletePost(int postId) async {
     try {
       final Map<String, String> headers = await _getAuthHeaders();

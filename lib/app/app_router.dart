@@ -308,11 +308,15 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: 'add',
-                pageBuilder: (context, state) => buildPageWithCustomTransition(
-                  context: context,
-                  state: state,
-                  child: const PostFormScreen(),
-                ),
+                pageBuilder: (context, state) {
+                  final CompanyPostModel? post =
+                      state.extra is CompanyPostModel ? state.extra as CompanyPostModel : null;
+                  return buildPageWithCustomTransition(
+                    context: context,
+                    state: state,
+                    child: PostFormScreen(post: post),
+                  );
+                },
               ),
               GoRoute(
                 path: 'my-posts',

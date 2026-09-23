@@ -9,12 +9,15 @@ import 'package:linkedin_clone/core/theme/app_colors.dart';
 import 'package:linkedin_clone/core/theme/app_text_styles.dart';
 import 'package:linkedin_clone/core/utils/extensions.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:linkedin_clone/shared/models/company_post_model.dart';
 import '../../companies/providers/company_provider.dart';
 import '../providers/my_posts_provider.dart';
 import '../providers/posts_provider.dart';
 
 class PostFormScreen extends ConsumerStatefulWidget {
-  const PostFormScreen({super.key});
+  final CompanyPostModel? post;
+
+  const PostFormScreen({super.key, this.post});
 
   @override
   ConsumerState<PostFormScreen> createState() => _PostFormScreenState();
@@ -22,13 +25,23 @@ class PostFormScreen extends ConsumerStatefulWidget {
 
 class _PostFormScreenState extends ConsumerState<PostFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
+  late final TextEditingController _titleController;
+  late final TextEditingController _contentController;
 
   int? _selectedCompanyId = -1; // -1 == 'Kompaniyasiz'
   Uint8List? _pickedImageBytes;
   String _pickedImageName = 'photo.jpg';
   bool _isLoading = false;
+
+  bool get _isEditing => widget.post != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.post?.title);
+    _contentController = TextEditingController(text: widget.post?.content);
+    _selectedCompanyId = widget.post?.companyId ?? -1;
+  }
 
   @override
   void dispose() {
@@ -69,10 +82,17 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
       'status': 'published',
     };
 
-    final int? newPostId = await ref.read(myPostsProvider.notifier).createPost(data);
+    final CompanyPostModel? existing = widget.post;
+    final int? postId;
+    if (existing != null) {
+      final bool updated = await ref.read(myPostsProvider.notifier).updatePost(existing.id, data);
+      postId = updated ? existing.id : null;
+    } else {
+      postId = await ref.read(myPostsProvider.notifier).createPost(data);
+    }
     if (!mounted) return;
 
-    if (newPostId == null) {
+    if (postId == null) {
       setState(() => _isLoading = false);
       context.showSnackBar('Xatolik yuz berdi', isError: true);
       return;
@@ -81,14 +101,17 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
     final Uint8List? imageBytes = _pickedImageBytes;
     if (imageBytes != null) {
       final String? imageUrl = await ref.read(myPostsProvider.notifier).uploadPostImage(
-            newPostId,
+            postId,
             imageBytes,
             _pickedImageName,
           );
       if (!mounted) return;
       if (imageUrl == null) {
         setState(() => _isLoading = false);
-        context.showSnackBar('Post yaratildi, lekin rasm yuklanmadi', isError: true);
+        context.showSnackBar(
+          _isEditing ? 'Post yangilandi, lekin rasm yuklanmadi' : 'Post yaratildi, lekin rasm yuklanmadi',
+          isError: true,
+        );
         context.go('/posts/my-posts');
         return;
       }
@@ -97,7 +120,7 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
     await ref.read(postsProvider.notifier).loadPosts(isRefresh: true);
     if (!mounted) return;
     setState(() => _isLoading = false);
-    context.showSnackBar('Post muvaffaqiyatli yaratildi');
+    context.showSnackBar(_isEditing ? 'Post yangilandi' : 'Post muvaffaqiyatli yaratildi');
     context.go('/posts/my-posts');
   }
 
@@ -114,10 +137,13 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Post yaratish', style: AppTextStyles.h2.copyWith(fontSize: 24, fontWeight: FontWeight.bold)),
+              Text(
+                _isEditing ? 'Postni tahrirlash' : 'Post yaratish',
+                style: AppTextStyles.h2.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 4),
               Text(
-                "Yangilik yoki yangilanish ulashing",
+                _isEditing ? "Sarlavha va matnni yangilang" : "Yangilik yoki yangilanish ulashing",
                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 20),
@@ -168,7 +194,9 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
                           Expanded(
                             child: _buildDropdownField<int>(
                               label: 'Kompaniya (ixtiyoriy)',
-                              value: _selectedCompanyId,
+                              value: _selectedCompanyId == -1 || companies.any((c) => c.id == _selectedCompanyId)
+                                  ? _selectedCompanyId
+                                  : -1,
                               items: [
                                 const DropdownMenuItem(value: -1, child: Text('Kompaniyasiz')),
                                 ...companies.map((c) => DropdownMenuItem(
@@ -188,17 +216,29 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
 
                     Text('Rasm', style: AppTextStyles.label.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
-                    _pickedImageBytes != null
+                    _pickedImageBytes != null || (widget.post?.image != null && widget.post!.image!.isNotEmpty)
                         ? Row(
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.memory(
-                                  _pickedImageBytes!,
-                                  width: 56,
-                                  height: 56,
-                                  fit: BoxFit.cover,
-                                ),
+                                child: _pickedImageBytes != null
+                                    ? Image.memory(
+                                        _pickedImageBytes!,
+                                        width: 56,
+                                        height: 56,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.network(
+                                        widget.post!.image!.fullImageUrl,
+                                        width: 56,
+                                        height: 56,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => const SizedBox(
+                                          width: 56,
+                                          height: 56,
+                                          child: Icon(LucideIcons.image, color: AppColors.textTertiary),
+                                        ),
+                                      ),
                               ),
                               const SizedBox(width: 12),
                               TextButton.icon(
@@ -244,7 +284,7 @@ class _PostFormScreenState extends ConsumerState<PostFormScreen> {
                                   child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                 )
                               : const Icon(LucideIcons.save, size: 16, color: Colors.white),
-                          label: const Text("E'lon qilish"),
+                          label: Text(_isEditing ? 'Saqlash' : "E'lon qilish"),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,

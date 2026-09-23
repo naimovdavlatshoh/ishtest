@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:linkedin_clone/core/theme/app_colors.dart';
 import 'package:linkedin_clone/core/theme/app_text_styles.dart';
 import 'package:linkedin_clone/core/utils/extensions.dart';
 import 'package:linkedin_clone/shared/models/company_post_model.dart';
+import 'package:linkedin_clone/features/posts/providers/my_posts_provider.dart';
 import 'package:linkedin_clone/features/posts/providers/posts_provider.dart';
+import 'package:linkedin_clone/features/profile/providers/user_me_provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class PostDetailScreen extends ConsumerStatefulWidget {
@@ -82,6 +85,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     final post = _post!;
     final hasImage = post.image != null && post.image!.isNotEmpty;
     final avatarUrl = post.author?.avatar;
+    final int? myUserId = ref.watch(userMeProvider).valueOrNull?.id;
+    final bool isMine = ref.watch(myPostsProvider).posts.any((item) => item.id == post.id) ||
+        (myUserId != null && myUserId == post.authorId);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -92,6 +98,14 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
           icon: const Icon(LucideIcons.chevronLeft, color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          if (isMine)
+            IconButton(
+              tooltip: 'Tahrirlash',
+              icon: const Icon(LucideIcons.pencil, color: AppColors.primary, size: 20),
+              onPressed: () => context.push('/posts/add', extra: post),
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 40),
@@ -177,6 +191,24 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                       ],
                     ),
                   ),
+                  if (isMine) ...[
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () => context.push('/posts/add', extra: post),
+                        icon: const Icon(LucideIcons.pencil, size: 18, color: Colors.white),
+                        label: const Text('Tahrirlash'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
