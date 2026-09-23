@@ -1,0 +1,139 @@
+import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/extensions.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+class PostActions extends StatelessWidget {
+  final int likes;
+  final int comments;
+  final int shares;
+  final bool isLiked;
+  final VoidCallback onLike;
+  final VoidCallback onComment;
+  final VoidCallback onShare;
+
+  const PostActions({
+    super.key,
+    required this.likes,
+    required this.comments,
+    required this.shares,
+    required this.isLiked,
+    required this.onLike,
+    required this.onComment,
+    required this.onShare,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      children: [
+        // Stats Row
+        if (likes > 0 || comments > 0)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                if (likes > 0) ...[
+                  Icon(
+                    LucideIcons.thumbsUp,
+                    size: 16,
+                    color: AppColors.like,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    likes.compactFormat,
+                    style: AppTextStyles.caption,
+                  ),
+                ],
+                const Spacer(),
+                if (comments > 0) ...[
+                  Text(
+                    l10n.feedCommentsCount(comments.compactFormat),
+                    style: AppTextStyles.caption,
+                  ),
+                  const SizedBox(width: 16),
+                ],
+                if (shares > 0)
+                  Text(
+                    l10n.feedSharesCount(shares.compactFormat),
+                    style: AppTextStyles.caption,
+                  ),
+              ],
+            ),
+          ),
+
+        const Divider(height: 1),
+
+        // Action Buttons
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _ActionButton(
+                icon: isLiked ? LucideIcons.thumbsUp : LucideIcons.thumbsUp,
+                label: l10n.feedActionLike,
+                onTap: onLike,
+                color: isLiked ? AppColors.like : AppColors.iconSecondary,
+              ),
+              _ActionButton(
+                icon: LucideIcons.messageSquare,
+                label: l10n.feedActionComment,
+                onTap: onComment,
+              ),
+              _ActionButton(
+                icon: LucideIcons.share2,
+                label: l10n.feedActionShare,
+                onTap: onShare,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? color;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: color ?? AppColors.iconSecondary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: AppTextStyles.label.copyWith(
+                color: color ?? AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
